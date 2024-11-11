@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Under Construction</title>
+    <link rel="stylesheet" href="./home.css" />
+  </head>
+  <body>
+    
+    <div class="loading-screen" id="loading-screen">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+    
+    <div class="construction-container" id="main-content">
+      <h1>We're still working on it!</h1>
+      <p>Our team is hard at work to make this page amazing. Check back soon!</p>
+      <div class="animation">
+        <div class="worker">
+          <img src="./workers.png" alt="worker" />
+        </div>
+        <div class="sign">
+          <span>Under Construction</span>
+        </div>
+        <div class="cone"></div>
+        <div class="cone"></div>
+      </div>
+    </div>
+
+    
+    <script>
+      
+      window.addEventListener("load", () => {
+        const loadingScreen = document.getElementById("loading-screen");
+        const mainContent = document.getElementById("main-content");
+
+        setTimeout(() => {
+          loadingScreen.style.opacity = "0";
+          loadingScreen.style.visibility = "hidden";
+          mainContent.style.opacity = "1";
+          mainContent.style.transform = "translateY(0)";
+        }, 1500); 
+      });
+
+      
+      document.querySelector('.worker').addEventListener('mouseover', () => {
+        document.querySelector('.worker').classList.add('wobble');
+      });
+      document.querySelector('.worker').addEventListener('animationend', () => {
+        document.querySelector('.worker').classList.remove('wobble');
+      });
+    </script>
+  </body>
+</html>

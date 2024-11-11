@@ -1,0 +1,109 @@
+:root {
+  --background: #4b5574;
+  --color: #ffffff;
+  --primary-color: 15, 52, 96; 
+}
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  background: var(--background);
+  position: relative;
+}
+
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: linear-gradient(45deg, var(--background), #1f1f1f);
+}
+
+.floating-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(45deg, rgba(var(--primary-color), 0.1), rgba(var(--primary-color), 0.1));
+  animation: float 20s infinite linear;
+  backdrop-filter: blur(5px);
+}
+
+@keyframes float {
+  0% {
+      transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+      transform: translate(100px, 100px) rotate(90deg);
+  }
+  50% {
+      transform: translate(0, 200px) rotate(180deg);
+  }
+  75% {
+      transform: translate(-100px, 100px) rotate(270deg);
+  }
+  100% {
+      transform: translate(0, 0) rotate(360deg);
+  }
+}
+
+.container {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1s ease-out;
+  z-index: 3;
+  background: rgba(var(--background), 0.8);
+  padding: 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-text {
+  font-size: 4em;
+  color: #fff;
+  margin-bottom: 30px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.subtitle {
+  font-size: 1.5em;
+  color: #b0bec5;
+  margin-bottom: 40px;
+}
+
+.enter-btn {
+  padding: 15px 40px;
+  font-size: 1.2em;
+  background: linear-gradient(45deg, var(--primary-color), #ff8a80);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+}
+
+.enter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+}
+
+.hidden {
+  display: none;
+}
