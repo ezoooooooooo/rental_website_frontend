@@ -1,56 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Under Construction</title>
-    <link rel="stylesheet" href="./home.css" />
-  </head>
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentEase - Home</title>
+    <link rel="stylesheet" href="home.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-navigation">
+        <div class="nav-container">
+            <div class="logo-section">
+                <img src="./rent.png" alt="RentEase Logo" class="logo">
+                <h1>Rently</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#categories">Categories</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+            <div class="user-actions">
+                <button class="btn btn-login" onclick="rentEaseApp.logout()">Logout</button>
+                <button class="btn btn-login" onclick="redirectToLogin()">Login</button>
+                <button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>
+            </div>
+        </div>
+    </nav>
     
-    <div class="loading-screen" id="loading-screen">
-      <div class="spinner"></div>
-      <p>Loading...</p>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section id="home" class="hero-section">
+            <div class="hero-content">
+                <h1>Discover Great Rentals</h1>
+                <p>Find what you need or list your items to earn extra income</p>
+                <div class="search-container">
+                    <input type="text" placeholder="Search for items..." class="search-input">
+                    <button class="search-btn">
+                        <i class="ri-search-line"></i>
+                    </button>
+                </div>
+                <button id="addItemBtn" class="btn btn-primary" onclick="rentEaseApp.handleAddItemClick()">Add Item</button>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section id="categories" class="categories">
+            <div class="category">
+                <a href="pets.html"><img src="pets.jpeg" alt="Pets Supplies"></a>
+                <p>Pets Supplies</p>
+            </div>
+            <div class="category">
+                <a href="clothes.html"><img src="clothes.jpeg" alt="Clothes"></a>
+                <p>Clothes</p>
+            </div>
+            <div class="category">
+                <img src="furn.jpeg" alt="Occasion Furniture">
+                <p>Occasion Furniture</p>
+            </div>
+            <div class="category">
+                <img src="medical.jpeg" alt="Medical Equipment">
+                <p>Medical Equipment</p>
+            </div>
+            <div class="category">
+                <img src="tools.jpeg" alt="Tools">
+                <p>Tools</p>
+            </div>
+            <div class="category">
+                <img src="sports.jpeg" alt="Sports Equipment">
+                <p>Sports Equipment</p>
+            </div>
+        </section>
+        <!-- Add this right after or before the existing user-listings section -->
+<!-- Add this section to replace the existing sections -->
+<section id="listings-container" class="listings-container">
+    <div class="listings-toggle">
+        <button id="allListingsBtn" class="active">All Listings</button>
+        <button id="userListingsBtn">My Listings</button>
+    </div>
+    <div id="listingsDisplayContainer">
+        <div id="listingsContainer" class="listings-grid active">
+            <!-- Dynamic items will be populated here for non-logged in users -->
+        </div>
+        <div id="userListingsContainer" class="listings-grid">
+            <!-- Dynamic items will be populated here -->
+        </div>
+    </div>
+</section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-columns">
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <a href="#">Home</a>
+                    <a href="#">Categories</a>
+                    <a href="#">About Us</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact</a>
+                    <a href="#">FAQ</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Rently. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Item Modal -->
+    <div id="addItemModal" class="modal hidden">
+        <div class="modal-content">
+            <button id="closeModal" class="modal-close" type="button">×</button>
+            <form class="item-listing-form">
+                <h3>Add Your Item</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Item Name</label>
+                        <input type="text" name="name" placeholder="Enter item name">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category">
+                            <option value="Electronics" >Electronics</option>
+                            <option value="Furniture" >Furniture</option>
+                            <option value="Tools" >Tools</option>
+                            <option value="Sports Equipment" >Sports Equipment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Daily Rental Rate</label>
+                        <input type="number" name="rentalRate" placeholder="Enter price per day">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" placeholder="Describe your item"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Item Images</label>
+                        <div class="file-upload">
+                            <input type="file" multiple class="file-upload-input" >
+                            <span>Drag & Drop or Click to Upload</span>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-submit">List Item</button>
+            </form>
+        </div>
     </div>
 
-    
-    <div class="construction-container" id="main-content">
-      <h1>We're still working on it!</h1>
-      <p>Our team is hard at work to make this page amazing. Check back soon!</p>
-      <div class="animation">
-        <div class="worker">
-          <img src="./workers.png" alt="worker" />
-        </div>
-        <div class="sign">
-          <span>Under Construction</span>
-        </div>
-        <div class="cone"></div>
-        <div class="cone"></div>
-      </div>
-    </div>
-
-    
-    <script>
-      
-      window.addEventListener("load", () => {
-        const loadingScreen = document.getElementById("loading-screen");
-        const mainContent = document.getElementById("main-content");
-
-        setTimeout(() => {
-          loadingScreen.style.opacity = "0";
-          loadingScreen.style.visibility = "hidden";
-          mainContent.style.opacity = "1";
-          mainContent.style.transform = "translateY(0)";
-        }, 1500); 
-      });
-
-      
-      document.querySelector('.worker').addEventListener('mouseover', () => {
-        document.querySelector('.worker').classList.add('wobble');
-      });
-      document.querySelector('.worker').addEventListener('animationend', () => {
-        document.querySelector('.worker').classList.remove('wobble');
-      });
-    </script>
-  </body>
+    <script src="home.js"></script>
+</body>
 </html>

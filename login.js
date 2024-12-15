@@ -28,7 +28,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
  const message = document.getElementById('message');
  
  try {
-  const response = await fetch('http://192.168.8.34:3000/api/login', {
+  const response = await fetch('http://localhost:3000/api/login', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -37,7 +37,8 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   });
   
   if (response.ok) {
-      
+      const data = await response.json(); 
+      localStorage.setItem('token', data.token);
       message.textContent = 'Login successful!';
       message.className = 'message success';
       setTimeout(() => {

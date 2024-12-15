@@ -65,7 +65,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
  }
 
  try {
-     const response = await fetch("http://192.168.8.34:3000/api/signup", {
+     const response = await fetch("http://localhost:3000/api/signup", {
          method: "POST",
          headers: {
              "Content-Type": "application/json",
@@ -76,7 +76,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
      const data = await response.json();
 
      if (response.ok) {
-      
+      localStorage.setItem('token', data.token);
       message.textContent = "Account created successfully!";
       message.className = "message success";
       
