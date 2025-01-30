@@ -9,6 +9,7 @@ class RentEaseApp {
         this.setupModalInteractions();
         this.checkAuthStatus();
         this.setupListingsToggle();
+        this.setupSearch();
 
         const token = this.getToken();
         if (token) {
@@ -47,6 +48,61 @@ class RentEaseApp {
                     <button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>
                 `;
             }
+        }
+    }
+    setupSearch() {
+        const searchInput = document.querySelector('.search-input');
+        const searchBtn = document.querySelector('.search-btn');
+
+        if (searchInput && searchBtn) {
+            // Handle search button click
+            searchBtn.addEventListener('click', () => {
+                this.performSearch(searchInput.value);
+            });
+
+            // Handle enter key press
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.performSearch(searchInput.value);
+                }
+            });
+
+            // Optional: Real-time search as user types (with debounce)
+            let debounceTimer;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    this.performSearch(searchInput.value);
+                }, 500); // Wait 500ms after user stops typing
+            });
+        }
+    }
+
+    // Add this new method
+    async performSearch(searchTerm) {
+        const listingsContainer = document.getElementById('listingsContainer');
+        
+        if (!listingsContainer) return;
+
+        try {
+            // Build URL with search parameter
+            const url = new URL(`${this.baseUrl}/listings`);
+            if (searchTerm.trim()) {
+                url.searchParams.append('search', searchTerm.trim());
+            }
+
+            const response = await fetch(url, {
+                method: 'GET',
+            });
+
+            if (response.ok) {
+                const listings = await response.json();
+                this.renderListings(listings, listingsContainer);
+            } else {
+                console.error('Failed to fetch listings');
+            }
+        } catch (error) {
+            console.error('Error performing search:', error);
         }
     }
 
@@ -126,25 +182,8 @@ class RentEaseApp {
         }
     }
     async fetchAllListings() {
-        const listingsContainer = document.getElementById('listingsContainer');
-
-        if (!listingsContainer) return;
-
-        try {
-            const response = await fetch(`${this.baseUrl}/listings`, {
-                method: 'GET',
-            });
-
-            if (response.ok) {
-                const listings = await response.json();
-                console.log('Fetched Listings:', listings)
-                this.renderListings(listings, listingsContainer);
-            } else {
-                console.error('Failed to fetch listings');
-            }
-        } catch (error) {
-            console.error('Error fetching listings:', error);
-        }
+        // Simply call performSearch with empty string to get all listings
+        await this.performSearch('');
     }
 
     async fetchUserListings() {
