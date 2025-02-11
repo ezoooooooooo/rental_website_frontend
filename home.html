@@ -159,6 +159,59 @@
             </form>
         </div>
     </div>
+    <div id="editItemModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Listing</h2>
+                <button id="closeEditModal" class="modal-close">&times;</button>
+            </div>
+            <form id="editItemForm" class="edit-form">
+                <input type="hidden" id="editItemId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editItemName">Name</label>
+                        <input type="text" id="editItemName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editItemCategory">Category</label>
+                        <select id="editItemCategory" name="category" required>
+                            <option value="electronics">Electronics</option>
+                            <option value="furniture">Furniture</option>
+                            <option value="tools">Tools</option>
+                            <option value="sports">Sports Equipment</option>
+                            <!-- Add other categories as needed -->
+                        </select>
+                    </div>
+                </div>
+    
+                <div class="form-group full-width">
+                    <label for="editItemRate">Rental Rate (per day)</label>
+                    <input type="number" id="editItemRate" name="rentalRate" required>
+                </div>
+    
+                <div class="form-group full-width">
+                    <label for="editItemDescription">Description</label>
+                    <textarea id="editItemDescription" name="description" required></textarea>
+                </div>
+    
+                <!-- Hidden input to store removed images -->
+                <input type="hidden" id="removedImages" name="removedImages">
+    
+                <!-- Current Images -->
+                <div id="currentImages" class="current-images"></div>
+    
+                <div class="form-group full-width">
+                    <label for="editItemImages">Add New Images</label>
+                    <input type="file" id="editItemImages" name="images" multiple accept="image/*">
+                </div>
+    
+                <button type="submit" class="btn btn-submit">Update Listing</button>
+            </form>
+        </div>
+    </div>
+    
+    
 
     <script src="home.js"></script>
 </body>
