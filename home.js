@@ -227,12 +227,10 @@ class RentEaseApp {
         container.innerHTML = listings.map(listing => {
             // Ensure images are properly formatted with the full URL
             const images = listing.images && listing.images.length > 0 
-                ? listing.images.map(img => {
-                    // Clean the path and ensure it doesn't have double slashes
-                    const cleanPath = img.replace(/\\/g, '/').replace(/^\//, '');
-                    return `http://localhost:3000/${cleanPath}`;
-                })
+                ? listing.images.map(img => img.url)
                 : ['./pets.jpeg'];
+
+                const showAddToCart = !isUserListings && this.getToken();
 
             return `
             <div class="listing-card" data-id="${listing._id}">
@@ -256,7 +254,19 @@ class RentEaseApp {
                         <div class="listing-actions">
                             <button class="btn btn-edit" onclick="rentEaseApp.openEditModal('${listing._id}')">Edit</button>
                             <button class="btn btn-delete" onclick="rentEaseApp.deleteListing('${listing._id}')">Delete</button>
+                        </div>` : 
+                        showAddToCart ? `
+                        <div class="listing-actions">
+                            <button class="btn btn-cart" onclick="rentEaseApp.addToCart('${listing._id}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
+                                    <circle cx="9" cy="21" r="1"></circle>
+                                    <circle cx="20" cy="21" r="1"></circle>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                </svg>
+                            Add to Cart
+                            </button>
                         </div>` : ''
+                        
                     }
                 </div>
             </div>
@@ -515,15 +525,27 @@ class RentEaseApp {
 
         currentImagesContainer.innerHTML = images.map((image, index) => {
             // Clean the image path and ensure proper URL construction
-            const cleanImagePath = image.replace(/\\/g, '/').replace(/^\//, '');
+            const imageUrl = image.url || image;
             return `
-                <div class="current-image-container" data-image="${cleanImagePath}">
+                <div class="current-image-container" data-image="${imageUrl}">
                     <img 
-                        src="http://localhost:3000/${cleanImagePath}" 
+                        src="${imageUrl}" 
                         alt="Current image ${index + 1}"
-                        onerror="this.onerror=null; this.src='./pets.jpeg';"
-                    >
-                    <button type="button" class="remove-image-btn" data-image="${cleanImagePath}" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+                <div class="loading-container" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loading-spinner">
+                        <line x1="12" y1="2" x2="12" y2="6"></line>
+                        <line x1="12" y1="18" x2="12" y2="22"></line>
+                        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                        <line x1="2" y1="12" x2="6" y2="12"></line>
+                        <line x1="18" y1="12" x2="22" y2="12"></line>
+                        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                    </svg>
+                </div>
+                    <button type="button" class="remove-image-btn" data-image="${imageUrl}" 
                             aria-label="Remove image ${index + 1}">&times;</button>
                 </div>
             `;
@@ -555,8 +577,8 @@ class RentEaseApp {
             removedImages = [];
         }
 
-        // Normalize the image path (replace backslashes with forward slashes)
-        const normalizedImagePath = imagePath.replace(/\\/g, '/');
+        // // Normalize the image path (replace backslashes with forward slashes)
+        // const normalizedImagePath = imagePath.replace(/\\/g, '/');
 
         // Add the image to removed images if not already there
         if (!removedImages.includes(imagePath)) {
@@ -565,11 +587,11 @@ class RentEaseApp {
         }
 
         // Remove the image container from display
-        const imageContainer = document.querySelector(`.current-image-container[data-image="${normalizedImagePath}"]`);
+        const imageContainer = document.querySelector(`.current-image-container[data-image="${imagePath}"]`);
         if (imageContainer) {
             imageContainer.remove();
         } else {
-            console.error('Image container not found for path:', normalizedImagePath);
+            console.error('Image container not found for path:', imagePath);
         }
 
         // Get the current images container
@@ -577,9 +599,9 @@ class RentEaseApp {
         
         // If no images remain, show the "No images" message
         const remainingImages = currentImagesContainer.querySelectorAll('.current-image-container');
-        if (currentImagesContainer && remainingImages.length === 0) {
-            currentImagesContainer.innerHTML = '<p>No images available</p>';
-        }
+    if (currentImagesContainer && remainingImages.length === 0) {
+        currentImagesContainer.innerHTML = '<p>No images available</p>';
+    }
 
         // Log the current state for debugging
         console.log('Currently removed images:', removedImages);
@@ -638,7 +660,15 @@ class RentEaseApp {
             if (removedImagesInput && removedImagesInput.value) {
                 const removedImages = JSON.parse(removedImagesInput.value);
                 if (removedImages.length > 0) {
-                    formData.append('removedImages', JSON.stringify(removedImages));
+                    // Extract just the filenames if needed by your backend
+                    const removedFilenames = removedImages.map(url => {
+                        try {
+                            return new URL(url).pathname.split('/').pop();
+                        } catch {
+                            return url;
+                        }
+                    });
+                    formData.append('removedImages', JSON.stringify(removedFilenames));
                 }
             }
 
