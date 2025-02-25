@@ -785,21 +785,54 @@ label {
     opacity: 1;
   }
 }
+.cart-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cart-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 16px;
+  border-radius: 5px;
+}
+.cart-button:hover {
+  background-color: #218838;
+}
+.cart-icon {
+  width: 20px;
+  height: 20px;
+}
+
+
+
+
+
+
+
+
+
 .btn-cart {
-  background-color: #4CAF50;
+  background-color: #4b36d7;
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 25px;
   cursor: pointer;
   transition: background-color 0.3s;
   display: flex;
   align-items: center;
-  gap: 8px;  /* This creates space between the icon and text */
+  gap: 8px;  
 }
 
 .btn-cart:hover {
-  background-color: #45a049;
+  background-color: #c1dec2;
 }
 
 .cart-icon {

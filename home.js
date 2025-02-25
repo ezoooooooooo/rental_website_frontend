@@ -276,7 +276,45 @@ class RentEaseApp {
         this.setupListingImageCarousel();
     }
 
-
+    async addToCart(listingId) {
+        const token = this.getToken();
+        
+        if (!token) {
+            this.showAuthRedirectModal();
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${this.baseUrl}/cart`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    listingId,
+                    rentalDays: 1  // Default to 1 day, will be adjustable on cart page
+                })
+            });
+        
+            const data = await response.json(); // Parse JSON instead of text
+            
+            if (!response.ok) {
+                throw new Error(data.message || 'Error adding item to cart');
+            }
+            
+            // Check if the item was already in the cart
+            if (data.alreadyInCart) {
+                this.showMessage(data.message || 'This item is already in your cart');
+            } else {
+                this.showMessage(data.message || 'Item added to cart');
+            }
+        
+        } catch (error) {
+            console.error('🚨 Error adding to cart:', error);
+            this.showErrorMessage(error.message || 'Error adding item to cart');
+        }
+    }       
     handleAddItemClick() {
         const token = this.getToken();
 

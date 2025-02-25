@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Rently</title>
+    <link rel="stylesheet" href="cart.css">
+</head>
+<body>
+  
+    <div class="cart-container">
+        <header>
+            <h1>My Cart</h1>
+        </header>
+        <div class="cart-list">
+            <div class="cart-item">
+                <img src="item1.jpg" alt="Item 1">
+                <div class="item-details">
+                    <h2>keyboard</h2>
+                    <p>$10 per day</p>
+                </div>
+                <div class="quantity-controls">
+                    <button class="decrease">-</button>
+                    <span class="quantity">1</span>
+                    <button class="increase">+</button>
+                </div>
+            </div>
+            <div class="cart-item">
+                <img src="item2.jpg" alt="Item 2">
+                <div class="item-details">
+                    <h2>pet House</h2>
+                    <p>$15 per day</p>
+                </div>
+                <div class="quantity-controls">
+                    <button class="decrease">-</button>
+                    <span class="quantity">2</span>
+                    <button class="increase">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="cart-summary">
+            <p>Subtotal: <span id="subtotal">$40</span></p>
+            <p>Total: <span id="total">$40</span></p>
+            <button class="checkout-btn">Checkout</button>
+        </div>
+    </div>
+    <script src="cart.js"></script>
+</body>
+</html>
