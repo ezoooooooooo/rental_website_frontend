@@ -621,8 +621,15 @@ label {
 
 .listings-container {
   max-width: 1200px;
-  margin: 50px auto;
-  padding: 20px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.listings-container h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #333;
 }
 
 .listings-toggle {
@@ -809,15 +816,6 @@ label {
   width: 20px;
   height: 20px;
 }
-
-
-
-
-
-
-
-
-
 .btn-cart {
   background-color: #4b36d7;
   color: white;
@@ -843,4 +841,46 @@ label {
   margin-top: 10px;
   display: flex;
   gap: 10px;
+}
+/* Update the category-nav styling */
+.category-nav {
+  background: linear-gradient(135deg, rgba(153, 130, 177, 0.1), rgba(129, 144, 171, 0.1));
+  border-bottom: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-top: 80px; /* Add margin to push it below the main navigation */
+  width: 100%;
+}
+
+.category-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* For Firefox */
+}
+
+.category-link {
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  flex: 1; 
+  text-align: center;
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: 500;
+  border-radius: 25px; 
+  transition: all 0.2s ease;
+}
+
+.category-link:hover {
+  background-color: rgba(153, 130, 177, 0.2);
+  color: var(--primary-color);
+}
+
+.category-link.active {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
 }

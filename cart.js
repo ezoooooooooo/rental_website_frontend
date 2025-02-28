@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", async function () {
     const cartList = document.querySelector(".cart-list");
     const subtotalElement = document.getElementById("subtotal");
@@ -70,7 +69,11 @@ document.body.appendChild(popupHTML);
         // Handle confirm button
         confirmClearBtn.addEventListener("click", function() {
             customPopup.classList.remove("active");
-            clearCartDirectly();
+            // clearCartDirectly(); // COMMENTED OUT: Backend functionality
+            console.log("Clear cart confirmed - backend call disabled");
+            // Temporarily show empty cart instead of calling backend
+            renderCart([]);
+            updateTotal(0);
         });
         
         // Also close popup when clicking outside
@@ -82,6 +85,7 @@ document.body.appendChild(popupHTML);
     }
 
     // NEW FUNCTION 2: Clear cart directly
+    /* COMMENTED OUT: Backend functionality
     async function clearCartDirectly() {
         try {
             console.log("Attempting to clear cart with token:", token);
@@ -111,11 +115,13 @@ document.body.appendChild(popupHTML);
             alert("Error clearing cart. Please try again.");
         }
     }
+    */
     
     // Call setup function right after adding the button
     setupClearCartButton();
     
     // Function to fetch cart data
+    /* COMMENTED OUT: Backend functionality
     async function fetchCart() {
         try {
             const response = await fetch("http://localhost:3000/api/cart", {
@@ -140,6 +146,41 @@ document.body.appendChild(popupHTML);
             cartList.innerHTML = "<div class='error-message'>Error loading cart. Please try again later.</div>";
         }
     }
+    */
+
+    // MOCK FUNCTION: Replaces fetchCart with mock data for frontend development
+    // function fetchCart() {
+    //     console.log("Using mock cart data for frontend development");
+        
+    //     // Sample mock data
+    //     const mockItems = [
+    //         {
+    //             _id: "item1",
+    //             listing: {
+    //                 name: "Example Item 1",
+    //                 rentalRate: 25.99,
+    //                 images: ["placeholder.jpg"]
+    //             },
+    //             rentalDays: 3
+    //         },
+    //         {
+    //             _id: "item2",
+    //             listing: {
+    //                 name: "Example Item 2",
+    //                 rentalRate: 15.50,
+    //                 images: ["placeholder.jpg"]
+    //             },
+    //             rentalDays: 2
+    //         }
+    //     ];
+        
+    //     renderCart(mockItems);
+        
+    //     // Calculate mock total
+    //     const mockTotal = mockItems.reduce((sum, item) => 
+    //         sum + (item.listing.rentalRate * item.rentalDays), 0);
+    //     updateTotal(mockTotal.toFixed(2));
+    // }
 
     // Function to render cart items in the HTML
     function renderCart(items) {
@@ -196,21 +237,54 @@ document.body.appendChild(popupHTML);
                 const currentVal = parseInt(quantityElement.textContent);
                 if (currentVal > 1) {
                   const newValue = currentVal - 1;
-                  updateCartItemDays(item._id, newValue);
+                  // updateCartItemDays(item._id, newValue); // COMMENTED OUT: Backend functionality
+                  console.log(`Would update item ${item._id} days to ${newValue} - backend call disabled`);
+                  // Update UI only for frontend development
+                  quantityElement.textContent = newValue;
+                  const totalPrice = (item.listing.rentalRate * newValue).toFixed(2);
+                  cartItem.querySelector(".item-details p:last-child").textContent = `Total: $${totalPrice}`;
+                  updateMockTotal();
                 }
               });
             
               increaseButton.addEventListener("click", () => {
                 const currentVal = parseInt(quantityElement.textContent);
                 const newValue = currentVal + 1;
-                updateCartItemDays(item._id, newValue);
+                // updateCartItemDays(item._id, newValue); // COMMENTED OUT: Backend functionality
+                console.log(`Would update item ${item._id} days to ${newValue} - backend call disabled`);
+                // Update UI only for frontend development
+                quantityElement.textContent = newValue;
+                const totalPrice = (item.listing.rentalRate * newValue).toFixed(2);
+                cartItem.querySelector(".item-details p:last-child").textContent = `Total: $${totalPrice}`;
+                updateMockTotal();
               });
             
             // Add event listener for remove button
             removeButton.addEventListener("click", function() {
-                removeFromCart(item._id);
+                // removeFromCart(item._id); // COMMENTED OUT: Backend functionality
+                console.log(`Would remove item ${item._id} - backend call disabled`);
+                // Just remove from UI for frontend development
+                cartItem.remove();
+                // Check if cart is empty after removal
+                if (cartList.children.length === 0) {
+                    cartList.innerHTML = "<div class='empty-cart'>Your cart is empty</div>";
+                    updateTotal(0);
+                } else {
+                    updateMockTotal();
+                }
             });
         });
+    }
+
+    // Helper function to recalculate mock total after UI changes
+    function updateMockTotal() {
+        let total = 0;
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const rate = parseFloat(item.querySelector('.item-details p').textContent.replace('$', '').split(' ')[0]);
+            const days = parseInt(item.querySelector('.quantity').textContent);
+            total += rate * days;
+        });
+        updateTotal(total.toFixed(2));
     }
 
     // Function to update total price
@@ -220,6 +294,7 @@ document.body.appendChild(popupHTML);
     }
     
     // Function to remove item from cart
+    /* COMMENTED OUT: Backend functionality
     async function removeFromCart(itemId) {
         try {
             console.log("Removing item with ID:", itemId);
@@ -251,7 +326,9 @@ document.body.appendChild(popupHTML);
             alert("Error removing item from cart. Please try again.");
         }
     }
+    */
     
+    /* COMMENTED OUT: Backend functionality
     async function updateCartItemDays(itemId, rentalDays) {
         try {
           const token = localStorage.getItem("token");
@@ -284,6 +361,7 @@ document.body.appendChild(popupHTML);
           alert("Error updating item in cart. Please try again.");
         }
       }
+    */
 
     // Initialize the cart
     fetchCart();

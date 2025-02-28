@@ -17,9 +17,9 @@
             </div>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
-                <li><a href="#categories">Categories</a></li>
-                <li><a href="#about">About</a></li>
                 <li><a href="cart.html">Cart  </a><img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart" class="cart-icon"></li>
+                <li><a href="#about">About</a></li>
+                
             </ul>
             <div class="user-actions">
                 <button class="btn btn-login" onclick="rentEaseApp.logout()">Logout</button>
@@ -28,6 +28,18 @@
             </div>
         </div>
     </nav>
+    <div class="category-nav">
+        <div class="category-container">
+            <a href="#" class="category-link active">All</a>
+            <a href="#" class="category-link">Electronics</a>
+            <a href="#" class="category-link">Furniture</a>
+            <a href="#" class="category-link">Pets Supplies</a>
+            <a href="#" class="category-link">Clothes</a>
+            <a href="#" class="category-link">Medical Equipment</a>
+            <a href="#" class="category-link">Tools</a>
+            <a href="#" class="category-link">Sports Equipment</a>
+        </div>
+    </div>
     
 
     <!-- Main Content -->
@@ -43,51 +55,15 @@
                         <i class="ri-search-line"></i>
                     </button>
                 </div>
-                <button id="addItemBtn" class="btn btn-primary" onclick="rentEaseApp.handleAddItemClick()">Add Item</button>
+                <!-- <button id="addItemBtn" class="btn btn-primary" onclick="rentEaseApp.handleAddItemClick()">Add Item</button> -->
             </div>
         </section>
 
-        <!-- Categories Section -->
-        <section id="categories" class="categories">
-            <div class="category">
-                <a href="pets.html"><img src="pets.jpeg" alt="Pets Supplies"></a>
-                <p>Pets Supplies</p>
-            </div>
-            <div class="category">
-                <a href="clothes.html"><img src="clothes.jpeg" alt="Clothes"></a>
-                <p>Clothes</p>
-            </div>
-            <div class="category">
-                <img src="furn.jpeg" alt="Occasion Furniture">
-                <p>Occasion Furniture</p>
-            </div>
-            <div class="category">
-                <img src="medical.jpeg" alt="Medical Equipment">
-                <p>Medical Equipment</p>
-            </div>
-            <div class="category">
-                <img src="tools.jpeg" alt="Tools">
-                <p>Tools</p>
-            </div>
-            <div class="category">
-                <img src="sports.jpeg" alt="Sports Equipment">
-                <p>Sports Equipment</p>
-            </div>
-        </section>
-        <!-- Add this right after or before the existing user-listings section -->
-<!-- Add this section to replace the existing sections -->
+
+        
 <section id="listings-container" class="listings-container">
-    <div class="listings-toggle">
-        <button id="allListingsBtn" class="active">All Listings</button>
-        <button id="userListingsBtn">My Listings</button>
-    </div>
-    <div id="listingsDisplayContainer">
-        <div id="listingsContainer" class="listings-grid active">
-            <!-- Dynamic items will be populated here for non-logged in users -->
-        </div>
-        <div id="userListingsContainer" class="listings-grid">
-            <!-- Dynamic items will be populated here -->
-        </div>
+    <div id="listingsContainer" class="listings-grid active">
+        
     </div>
 </section>
     </main>

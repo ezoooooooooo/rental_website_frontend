@@ -8,16 +8,16 @@ class RentEaseApp {
     initializeApp() {
         this.setupModalInteractions();
         this.checkAuthStatus();
-        this.setupListingsToggle();
+        // this.setupListingsToggle();
         this.setupSearch();
 
         const token = this.getToken();
-        if (token) {
-            this.fetchUserListings();
+        // if (token) {
+        //     this.fetchUserListings();
+        //     this.fetchAllListings();
+        // } else {
             this.fetchAllListings();
-        } else {
-            this.fetchAllListings();
-        }
+        
     }
     handleFileUpload(event) {
         const files = event.target.files;
