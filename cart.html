@@ -5,45 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Cart - Rently</title>
     <link rel="stylesheet" href="cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
-  
-    <div class="cart-container">
-        <header>
-            <h1>My Cart</h1>
-        </header>
-        <div class="cart-list">
-            <div class="cart-item">
-                <img src="item1.jpg" alt="Item 1">
-                <div class="item-details">
-                    <h2>keyboard</h2>
-                    <p>$10 per day</p>
-                </div>
-                <div class="quantity-controls">
-                    <button class="decrease">-</button>
-                    <span class="quantity">1</span>
-                    <button class="increase">+</button>
-                </div>
+    <!-- Navigation -->
+    <nav class="main-navigation">
+        <div class="nav-container">
+            <div class="logo-section">
+                <img src="./rent.png" alt="RentEase Logo" class="logo">
+                <h1>Rently</h1>
             </div>
-            <div class="cart-item">
-                <img src="item2.jpg" alt="Item 2">
-                <div class="item-details">
-                    <h2>pet House</h2>
-                    <p>$15 per day</p>
+            <ul class="nav-links">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="cart.html">Cart <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart" class="cart-icon"></a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+            <div class="user-actions">
+                <div class="user-profile-dropdown">
+                    <button class="profile-button">
+                        <img src="./user-avatar.png" alt="Profile" class="avatar-img">
+                        <span class="username">Profile</span>
+                        <i class="ri-arrow-down-s-line"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="my-items.html"><i class="ri-shopping-bag-line"></i> My Items</a>
+                        <a href="my-orders.html"><i class="ri-shopping-cart-line"></i> My Orders</a>
+                        <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-line"></i> Logout</a>
+                    </div>
                 </div>
-                <div class="quantity-controls">
-                    <button class="decrease">-</button>
-                    <span class="quantity">2</span>
-                    <button class="increase">+</button>
-                </div>
+                <button class="btn btn-login" onclick="redirectToLogin()">Login</button>
+                <button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>
             </div>
         </div>
-        <div class="cart-summary">
-            <p>Subtotal: <span id="subtotal">$40</span></p>
-            <p>Total: <span id="total">$40</span></p>
-            <button class="checkout-btn">Checkout</button>
+    </nav>
+    
+    <div class="page-wrapper">
+        <div class="cart-container">
+            <header>
+                <h1><i class="fas fa-shopping-cart"></i> My Cart</h1>
+                <p class="tagline">Ready to rent amazing products</p>
+            </header>
+            <div class="cart-content">
+                <div class="cart-summary">
+                    <h2>Order Summary</h2>
+                    <div class="summary-details">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">$40</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span>Free</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span id="total">$40</span>
+                        </div>
+                    </div>
+                    <button class="checkout-btn">Proceed to Checkout</button>
+                    <p class="secure-checkout"><i class="fas fa-lock"></i> Secure checkout</p>
+                </div>
+                <div class="cart-list">
+                    <!-- Cart items will be loaded here -->
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-columns">
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <a href="index.html">Home</a>
+                    <a href="index.html#categories">Categories</a>
+                    <a href="index.html#about">About Us</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact</a>
+                    <a href="#">FAQ</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link">Twitter</a>
+                        <a href="#" class="social-link">Instagram</a>
+                        <a href="#" class="social-link">LinkedIn</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Rently. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="cart.js"></script>
 </body>
 </html>

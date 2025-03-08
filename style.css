@@ -1,18 +1,22 @@
 :root {
-  --background: #4b5574;
-  --color: #ffffff;
-  --primary-color: 15, 52, 96; 
+  --background: #f4f4f6;
+  --color: #2c3e50;
+  --primary-color: 153, 130, 177; /* light purple in RGB format */
+  --accent-color: 108, 92, 231; /* vibrant purple in RGB format */
 }
+
 body {
   margin: 0;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
   background: var(--background);
   position: relative;
+  line-height: 1.6;
+  color: var(--color);
 }
 
 .background {
@@ -22,7 +26,7 @@ body {
   width: 100%;
   height: 100%;
   z-index: 1;
-  background: linear-gradient(45deg, var(--background), #1f1f1f);
+  background: linear-gradient(45deg, var(--background), #8190ab);
 }
 
 .floating-shapes {
@@ -37,8 +41,8 @@ body {
 
 .shape {
   position: absolute;
-  border-radius: 50%;
-  background: linear-gradient(45deg, rgba(var(--primary-color), 0.1), rgba(var(--primary-color), 0.1));
+  border-radius: 8px;
+  background: linear-gradient(45deg, rgba(var(--primary-color), 0.1), rgba(var(--accent-color), 0.1));
   animation: float 20s infinite linear;
   backdrop-filter: blur(5px);
 }
@@ -65,45 +69,84 @@ body {
   text-align: center;
   opacity: 0;
   transform: translateY(30px);
-  transition: all 1s ease-out;
+  transition: all 0.3s ease;
   z-index: 3;
-  background: rgba(var(--background), 0.8);
+  background: rgba(255, 255, 255, 0.8);
   padding: 40px;
-  border-radius: 20px;
+  border-radius: 8px;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
 }
 
 .welcome-text {
-  font-size: 4em;
-  color: #fff;
+  font-size: 36px;
+  color: #2c3e50;
   margin-bottom: 30px;
-  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  background: linear-gradient(45deg, #9982b1, #6c5ce7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
 }
 
 .subtitle {
-  font-size: 1.5em;
-  color: #b0bec5;
+  font-size: 18px;
+  color: #7f8c8d;
   margin-bottom: 40px;
 }
 
 .enter-btn {
   padding: 15px 40px;
-  font-size: 1.2em;
-  background: linear-gradient(45deg, var(--primary-color), #ff8a80);
+  font-size: 16px;
+  background: linear-gradient(45deg, #9982b1, #6c5ce7);
   border: none;
-  border-radius: 25px;
+  border-radius: 8px;
   color: white;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
 }
 
 .enter-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
 }
 
 .hidden {
   display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .welcome-text {
+    font-size: 28px;
+  }
+  
+  .subtitle {
+    font-size: 16px;
+  }
+  
+  .container {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-text {
+    font-size: 24px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+  
+  .enter-btn {
+    padding: 12px 30px;
+    font-size: 14px;
+  }
 }

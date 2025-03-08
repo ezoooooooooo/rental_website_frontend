@@ -1,50 +1,200 @@
 document.addEventListener("DOMContentLoaded", async function () {
+    // DOM element references
     const cartList = document.querySelector(".cart-list");
     const subtotalElement = document.getElementById("subtotal");
     const totalElement = document.getElementById("total");
+    const userActions = document.querySelector('.user-actions');
+    const baseUrl = "http://localhost:3000/api"; // Update with your actual base URL
+    
+    // Authentication check
     const token = localStorage.getItem("token");
-    // createPopupHTML();
-    
-    // Add a clear cart button to the page
-    const cartActionsDiv = document.createElement("div");
-    cartActionsDiv.className = "cart-actions";
-    cartActionsDiv.innerHTML = `
-        <button id="clearCartBtn" class="clear-cart" aria-label="Clear cart">
-        <div class="trash-lid"></div>
-        <div class="trash-body"></div>
-    </button>
-    `;
-    // Create popup HTML and add it to the document
-const popupHTML = document.createElement("div");
-popupHTML.id = "customPopup";
-popupHTML.className = "custom-popup-overlay";
-popupHTML.innerHTML = `
-  <div class="custom-popup">
-    <h3>Clear Shopping Cart</h3>
-    <p>Are you sure you want to remove all items from your cart?</p>
-    <div class="popup-buttons">
-      <button id="cancelClearBtn" class="cancel-btn">Cancel</button>
-      <button id="confirmClearBtn" class="confirm-btn">Clear Cart</button>
-    </div>
-  </div>
-`;
-document.body.appendChild(popupHTML);
-    
-    // Insert the clear cart button before or after an appropriate element
-    const cartSummary = document.querySelector(".cart-summary") || document.querySelector(".cart-container");
-    if (cartSummary) {
-        cartSummary.prepend(cartActionsDiv);
-    }
-    
-    // Add event listener to clear cart button
-    // document.getElementById("clearCartBtn")?.addEventListener("click", clearCart);
-
-    // Check authentication first
     if (!token) {
-        // Handle unauthenticated user (redirect to login or show message)
-        cartList.innerHTML = "<div class='auth-required'>Please log in to view your cart</div>";
+        // Handle unauthenticated user
+        cartList.innerHTML = "<div class='auth-required'><i class='fas fa-lock' style='font-size: 32px; margin-bottom: 15px; color: #cbd5e0;'></i><p>Please log in to view your cart</p></div>";
         return;
     }
+    
+    // -------------------------- PROFILE --------------------------
+    
+    /**
+     * Checks authentication status and updates UI accordingly
+     */
+    function checkAuthStatus() {
+        const addItemBtn = document.getElementById("addItemBtn");
+        if (addItemBtn) {
+            addItemBtn.style.display = "block"; // "Add Item" button is always visible
+        } 
+        
+        if (token) {
+            // User is logged in - fetch profile data
+            fetch(`${baseUrl}/profile`, {  // This URL should match your backend route
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Profile response error:', response.status);
+                    throw new Error(`Failed to fetch profile: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(userData => {
+                console.log('Profile data received:', userData);
+                
+                // Store user data for use elsewhere in the app
+                window.userData = userData;
+                
+                // Create profile UI with actual user data
+                if (userActions) {
+                    userActions.innerHTML = `
+                        <div class="user-profile-dropdown">
+                            <button class="pill-profile-button">
+                                <i class="ri-user-line profile-icon"></i>
+                                <span class="username">${userData.firstName || 'Profile'}</span>
+                                <i class="ri-arrow-down-s-line"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="./item.html"><i class="ri-shopping-bag-line"></i> My Items</a>
+                                <a href="my-orders.html"><i class="ri-shopping-cart-line"></i> My Orders</a>
+                                <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" onclick="logout()"><i class="ri-logout-box-line"></i> Logout</a>
+                            </div>
+                        </div>
+                    `;
+                    
+                    setupDropdownListeners();
+                }
+            })
+            .catch(error => {
+                console.error('Profile fetch error:', error);
+                
+                if (userActions) {
+                    userActions.innerHTML = `
+                        <div class="user-profile-dropdown">
+                            <button class="profile-button">
+                                <div class="avatar-initial">U</div>
+                                <span class="username">Profile</span>
+                                <i class="ri-arrow-down-s-line"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="./item.html"><i class="ri-shopping-bag-line"></i> My Items</a>
+                                <a href="my-orders.html"><i class="ri-shopping-cart-line"></i> My Orders</a>
+                                <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" onclick="logout()"><i class="ri-logout-box-line"></i> Logout</a>
+                            </div>
+                        </div>
+                    `;
+                    
+                    setupDropdownListeners();
+                }
+            });
+        } else {
+            // User not logged in - show login/signup buttons
+            if (userActions) {
+                userActions.innerHTML = `
+                    <button class="btn btn-login" onclick="redirectToLogin()">Login</button>
+                    <button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>
+                `;
+            }
+        }
+    }
+
+    /**
+     * Sets up event listeners for the user profile dropdown
+     */
+    function setupDropdownListeners() {
+        const profileButton = document.querySelector('.pill-profile-button') || document.querySelector('.profile-button');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        
+        if (profileButton && dropdownMenu) {
+            // Define the toggle function
+            const toggleDropdown = (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            };
+            
+            // Remove any existing listeners first to avoid duplicates
+            profileButton.removeEventListener('click', toggleDropdown);
+            
+            // Add the listener
+            profileButton.addEventListener('click', toggleDropdown);
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                dropdownMenu.classList.remove('show');
+            });
+        }
+    }
+
+    /**
+     * Handles user logout
+     */
+    window.logout = function() {
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+    };
+
+    /**
+     * Redirects to login page
+     */
+    window.redirectToLogin = function() {
+        window.location.href = "login.html";
+    };
+
+    /**
+     * Redirects to signup page
+     */
+    window.redirectToSignup = function() {
+        window.location.href = "signup.html";
+    };
+
+    // ======== UI INITIALIZATION FUNCTIONS ========
+    
+    /**
+     * Creates and adds the Clear Cart button and popup to the page
+     */
+    function initializeCartUI() {
+        // Create clear cart button
+        const cartActionsDiv = document.createElement("div");
+        cartActionsDiv.className = "cart-actions";
+        cartActionsDiv.innerHTML = `
+            <button id="clearCartBtn" class="clear-cart" aria-label="Clear cart">
+                <i class="fas fa-trash-alt"></i> Clear Cart
+            </button>
+        `;
+        
+        // Create confirmation popup
+        const popupHTML = document.createElement("div");
+        popupHTML.id = "customPopup";
+        popupHTML.className = "custom-popup-overlay";
+        popupHTML.innerHTML = `
+          <div class="custom-popup">
+            <h3>Clear Shopping Cart</h3>
+            <p>Are you sure you want to remove all items from your cart?</p>
+            <div class="popup-buttons">
+              <button id="cancelClearBtn" class="cancel-btn">Cancel</button>
+              <button id="confirmClearBtn" class="confirm-btn">Clear Cart</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(popupHTML);
+        
+        // Insert the clear cart button in the cart summary
+        const cartSummary = document.querySelector(".cart-summary");
+        if (cartSummary) {
+            cartSummary.prepend(cartActionsDiv);
+        }
+        
+        // Set up event listeners for the clear cart functionality
+        setupClearCartButton();
+    }
+    
+    /**
+     * Sets up event listeners for the clear cart button and popup
+     */
     function setupClearCartButton() {
         const clearCartBtn = document.getElementById("clearCartBtn");
         const customPopup = document.getElementById("customPopup");
@@ -69,11 +219,7 @@ document.body.appendChild(popupHTML);
         // Handle confirm button
         confirmClearBtn.addEventListener("click", function() {
             customPopup.classList.remove("active");
-            // clearCartDirectly(); // COMMENTED OUT: Backend functionality
-            console.log("Clear cart confirmed - backend call disabled");
-            // Temporarily show empty cart instead of calling backend
-            renderCart([]);
-            updateTotal(0);
+            clearCartDirectly();
         });
         
         // Also close popup when clicking outside
@@ -83,111 +229,18 @@ document.body.appendChild(popupHTML);
             }
         });
     }
-
-    // NEW FUNCTION 2: Clear cart directly
-    /* COMMENTED OUT: Backend functionality
-    async function clearCartDirectly() {
-        try {
-            console.log("Attempting to clear cart with token:", token);
-            
-            const response = await fetch("http://localhost:3000/api/cart", {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-            
-            console.log("Clear cart response status:", response.status);
-            
-            const data = await response.json();
-            console.log("Clear cart response:", data);
-            
-            if (data.success) {
-                console.log("Cart cleared successfully");
-                fetchCart(); // Refresh the cart display
-            } else {
-                console.error("Failed to clear cart:", data.message);
-                alert(`Failed to clear cart: ${data.message}`);
-            }
-        } catch (error) {
-            console.error("Error clearing cart:", error);
-            alert("Error clearing cart. Please try again.");
-        }
-    }
-    */
     
-    // Call setup function right after adding the button
-    setupClearCartButton();
+    // ======== CART RENDERING FUNCTIONS ========
     
-    // Function to fetch cart data
-    /* COMMENTED OUT: Backend functionality
-    async function fetchCart() {
-        try {
-            const response = await fetch("http://localhost:3000/api/cart", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-
-            const data = await response.json();
-            if (!data.success) {
-                console.error("Failed to fetch cart:", data.message);
-                cartList.innerHTML = `<div class='error-message'>${data.message}</div>`;
-                return;
-            }
-
-            renderCart(data.cart.items);
-            updateTotal(data.totalPrice);
-        } catch (error) {
-            console.error("Error fetching cart:", error);
-            cartList.innerHTML = "<div class='error-message'>Error loading cart. Please try again later.</div>";
-        }
-    }
-    */
-
-    // MOCK FUNCTION: Replaces fetchCart with mock data for frontend development
-    // function fetchCart() {
-    //     console.log("Using mock cart data for frontend development");
-        
-    //     // Sample mock data
-    //     const mockItems = [
-    //         {
-    //             _id: "item1",
-    //             listing: {
-    //                 name: "Example Item 1",
-    //                 rentalRate: 25.99,
-    //                 images: ["placeholder.jpg"]
-    //             },
-    //             rentalDays: 3
-    //         },
-    //         {
-    //             _id: "item2",
-    //             listing: {
-    //                 name: "Example Item 2",
-    //                 rentalRate: 15.50,
-    //                 images: ["placeholder.jpg"]
-    //             },
-    //             rentalDays: 2
-    //         }
-    //     ];
-        
-    //     renderCart(mockItems);
-        
-    //     // Calculate mock total
-    //     const mockTotal = mockItems.reduce((sum, item) => 
-    //         sum + (item.listing.rentalRate * item.rentalDays), 0);
-    //     updateTotal(mockTotal.toFixed(2));
-    // }
-
-    // Function to render cart items in the HTML
+    /**
+     * Renders the cart items in the DOM
+     * @param {Array} items - Array of cart items to render
+     */
     function renderCart(items) {
         cartList.innerHTML = ""; // Clear previous items
         
         if (!items || items.length === 0) {
-            cartList.innerHTML = "<div class='empty-cart'>Your cart is empty</div>";
+            cartList.innerHTML = "<div class='empty-cart'><i class='fas fa-shopping-cart' style='font-size: 40px; margin-bottom: 15px; color: #cbd5e0;'></i><p>Your cart is empty</p></div>";
             return;
         }
         
@@ -201,7 +254,7 @@ document.body.appendChild(popupHTML);
             const cartItem = document.createElement("div");
             cartItem.classList.add("cart-item");
             
-            // Handle image path correctly based on your data structure
+            // Handle image path correctly based on data structure
             let imageUrl = "";
             if (item.listing.images && item.listing.images.length > 0) {
                 // Check if images is an array of objects or strings
@@ -227,80 +280,91 @@ document.body.appendChild(popupHTML);
 
             cartList.appendChild(cartItem);
 
-            // Add event listeners for quantity update
-            const decreaseButton = cartItem.querySelector(".decrease");
-            const increaseButton = cartItem.querySelector(".increase");
-            const quantityElement = cartItem.querySelector(".quantity");
-            const removeButton = cartItem.querySelector(".remove-item");
-
-            decreaseButton.addEventListener("click", () => {
-                const currentVal = parseInt(quantityElement.textContent);
-                if (currentVal > 1) {
-                  const newValue = currentVal - 1;
-                  // updateCartItemDays(item._id, newValue); // COMMENTED OUT: Backend functionality
-                  console.log(`Would update item ${item._id} days to ${newValue} - backend call disabled`);
-                  // Update UI only for frontend development
-                  quantityElement.textContent = newValue;
-                  const totalPrice = (item.listing.rentalRate * newValue).toFixed(2);
-                  cartItem.querySelector(".item-details p:last-child").textContent = `Total: $${totalPrice}`;
-                  updateMockTotal();
-                }
-              });
-            
-              increaseButton.addEventListener("click", () => {
-                const currentVal = parseInt(quantityElement.textContent);
-                const newValue = currentVal + 1;
-                // updateCartItemDays(item._id, newValue); // COMMENTED OUT: Backend functionality
-                console.log(`Would update item ${item._id} days to ${newValue} - backend call disabled`);
-                // Update UI only for frontend development
-                quantityElement.textContent = newValue;
-                const totalPrice = (item.listing.rentalRate * newValue).toFixed(2);
-                cartItem.querySelector(".item-details p:last-child").textContent = `Total: $${totalPrice}`;
-                updateMockTotal();
-              });
-            
-            // Add event listener for remove button
-            removeButton.addEventListener("click", function() {
-                // removeFromCart(item._id); // COMMENTED OUT: Backend functionality
-                console.log(`Would remove item ${item._id} - backend call disabled`);
-                // Just remove from UI for frontend development
-                cartItem.remove();
-                // Check if cart is empty after removal
-                if (cartList.children.length === 0) {
-                    cartList.innerHTML = "<div class='empty-cart'>Your cart is empty</div>";
-                    updateTotal(0);
-                } else {
-                    updateMockTotal();
-                }
-            });
+            // Add event listeners for item controls
+            setupCartItemEventListeners(cartItem, item._id);
         });
     }
+    
+    /**
+     * Sets up event listeners for cart item controls (quantity, remove)
+     * @param {HTMLElement} cartItem - The cart item DOM element
+     * @param {string} itemId - The ID of the cart item
+     */
+    function setupCartItemEventListeners(cartItem, itemId) {
+        const decreaseButton = cartItem.querySelector(".decrease");
+        const increaseButton = cartItem.querySelector(".increase");
+        const quantityElement = cartItem.querySelector(".quantity");
+        const removeButton = cartItem.querySelector(".remove-item");
 
-    // Helper function to recalculate mock total after UI changes
-    function updateMockTotal() {
-        let total = 0;
-        document.querySelectorAll('.cart-item').forEach(item => {
-            const rate = parseFloat(item.querySelector('.item-details p').textContent.replace('$', '').split(' ')[0]);
-            const days = parseInt(item.querySelector('.quantity').textContent);
-            total += rate * days;
+        decreaseButton.addEventListener("click", () => {
+            const currentVal = parseInt(quantityElement.textContent);
+            if (currentVal > 1) {
+                const newValue = currentVal - 1;
+                updateCartItemDays(itemId, newValue);
+            }
         });
-        updateTotal(total.toFixed(2));
+        
+        increaseButton.addEventListener("click", () => {
+            const currentVal = parseInt(quantityElement.textContent);
+            const newValue = currentVal + 1;
+            updateCartItemDays(itemId, newValue);
+        });
+        
+        // Add event listener for remove button
+        removeButton.addEventListener("click", function() {
+            removeFromCart(itemId);
+        });
     }
-
-    // Function to update total price
+    
+    /**
+     * Updates the total price display
+     * @param {number} totalPrice - The total price to display
+     */
     function updateTotal(totalPrice) {
         if (subtotalElement) subtotalElement.textContent = `$${totalPrice}`;
         if (totalElement) totalElement.textContent = `$${totalPrice}`;
     }
     
-    // Function to remove item from cart
-    /* COMMENTED OUT: Backend functionality
+    // ======== API INTERACTION FUNCTIONS ========
+    
+    /**
+     * Fetches the current cart from the backend
+     */
+    async function fetchCart() {
+        try {
+            const response = await fetch(`${baseUrl}/cart`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+            if (!data.success) {
+                console.error("Failed to fetch cart:", data.message);
+                cartList.innerHTML = `<div class='error-message'><i class='fas fa-exclamation-circle' style='font-size: 32px; margin-bottom: 15px; color: #cbd5e0;'></i><p>${data.message}</p></div>`;
+                return;
+            }
+
+            renderCart(data.cart.items);
+            updateTotal(data.totalPrice);
+        } catch (error) {
+            console.error("Error fetching cart:", error);
+            cartList.innerHTML = "<div class='error-message'><i class='fas fa-exclamation-circle' style='font-size: 32px; margin-bottom: 15px; color: #cbd5e0;'></i><p>Error loading cart. Please try again later.</p></div>";
+        }
+    }
+    
+    /**
+     * Removes an item from the cart
+     * @param {string} itemId - The ID of the item to remove
+     */
     async function removeFromCart(itemId) {
         try {
             console.log("Removing item with ID:", itemId);
             console.log("Using token:", token);
             
-            const response = await fetch(`http://localhost:3000/api/cart/${itemId}`, {
+            const response = await fetch(`${baseUrl}/cart/${itemId}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -326,43 +390,84 @@ document.body.appendChild(popupHTML);
             alert("Error removing item from cart. Please try again.");
         }
     }
-    */
     
-    /* COMMENTED OUT: Backend functionality
+    /**
+     * Updates the rental days for a cart item
+     * @param {string} itemId - The ID of the item to update
+     * @param {number} rentalDays - The new number of rental days
+     */
     async function updateCartItemDays(itemId, rentalDays) {
         try {
-          const token = localStorage.getItem("token");
-          
-          console.log(`Updating item ${itemId}: rentalDays=${rentalDays}`);
-          
-          const response = await fetch(`http://localhost:3000/api/cart/${itemId}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ rentalDays })
-          });
-          
-          console.log("Update response status:", response.status);
-          
-          const data = await response.json();
-          console.log("Update response:", data);
-          
-          if (data.success) {
-            // Refresh the cart after successful update
-            fetchCart();
-          } else {
-            console.error("Failed to update item:", data.message);
-            alert(`Failed to update item: ${data.message}`);
-          }
+            console.log(`Updating item ${itemId}: rentalDays=${rentalDays}`);
+            
+            const response = await fetch(`${baseUrl}/cart/${itemId}`, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ rentalDays })
+            });
+            
+            console.log("Update response status:", response.status);
+            
+            const data = await response.json();
+            console.log("Update response:", data);
+            
+            if (data.success) {
+                // Refresh the cart after successful update
+                fetchCart();
+            } else {
+                console.error("Failed to update item:", data.message);
+                alert(`Failed to update item: ${data.message}`);
+            }
         } catch (error) {
-          console.error("Error updating item in cart:", error);
-          alert("Error updating item in cart. Please try again.");
+            console.error("Error updating item in cart:", error);
+            alert("Error updating item in cart. Please try again.");
         }
-      }
-    */
-
-    // Initialize the cart
+    }
+    
+    /**
+     * Clears all items from the cart
+     */
+    async function clearCartDirectly() {
+        try {
+            console.log("Attempting to clear cart with token:", token);
+            
+            const response = await fetch(`${baseUrl}/cart`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            
+            console.log("Clear cart response status:", response.status);
+            
+            const data = await response.json();
+            console.log("Clear cart response:", data);
+            
+            if (data.success) {
+                console.log("Cart cleared successfully");
+                fetchCart(); // Refresh the cart display
+            } else {
+                console.error("Failed to clear cart:", data.message);
+                alert(`Failed to clear cart: ${data.message}`);
+            }
+        } catch (error) {
+            console.error("Error clearing cart:", error);
+            alert("Error clearing cart. Please try again.");
+        }
+    }
+    
+    // ======== INITIALIZATION ========
+    
+    // Set up the UI components
+    initializeCartUI();
+    
+    // Check authentication status and update UI
+    checkAuthStatus();
+    
+    // Load cart data from the server
     fetchCart();
 });

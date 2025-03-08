@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RentEase - Home</title>
-    <link rel="stylesheet" href="home.css">
+    <title>Rently - My Items</title>
+    <link rel="stylesheet" href="item.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
@@ -19,82 +19,42 @@
                 <li><a href="home.html">Home</a></li>
                 <li><a href="cart.html">Cart  </a><img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart" class="cart-icon"></li>
                 <li><a href="#about">About</a></li>
-                
             </ul>
             <div class="user-actions">
-                <div class="user-profile-dropdown">
-                    <button class="profile-button">
-                        <img src="./user-avatar.png" alt="Profile" class="avatar-img">
-                        <span class="username">Profile</span>
-                        <i class="ri-arrow-down-s-line"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="my-items.html"><i class="ri-shopping-bag-line"></i> My Items</a>
-                        <a href="my-orders.html"><i class="ri-shopping-cart-line"></i> My Orders</a>
-                        <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-line"></i> Logout</a>
-                    </div>
-                </div>
-                <button class="btn btn-login" onclick="redirectToLogin()">Login</button>
-                <button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>
-            </div>
-        </div>
+             <div class="user-profile-dropdown">
+                 <button class="profile-button">
+                     <img src="./user-avatar.png" alt="Profile" class="avatar-img">
+                     <span class="username">Profile</span>
+                     <i class="ri-arrow-down-s-line"></i>
+                 </button>
+                 <div class="dropdown-menu">
+                     <a href="my-items.html"><i class="ri-shopping-bag-line"></i> My Items</a>
+                     <a href="my-orders.html"><i class="ri-shopping-cart-line"></i> My Orders</a>
+                     <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
+                     <div class="dropdown-divider"></div>
+                     <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-line"></i> Logout</a>
+                 </div>
+             </div>
+             <button class="btn btn-login" onclick="redirectToLogin()">Login</button>
+             <button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>
+         </div>
+     </div>
     </nav>
-    <div class="category-nav">
-        <div class="category-container">
-            <a href="#" class="category-link active" style="background-image: url('https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
-                <span class="category-name">All</span>
-            </a>
-            <a href="#" class="category-link" style="background-image: url('https://images.unsplash.com/photo-1526738549149-8e07eca6c147?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
-                <span class="category-name">Electronics</span>
-            </a>
-            <a href="#" class="category-link" style="background-image: url('https://images.unsplash.com/photo-1524758631624-e2822e304c36?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
-                <span class="category-name">Furniture</span>
-            </a>
-            <a href="#" class="category-link" style="background-image: url('https://images.unsplash.com/photo-1544568100-847a948585b9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
-                <span class="category-name">Pets Supplies</span>
-            </a>
-            <a href="#" class="category-link" style="background-image: url('https://images.unsplash.com/photo-1542060748-10c28b62716f?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
-                <span class="category-name">Clothes</span>
-            </a>
-            <a href="#" class="category-link" style="background-image: url('https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
-                <span class="category-name">Medical Equipment</span>
-            </a>
-            <a href="#" class="category-link" style="background-image: url('https://images.unsplash.com/photo-1581166397057-235af2b3c6dd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
-                <span class="category-name">Tools</span>
-            </a>
-            <a href="#" class="category-link" style="background-image: url('https://plus.unsplash.com/premium_photo-1664536968441-2c68da36ea84?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
-                <span class="category-name">Sports Equipment</span>
-            </a>
-        </div>
-    </div>
-    
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Hero Section -->
-        <section id="home" class="hero-section">
-            <div class="hero-content">
-                <h1>Discover Great Rentals</h1>
-                <p>Find what you need or list your items to earn extra income</p>
-                <div class="search-container">
-                    <input type="text" placeholder="Search for items..." class="search-input">
-                    <button class="search-btn">
-                        <i class="ri-search-line"></i>
-                    </button>
-                </div>
-
-            </div>
+        <section class="user-listings-header">
+            <h1>My Items</h1>
+            <p>Manage your listings and check their status</p>
+            <button id="addItemBtn" class="btn btn-primary">Add New Item</button>
         </section>
 
-
-        
-<section id="listings-container" class="listings-container">
-    <div id="listingsContainer" class="listings-grid active">
-        
-    </div>
-</section>
+        <!-- User Listings Section -->
+        <section id="listings-container" class="listings-container">
+            <div id="userListingsContainer" class="listings-grid">
+                <!-- Listings will be dynamically loaded here -->
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->
@@ -102,24 +62,24 @@
         <div class="footer-container">
             <div class="footer-columns">
                 <div class="footer-column">
-                    <h4>Quick Links</h4>
-                    <a href="#">Home</a>
-                    <a href="#">Categories</a>
-                    <a href="#">About Us</a>
+                    <h3>Quick Links</h3>
+                    <a href="index.html">Home</a>
+                    <a href="index.html#categories">Categories</a>
+                    <a href="index.html#about">About Us</a>
                 </div>
                 <div class="footer-column">
-                    <h4>Support</h4>
+                    <h3>Support</h3>
                     <a href="#">Help Center</a>
                     <a href="#">Contact</a>
                     <a href="#">FAQ</a>
                 </div>
                 <div class="footer-column">
-                    <h4>Legal</h4>
+                    <h3>Legal</h3>
                     <a href="#">Terms of Service</a>
                     <a href="#">Privacy Policy</a>
                 </div>
                 <div class="footer-column">
-                    <h4>Connect</h4>
+                    <h3>Connect</h3>
                     <div class="social-links">
                         <a href="#" class="social-link">Twitter</a>
                         <a href="#" class="social-link">Instagram</a>
@@ -147,12 +107,13 @@
                     <div class="form-group">
                         <label>Category</label>
                         <select name="category">
-                            <option value="Electronics" >Electronics</option>
-                            <option value="Furniture" >Furniture</option>
-                            <option value="Tools" >Tools</option>
-                            <option value="Pets Supplies" >Pets Supplies</option>
-                            <option value="Medical Equipment" >Medical Equipment</option>
-                            <option value="Clothes" >Clothes</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Tools">Tools</option>
+                            <option value="Sports Equipment">Sports Equipment</option>
+                            <option value="Pets Supplies">Pets Supplies</option>
+                            <option value="Clothes">Clothes</option>
+                            <option value="Medical Equipment">Medical Equipment</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -166,7 +127,7 @@
                     <div class="form-group full-width">
                         <label>Item Images</label>
                         <div class="file-upload">
-                            <input type="file" multiple class="file-upload-input" >
+                            <input type="file" multiple name="images" class="file-upload-input">
                             <span>Drag & Drop or Click to Upload</span>
                         </div>
                     </div>
@@ -175,6 +136,8 @@
             </form>
         </div>
     </div>
+
+    <!-- Edit Item Modal -->
     <div id="editItemModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -192,11 +155,13 @@
                     <div class="form-group">
                         <label for="editItemCategory">Category</label>
                         <select id="editItemCategory" name="category" required>
-                            <option value="electronics">Electronics</option>
-                            <option value="furniture">Furniture</option>
-                            <option value="tools">Tools</option>
-                            <option value="sports">Sports Equipment</option>
-                            <!-- Add other categories as needed -->
+                            <option value="Electronics">Electronics</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Tools">Tools</option>
+                            <option value="Sports Equipment">Sports Equipment</option>
+                            <option value="Pets Supplies">Pets Supplies</option>
+                            <option value="Clothes">Clothes</option>
+                            <option value="Medical Equipment">Medical Equipment</option>
                         </select>
                     </div>
                 </div>
@@ -212,7 +177,7 @@
                 </div>
     
                 <!-- Hidden input to store removed images -->
-                <input type="hidden" id="removedImages" name="removedImages">
+                <input type="hidden" id="removedImages" name="removedImages" value="[]">
     
                 <!-- Current Images -->
                 <div id="currentImages" class="current-images"></div>
@@ -226,9 +191,25 @@
             </form>
         </div>
     </div>
-    
-    
 
-    <script src="home.js"></script>
+    <!-- Script Tags -->
+    <script src="./items.js"></script>
+    <!-- <script>
+        // Initialize the manager when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if already initialized
+            if (typeof userListingsManager === 'undefined') {
+                window.userListingsManager = new UserListingsManager();
+            }
+        });
+
+        function redirectToLogin() {
+            window.location.href = 'login.html';
+        }
+
+        function redirectToSignup() {
+            window.location.href = 'signup.html';
+        }
+    </script> -->
 </body>
 </html>

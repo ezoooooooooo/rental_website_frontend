@@ -1,17 +1,26 @@
 :root {
-  --background: #4b5574;
-  --color: #ffffff;
-  --primary-color: #0f3460;
+  --background: #f4f4f6;
+  --color: #2c3e50;
+  --primary-color: #9982b185;
+  --secondary-color: #8190ab;
+  --white: #ffffff;
+  --accent: #6c5ce7;
+  --danger: #e74c3c;
+  --success: #2ecc71;
+  --gray-light: #ecf0f1;
+  --gray-medium: #bdc3c7;
+  --gray-dark: #7f8c8d;
 }
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--background);
   color: var(--color);
   letter-spacing: 1px;
+  line-height: 1.6;
 }
 
 a { text-decoration: none; color: var(--color); }
@@ -23,6 +32,8 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
   min-height: 100vh;
   position: relative;
   z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 .login-container { 
   position: relative; 
@@ -30,13 +41,14 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 .form-container {
   position: relative;
-  box-shadow: 0 0 36px 1px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
   backdrop-filter: blur(20px);
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--white);
   animation: formFloat 6s ease-in-out infinite;
   z-index: 2;
+  transition: all 0.3s ease;
 }
 .login-container form input {
   display: block;
@@ -45,44 +57,45 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
   margin: 1rem 0;
   color: var(--color);
   outline: none;
-  background-color: #9191911f;
+  background-color: var(--gray-light);
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   font-weight: 500;
   letter-spacing: 0.8px;
   font-size: 15px;
   position: relative;
   z-index: 3;
+  transition: all 0.3s ease;
 }
 .login-container form input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--gray-dark);
 }
 .login-container form input:focus {
-  box-shadow: 0 0 16px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 16px 1px rgba(108, 92, 231, 0.2);
   animation: wobble 0.3s ease-in;
-  background-color: rgba(145, 145, 145, 0.3);
+  background-color: var(--gray-light);
 }
 .login-container form button {
-  background-color: var(--primary-color);
-  color: var(--color);
+  background: linear-gradient(135deg, var(--primary-color), var(--accent));
+  color: var(--white);
   display: block;
   padding: 13px;
-  border-radius: 5px;
+  border-radius: 8px;
   outline: none;
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 1.5px;
   font-weight: bold;
   width: 100%;
   cursor: pointer;
   margin: 1rem 0;
-  transition: all 0.1s ease-in-out;
+  transition: all 0.3s ease;
   border: none;
   position: relative;
   z-index: 3;
 }
 .login-container form button:hover {
-  box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.15);
-  transform: scale(1.02);
+  box-shadow: 0 8px 16px rgba(108, 92, 231, 0.2);
+  transform: translateY(-3px);
 }
 .circle {
   width: 8rem;
@@ -97,12 +110,14 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
   left: 0;
   transform: translate(-45%, -45%);
   animation: pulseOne 4s ease-in-out infinite;
+  background: var(--primary-color);
 }
 .circle-two {
   bottom: 0;
   right: 0;
   transform: translate(45%, 45%);
   animation: pulseTwo 4s ease-in-out infinite;
+  background: var(--accent);
 }
 .illustration {
   position: absolute;
@@ -122,25 +137,26 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 .opacity { opacity: 0.8; }
 #hh {
-  color: hsla(0, 4%, 74%, 0.906);
+  color: var(--gray-medium);
   margin-bottom: 0.5rem;
 }
 .message {
   text-align: center;
   margin-top: 1rem;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 8px;
   position: relative;
   z-index: 3;
+  transition: all 0.3s ease;
 }
 .message.success {
-  background-color: rgba(39, 174, 96, 0.2);
-  color: #27ae60;
+  background-color: rgba(46, 204, 113, 0.2);
+  color: var(--success);
   animation: slideIn 0.3s ease-out;
 }
 .message.error {
   background-color: rgba(231, 76, 60, 0.2);
-  color: #e74c3c;
+  color: var(--danger);
   animation: shake 0.5s ease-in-out;
 }
 
@@ -155,7 +171,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 .particle {
   position: absolute;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(108, 92, 231, 0.1);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -197,4 +213,22 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
   25% { transform: scale(1); }
   75% { transform: scale(1.025); }
   100% { transform: scale(1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .login-container {
+    width: 90%;
+    max-width: 22.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .form-container {
+    padding: 1.5rem;
+  }
 }
