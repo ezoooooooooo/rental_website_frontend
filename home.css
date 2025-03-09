@@ -1501,3 +1501,43 @@ label {
       gap: 20px;
   }
 }
+/* Favorite button styles */
+.favorite-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.favorite-button:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.favorite-button.active {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.favorite-icon {
+  stroke: #2c3e50;
+  transition: all 0.2s ease;
+}
+
+.favorite-button.active .favorite-icon {
+  fill: #6c5ce7;
+  stroke: #6c5ce7;
+}
+
+.favorite-button:hover .favorite-icon {
+  stroke: #6c5ce7;
+}

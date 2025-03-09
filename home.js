@@ -311,7 +311,7 @@ class RentEaseApp {
                 : listing.description;
                 
             const showAddToCart = this.getToken();
-            
+            const showFavoriteButton = this.getToken();
             // Create image dots for carousel
             const imageDots = images.length > 1 
                 ? `<div class="image-controls">
@@ -326,6 +326,13 @@ class RentEaseApp {
             <div class="listing-card" data-id="${listing._id}">
                 <div class="listing-image">
                     <div class="listing-category-tag">${listing.category}</div>
+                      ${showFavoriteButton ? `
+                <div class="favorite-button" onclick="event.stopPropagation(); rentEaseApp.toggleFavorite('${listing._id}', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="favorite-icon">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </div>` : ''
+                }
                     ${images.map((imageUrl, index) => `
                         <img 
                             src="${imageUrl}" 
@@ -362,7 +369,120 @@ class RentEaseApp {
         this.setupListingImageCarousel();
         this.setupImageDotControls();
         this.initCategoryFilters();
+        this.checkFavoriteStatus();
     }
+    // Add these methods to your class
+
+
+/**
+ * Toggle favorite status for a listing
+ * @param {string} listingId - ID of the listing to toggle favorite status
+ * @param {HTMLElement} buttonElement - The favorite button element that was clicked
+ */
+async toggleFavorite(listingId, buttonElement) {
+    const token = this.getToken();
+    
+    if (!token) {
+        this.showErrorMessage('Please log in to add items to favorites');
+        return;
+    }
+
+    try {
+        const isFavorite = buttonElement.classList.contains('active');
+        
+        if (isFavorite) {
+            // Remove from favorites
+            const response = await fetch(`${this.baseUrl}/favorites/remove/${listingId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.message || 'Error removing from favorites');
+            }
+            
+            buttonElement.classList.remove('active');
+            const favoriteIcon = buttonElement.querySelector('.favorite-icon');
+            if (favoriteIcon) {
+                favoriteIcon.setAttribute('fill', 'none');
+            }
+            
+            this.showMessage('Removed from favorites');
+            
+        } else {
+            // Add to favorites
+            const response = await fetch(`${this.baseUrl}/favorites/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    listingId
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.message || 'Error adding to favorites');
+            }
+            
+            buttonElement.classList.add('active');
+            const favoriteIcon = buttonElement.querySelector('.favorite-icon');
+            if (favoriteIcon) {
+                favoriteIcon.setAttribute('fill', '#6c5ce7');
+            }
+            
+            this.showMessage('Added to favorites');
+        }
+        
+    } catch (error) {
+        console.error('🚨 Error updating favorites:', error);
+        this.showErrorMessage(error.message || 'Error updating favorites');
+    }
+}
+/**
+ * Check favorite status for all listings on the page
+ */
+async checkFavoriteStatus() {
+    if (!this.getToken()) return;
+    
+    const listingCards = document.querySelectorAll('.listing-card');
+    
+    for (const card of listingCards) {
+        const listingId = card.dataset.id;
+        if (!listingId) continue;
+        
+        try {
+            const response = await fetch(`${this.baseUrl}/favorites/check/${listingId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.getToken()}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const favoriteButton = card.querySelector('.favorite-button');
+                
+                if (favoriteButton && data.isFavorite) {
+                    favoriteButton.classList.add('active');
+                    const favoriteIcon = favoriteButton.querySelector('.favorite-icon');
+                    if (favoriteIcon) {
+                        favoriteIcon.setAttribute('fill', '#6c5ce7');
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error checking favorite status:', error);
+        }
+    }
+}
     setupImageDotControls() {
         const listingCards = document.querySelectorAll('.listing-card');
         
