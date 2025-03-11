@@ -1,0 +1,35 @@
+.cart-badge {
+ position: absolute;
+ top: -8px;
+ right: -8px;
+ background-color: #ff4757;
+ color: white;
+ border-radius: 50%;
+ min-width: 18px;
+ height: 18px;
+ padding: 0 4px;
+ font-size: 12px;
+ font-weight: bold;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+ border: 1.5px solid white;
+ z-index: 5;
+ text-align: center;
+ line-height: 1;
+}
+
+/* Make sure the parent element has a relative position */
+li a {
+ position: relative;
+ display: inline-flex;
+ align-items: center;
+}
+
+.cart-icon {
+ position: relative;
+ /* Adjust the width/height if needed */
+ width: 24px;
+ height: 24px;
+}

@@ -432,9 +432,9 @@
    
    .user-actions {
     display: flex;
-    gap: 10px;
-   }
-   
+    align-items: center;
+    gap: 15px;
+}
    .cart-icon {
     width: 20px;
     height: 20px;
@@ -773,99 +773,125 @@
       5. SPECIFIC PAGE COMPONENTS
       ========================================= */
    
-   /* Profile Dropdown Styles */
-   .user-profile-dropdown {
-    position: relative;
-   }
-   
-   .profile-button {
-    display: flex;
-    align-items: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: var(--border-radius);
-    transition: background-color 0.2s;
-    color: var(--white);
-   }
-   
-   .profile-button:hover {
-    background-color: rgba(108, 92, 231, 0.1);
-    transform: translateY(-2px);
-    transition: all 0.3s ease;
-   }
-   
-   .avatar-initial {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: #4a6ee0;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+   /* --------------------------------------
+   User Profile Dropdown - Enhanced
+-------------------------------------- */
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
-   
-   .username {
-    margin-right: 8px;
-    font-weight: 500;
-    color: #2c3e50;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-   }
-   
-   .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 200px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(10px);
-    transition: all 0.3s ease;
-    z-index: 100;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-   }
-   
-   .dropdown-menu.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-   }
-   
-   .dropdown-menu a {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    color: #2c3e50;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-    border-radius: 4px;
-    margin: 2px 6px;
-   }
-   
-   .dropdown-menu a:hover {
-    background-color: #ecf0f1;
-    color: #6c5ce7;
-   }
-   
-   .dropdown-menu i {
-    margin-right: 8px;
-    font-size: 18px;
-    color: #8190ab;
-   }
-   
-   .dropdown-divider {
-    height: 1px;
-    background-color: #bdc3c7;
-    margin: 8px 0;
-   }
-   
+
+.user-profile-dropdown {
+  position: relative;
+}
+
+.profile-button {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(to right, #f4f4f6, #e8e9f3);
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.1);
+}
+
+.profile-button:hover {
+  background: linear-gradient(to right, #e8e9f3, #d8d9e3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.15);
+}
+
+.avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+  border: 2px solid #6c5ce7;
+}
+
+.avatar-initial {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9982b1, #6c5ce7);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.profile-icon {
+  color: #6c5ce7;
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.username {
+  color: #2c3e50;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background-color: white;
+  box-shadow: 0 5px 20px rgba(44, 62, 80, 0.15);
+  border-radius: 12px;
+  width: 220px;
+  padding: 10px 0;
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu a {
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  color: #2c3e50;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f4f4f6;
+  color: #6c5ce7;
+  transform: translateX(5px);
+}
+
+.dropdown-menu a i {
+  margin-right: 12px;
+  font-size: 18px;
+  color: #6c5ce7;
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu a:hover i {
+  transform: scale(1.2);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #ecf0f1;
+  margin: 8px 12px;
+}
    /* Current Images in Edit Modal */
    .current-images {
     display: flex;

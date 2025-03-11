@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Cart - Rently</title>
     <link rel="stylesheet" href="cart.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="nav-utils.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
 </head>
 <body>
     <!-- Navigation -->
@@ -18,7 +20,13 @@
             </div>
             <ul class="nav-links">
                 <li><a href="home.html">Home</a></li>
-                <li><a href="cart.html">Cart <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart" class="cart-icon"></a></li>
+                <li>
+                    <a href="cart.html" class="cart-icon-container">
+                      Cart 
+                      <span id="cart-badge" class="cart-badge">3</span>
+                      <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart" class="cart-icon">
+                    </a>
+                  </li>
                 <li><a href="#about">About</a></li>
             </ul>
             <div class="user-actions">
@@ -113,5 +121,6 @@
     </footer>
 
     <script src="cart.js"></script>
+    <script src="nav-utils.js"></script>
 </body>
 </html>

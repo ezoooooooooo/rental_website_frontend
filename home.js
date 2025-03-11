@@ -57,21 +57,27 @@ class RentEaseApp {
                 // Create profile UI with actual user data
                 if (userActions) {
                     userActions.innerHTML = `
-                        <div class="user-profile-dropdown">
-                            <button class="pill-profile-button">
-                                <i class="ri-user-line profile-icon"></i>
-                                <span class="username">${userData.firstName || 'Profile'}</span>
-                                <i class="ri-arrow-down-s-line"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a href="./item.html"><i class="ri-shopping-bag-line"></i> My Items</a>
-                                <a href="my-orders.html"><i class="ri-shopping-cart-line"></i> My Orders</a>
-                                <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-line"></i> Logout</a>
-                            </div>
+                    <div class="user-profile-dropdown">
+                        <button class="profile-button">
+                            ${userData.profileImage 
+                                ? `<img src="${userData.profileImage}" alt="Profile" class="avatar-img">` 
+                                : userData.firstName 
+                                    ? `<div class="avatar-initial">${userData.firstName[0]}</div>`
+                                    : `<i class="ri-user-line profile-icon"></i>`
+                            }
+                            <span class="username">${userData.firstName || 'Profile'}</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="favorite.html"><i class="ri-heart-3-line"></i> My Favorites</a>
+                            <a href="./item.html"><i class="ri-shopping-bag-3-line"></i> My Items</a>
+                            <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
+                            <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" onclick="favoritesManager.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
                         </div>
-                    `;
+                    </div>
+                `;
                     
                     this.setupDropdownListeners();
                 }
@@ -90,6 +96,7 @@ class RentEaseApp {
                             <div class="dropdown-menu">
                                 <a href="./item.html"><i class="ri-shopping-bag-line"></i> My Items</a>
                                 <a href="my-orders.html"><i class="ri-shopping-cart-line"></i> My Orders</a>
+                                 <a href="favorite.html"><i class="ri-heart-line"></i> My Favorites</a>
                                 <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
                                 <div class="dropdown-divider"></div>
                                 <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-line"></i> Logout</a>
@@ -114,7 +121,7 @@ class RentEaseApp {
     
     // Extract the dropdown setup logic to avoid duplication
     setupDropdownListeners() {
-        const profileButton = document.querySelector('.pill-profile-button');
+        const profileButton = document.querySelector('.profile-button');
         const dropdownMenu = document.querySelector('.dropdown-menu');
         
         if (profileButton && dropdownMenu) {
@@ -657,6 +664,8 @@ initCategoryFilters() {
             } else {
                 this.showMessage(data.message || 'Item added to cart');
             }
+
+            updateCartBadgeWithAnimation();
         
         } catch (error) {
             console.error('🚨 Error adding to cart:', error);

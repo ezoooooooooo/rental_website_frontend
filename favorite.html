@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>My Favorites | Rently</title>
+ <link rel="stylesheet" href="favorite.css">
+ <link rel="stylesheet" href="nav-utils.css">
+ <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+<nav class="main-navigation">
+ <div class="nav-container">
+     <div class="logo-section">
+         <img src="./rent.png" alt="RentEase Logo" class="logo">
+         <h1>Rently</h1>
+     </div>
+     <ul class="nav-links">
+         <li><a href="home.html">Home</a></li>
+         <li>
+            <a href="cart.html" class="cart-icon-container">
+              Cart 
+              <span id="cart-badge" class="cart-badge">3</span>
+              <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart" class="cart-icon">
+            </a>
+          </li>
+         <li><a href="#about">About</a></li>
+     </ul>
+     <div class="user-actions">
+         <div class="user-profile-dropdown">
+             <button class="profile-button">
+                 <img src="./user-avatar.png" alt="Profile" class="avatar-img">
+                 <span class="username">Profile</span>
+                 <i class="ri-arrow-down-s-line"></i>
+             </button>
+             <div class="dropdown-menu">
+                 <a href="my-items.html"><i class="ri-shopping-bag-line"></i> My Items</a>
+                 <a href="my-orders.html"><i class="ri-shopping-cart-line"></i> My Orders</a>
+                 <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
+                 <a href="favorites.html"><i class="ri-heart-line"></i> My Favorites</a>
+                 <div class="dropdown-divider"></div>
+                 <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-line"></i> Logout</a>
+             </div>
+         </div>
+         <button class="btn btn-login" onclick="redirectToLogin()">Login</button>
+         <button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>
+     </div>
+ </div>
+</nav>
+
+<!-- Main Content -->
+<main>
+ <div class="favorites-container">
+     <div class="favorites-header">
+         <h1 class="favorites-title">My Favorites</h1>
+         <div class="favorites-count" id="favorites-count">0 items</div>
+     </div>
+
+     <div id="favorites-content">
+         <!-- Loading spinner will show initially -->
+         <div class="loading-container" id="loading-spinner">
+             <div class="loading-spinner"></div>
+         </div>
+
+         <!-- Favorites grid will be populated by JavaScript -->
+         <div class="favorites-grid" id="favorites-grid" style="display: none;"></div>
+
+         <!-- Empty state will show if no favorites -->
+         <div class="favorites-empty" id="empty-favorites" style="display: none;">
+             <i class="ri-heart-line empty-icon"></i>
+             <h3>No favorites yet</h3>
+             <p>Items you favorite will appear here for quick access.</p>
+             <a href="home.html" class="browse-btn">Browse Items</a>
+         </div>
+     </div>
+ </div>
+
+ <!-- Toast notifications container -->
+ <div class="toast-container" id="toast-container"></div>
+</main>
+
+<!-- Footer -->
+<footer class="main-footer">
+ <div class="footer-container">
+     <div class="footer-columns">
+         <div class="footer-column">
+             <h4>Quick Links</h4>
+             <a href="#">Home</a>
+             <a href="#">Categories</a>
+             <a href="#">About Us</a>
+         </div>
+         <div class="footer-column">
+             <h4>Support</h4>
+             <a href="#">Help Center</a>
+             <a href="#">Contact</a>
+             <a href="#">FAQ</a>
+         </div>
+         <div class="footer-column">
+             <h4>Legal</h4>
+             <a href="#">Terms of Service</a>
+             <a href="#">Privacy Policy</a>
+         </div>
+         <div class="footer-column">
+             <h4>Connect</h4>
+             <div class="social-links">
+                 <a href="#" class="social-link">Twitter</a>
+                 <a href="#" class="social-link">Instagram</a>
+                 <a href="#" class="social-link">LinkedIn</a>
+             </div>
+         </div>
+     </div>
+     <div class="footer-bottom">
+         <p>&copy; 2024 Rently. All Rights Reserved.</p>
+     </div>
+ </div>
+</footer>
+
+<script src="favorite.js"></script>
+<script src="nav-utils.js"></script>
+</body>
+</html>
