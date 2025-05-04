@@ -47,7 +47,7 @@ body {
 .btn-signup {
     background: linear-gradient(to right, #9982b1, #6c5ce7);
     color: white;
-    box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+    box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
 }
 
 .btn-signup:hover {

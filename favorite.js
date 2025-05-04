@@ -129,7 +129,7 @@ class FavoritesManager {
                         <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
                         <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" onclick="favoritesManager.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
+                        <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
                     </div>
                 </div>
             `;
@@ -154,7 +154,7 @@ class FavoritesManager {
                               <a href="favorite.html"><i class="ri-heart-line"></i> My Favorites</a>
                              <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
                              <div class="dropdown-divider"></div>
-                             <a href="#" onclick="favoritesManager.logout()"><i class="ri-logout-box-line"></i> Logout</a>
+                             <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-line"></i> Logout</a>
                          </div>
                      </div>
                  `;

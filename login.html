@@ -1,36 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RENTLY</title>
-    <link rel="stylesheet" href="./login.css">
-</head>
-<body>
+    <link rel="stylesheet" href="./login.css" />
+    <link rel="stylesheet" href="nav-styles.css" />
+    <link rel="stylesheet" href="nav-utils.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Navigation Bar for Auth Pages -->
+    <nav class="main-navigation">
+      <div class="nav-container">
+        <div class="logo-section">
+          <img src="./rent.png" alt="RentEase Logo" class="logo" />
+          <h1>Rently</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="home.html">Home</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+        <div class="user-actions">
+          <a href="login.html" class="btn btn-login">Login</a>
+          <a href="signup.html" class="btn btn-signup">Sign Up</a>
+        </div>
+      </div>
+    </nav>
     <div class="particles" id="particles"></div>
     <section class="container">
-        <div class="login-container">
-            <div class="circle circle-one"></div>
-            <div class="form-container">
-                <img src="https://raw.githubusercontent.com/hicodersofficial/glassmorphism-login-form/master/assets/illustration.png" alt="illustration" class="illustration"  />
-                <h1 id="hh">Login</h1>
-                <h1 class="opacity"></h1>
-                <form id="loginForm">
-                    <input type="email" id="email" placeholder="EMAIL" required />
-                    <input type="password" id="password" placeholder="PASSWORD" required>
-                    <button type="submit" class="opacity">LOGIN</button>
-                    <div id="message" class="message"></div>
-                </form>
-                <div class="register-forget">
-                    <a href="./signup.html" class="signup-link">Create Account</a>
-                </div>
-            </div>
-            <div class="circle circle-two"></div>
+      <div class="login-container">
+        <div class="circle circle-one"></div>
+        <div class="form-container">
+          <img
+            src="https://raw.githubusercontent.com/hicodersofficial/glassmorphism-login-form/master/assets/illustration.png"
+            alt="illustration"
+            class="illustration"
+          />
+          <h1 id="hh">Login</h1>
+          <h1 class="opacity"></h1>
+          <form id="loginForm">
+            <input type="email" id="email" placeholder="EMAIL" required />
+            <input
+              type="password"
+              id="password"
+              placeholder="PASSWORD"
+              required
+            />
+            <button type="submit" class="opacity">LOGIN</button>
+            <div id="message" class="message"></div>
+          </form>
+          <div class="register-forget">
+            <a href="./signup.html" class="signup-link">Create Account</a>
+            <span class="divider">|</span>
+            <a href="#" id="forgotPasswordLink" class="forgot-link">Forgot Password?</a>
+          </div>
         </div>
+        <div class="circle circle-two"></div>
+      </div>
     </section>
 
-    <script src="./login.js">
-        
-    </script>
-</body>
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Reset Password</h2>
+        <p>Enter your email address and we'll send you a link to reset your password.</p>
+        <form id="forgotPasswordForm">
+          <input type="email" id="resetEmail" placeholder="Enter your email" required />
+          <button type="submit" class="reset-btn">Send Reset Link</button>
+          <div id="resetMessage" class="message"></div>
+        </form>
+      </div>
+    </div>
+
+    <script src="./login.js"></script>
+  </body>
 </html>

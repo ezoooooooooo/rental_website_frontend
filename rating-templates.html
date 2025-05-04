@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rating System Templates</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- This file contains HTML templates for the rating system. Copy the relevant sections into your pages. -->
+</head>
+<body>
+  <!-- ITEM RATING TEMPLATE - Add this to product detail pages -->
+  <section class="rating-container">
+    <!-- Rating tabs for pages that need both item and owner ratings -->
+    <div class="rating-tabs">
+      <div class="rating-tab active" data-tab="item">Item Reviews</div>
+      <div class="rating-tab" data-tab="owner">Seller Reviews</div>
+    </div>
+    
+    <!-- Item rating container - this will be populated by the JS -->
+    <div id="itemRatingContainer">
+      <!-- Content will be dynamically generated -->
+      <div class="loading">Loading ratings...</div>
+    </div>
+    
+    <!-- Owner rating container - this will be populated by the JS -->
+    <div id="ownerRatingContainer" style="display: none;">
+      <!-- Content will be dynamically generated -->
+      <div class="loading">Loading ratings...</div>
+    </div>
+  </section>
+  
+  <!-- ITEM RATING ONLY TEMPLATE - Use this when only showing item ratings -->
+  <section class="rating-container">
+    <!-- Item rating container - this will be populated by the JS -->
+    <div id="itemRatingContainer">
+      <!-- Content will be dynamically generated -->
+      <div class="loading">Loading ratings...</div>
+    </div>
+  </section>
+  
+  <!-- OWNER RATING ONLY TEMPLATE - Use this when only showing owner ratings -->
+  <section class="rating-container">
+    <!-- Owner rating container - this will be populated by the JS -->
+    <div id="ownerRatingContainer">
+      <!-- Content will be dynamically generated -->
+      <div class="loading">Loading ratings...</div>
+    </div>
+  </section>
+  
+  <!-- STAR RATING COMPONENT - Small reusable component for showing ratings in lists -->
+  <div class="product-rating">
+    <div class="star-rating readonly">
+      <!-- Replace [rating] with the actual rating value (1-5) -->
+      <i class="ri-star-fill" style="color: var(--star-filled);"></i>
+      <i class="ri-star-fill" style="color: var(--star-filled);"></i>
+      <i class="ri-star-fill" style="color: var(--star-filled);"></i>
+      <i class="ri-star-half-fill" style="color: var(--star-filled);"></i>
+      <i class="ri-star-line" style="color: var(--star-empty);"></i>
+    </div>
+    <!-- Replace [count] with the actual review count -->
+    <span class="review-count">(24)</span>
+  </div>
+  
+  <!-- REQUIRED SCRIPTS - Include these scripts on pages using the rating system -->
+  <script>
+    // Script tag inclusion example:
+    // <link rel="stylesheet" href="rating.css">
+    // <script src="rating.js"></script>
+    // <script src="item-rating.js"></script>
+    // <script src="owner-rating.js"></script>
+  </script>
+</body>
+</html> 

@@ -131,9 +131,29 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .register-forget {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin: 1rem 0;
   position: relative;
   z-index: 3;
+  gap: 10px;
+}
+
+.register-forget .divider {
+  color: var(--gray-medium);
+  font-size: 14px;
+}
+
+.register-forget .signup-link,
+.register-forget .forgot-link {
+  color: var(--accent);
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.register-forget .signup-link:hover,
+.register-forget .forgot-link:hover {
+  text-decoration: underline;
+  opacity: 0.8;
 }
 .opacity { opacity: 0.8; }
 #hh {
@@ -195,6 +215,83 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 @keyframes pulseTwo {
   0%, 100% { transform: translate(45%, 45%) scale(1); }
   50% { transform: translate(45%, 45%) scale(1.2); }
+}
+
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--gray-dark);
+  transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+  color: var(--danger);
+}
+
+.modal-content h2 {
+  color: var(--color);
+  margin-bottom: 0.5rem;
+}
+
+.modal-content p {
+  color: var(--gray-dark);
+  margin-bottom: 1.5rem;
+  font-size: 14px;
+}
+
+.reset-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent));
+  color: var(--white);
+  display: block;
+  padding: 13px;
+  border-radius: 8px;
+  outline: none;
+  font-size: 16px;
+  letter-spacing: 1.5px;
+  font-weight: bold;
+  width: 100%;
+  cursor: pointer;
+  margin: 1rem 0;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.reset-btn:hover {
+  box-shadow: 0 8px 16px rgba(108, 92, 231, 0.2);
+  transform: translateY(-3px);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes shake {

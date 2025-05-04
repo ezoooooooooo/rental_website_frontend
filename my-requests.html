@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Requests - RentEase</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="nav-utils.css">
+    <link rel="stylesheet" href="my-orders.css">
+    <link rel="stylesheet" href="my-requests.css">
+    <!-- Removed inline <style> block for modern CSS only -->
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-navigation">
+      <div class="nav-container">
+        <div class="logo-section">
+          <img src="./rent.png" alt="RentEase Logo" class="logo" />
+          <h1>Rently</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="home.html">Home</a></li>
+          <li>
+            <a href="cart.html" class="cart-icon-container">
+              Cart
+              <span id="cart-badge" class="cart-badge">0</span>
+              <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart" class="cart-icon" />
+            </a>
+          </li>
+          <li><a href="index.html#about">About</a></li>
+        </ul>
+        <div class="user-actions"><!-- Profile dropdown rendered by JS --></div>
+      </div>
+    </nav>
+
+    <main class="main-content orders-main-section">
+      <header class="page-header gradient-text">
+        <h2>Requests</h2>
+        <p>View and manage your rental requests here.</p>
+      </header>
+      <section class="requests-list" id="requestsContainer">
+        <!-- Requests will be rendered here by JS -->
+      </section>
+      <div id="loadingIndicator" class="loading-indicator">Loading...</div>
+      <div id="emptyState" class="empty-state" style="display:none;">No requests yet.</div>
+      <div id="errorState" class="error-state" style="display:none;">Failed to load requests.</div>
+    </main>
+
+    <footer class="main-footer">
+      <div class="footer-container">
+        <div class="footer-columns">
+          <div class="footer-column">
+            <h4>Quick Links</h4>
+            <a href="#">Home</a>
+            <a href="#">Categories</a>
+            <a href="#">About Us</a>
+          </div>
+          <div class="footer-column">
+            <h4>Support</h4>
+            <a href="#">Help Center</a>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+          </div>
+          <div class="footer-column">
+            <h4>Legal</h4>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+          </div>
+          <div class="footer-column">
+            <h4>Connect</h4>
+            <div class="social-links">
+              <a href="#" class="social-link">Twitter</a>
+              <a href="#" class="social-link">Instagram</a>
+              <a href="#" class="social-link">LinkedIn</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Rently. All Rights Reserved.</p>
+        </div>
+      </div>
+    </footer>
+    <script src="nav-utils.js"></script>
+    <script src="my-requests.js"></script>
+    <script src="lightbox.js"></script>
+</body>
+</html>

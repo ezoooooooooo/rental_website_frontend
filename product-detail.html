@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Detail - Rently</title>
+    <link rel="stylesheet" href="item.css" />
+    <link rel="stylesheet" href="nav-utils.css" />
+    <link rel="stylesheet" href="rating.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="main-navigation">
+      <div class="nav-container">
+        <div class="logo-section">
+          <img src="./rent.png" alt="RentEase Logo" class="logo" />
+          <h1>Rently</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="home.html">Home</a></li>
+          <li>
+            <a href="cart.html" class="cart-icon-container">
+              Cart
+              <span id="cart-badge" class="cart-badge">0</span>
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+                alt="Cart"
+                class="cart-icon"
+              />
+            </a>
+          </li>
+          <li><a href="#about">About</a></li>
+        </ul>
+        <div class="user-actions">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Product Detail Section -->
+      <section class="product-detail-container">
+        <div class="product-detail-grid">
+          <!-- Product Images -->
+          <div class="product-images">
+            <div class="main-image">
+              <img id="mainProductImage" src="placeholder.jpg" alt="Product" />
+            </div>
+            <div class="image-thumbnails" id="imageThumbnails">
+              <!-- Will be populated by JS -->
+            </div>
+          </div>
+
+          <!-- Product Info -->
+          <div class="product-info">
+            <h1 id="productName">Product Name</h1>
+
+            <div class="product-meta">
+              <span class="product-category" id="productCategory"
+                >Category</span
+              >
+              <div class="product-rating" id="productRatingBadge">
+                <!-- Will be populated by JS -->
+              </div>
+            </div>
+
+            <div class="product-price">
+              <span id="productPrice">$0.00</span>
+              <span class="per-day">per day</span>
+            </div>
+
+            <div class="product-description" id="productDescription">
+              Product description will appear here.
+            </div>
+
+            <div class="rental-duration">
+              <label for="rentalDays">Rental Duration</label>
+              <div class="duration-controls">
+                <button class="decrease-days">-</button>
+                <input type="number" id="rentalDays" min="1" value="1" />
+                <button class="increase-days">+</button>
+                <span class="days-label">days</span>
+              </div>
+            </div>
+
+            <div class="product-actions">
+              <button id="addToCartBtn" class="btn btn-cart">
+                <i class="ri-shopping-cart-line"></i> Add to Cart
+              </button>
+              <button id="favoriteBtn" class="btn btn-favorite">
+                <i class="ri-heart-line"></i>
+              </button>
+            </div>
+
+            <div class="seller-info">
+              <h3>Seller Information</h3>
+              <div class="seller-profile">
+                <div class="seller-avatar" id="sellerAvatar">
+                  <!-- Will be populated by JS -->
+                </div>
+                <div class="seller-details">
+                  <div class="seller-name" id="sellerName">Seller Name</div>
+                  <div class="seller-rating" id="sellerRating">
+                    <!-- Will be populated by JS -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rating System Tabs -->
+      <section class="rating-container">
+        <div class="rating-tabs">
+          <div class="rating-tab active" data-tab="item">Item Reviews</div>
+          <div class="rating-tab" data-tab="owner">Seller Reviews</div>
+        </div>
+
+        <!-- Item Rating Container -->
+        <div id="itemRatingContainer">
+          <div class="loading">Loading item ratings...</div>
+        </div>
+
+        <!-- Owner Rating Container -->
+        <div id="ownerRatingContainer" style="display: none">
+          <div class="loading">Loading seller ratings...</div>
+        </div>
+      </section>
+
+      <!-- Similar Products Section -->
+      <section class="similar-products">
+        <h2>Similar Products</h2>
+        <div class="listings-grid" id="similarProductsContainer">
+          <!-- Will be populated by JS -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+      <div class="footer-container">
+        <div class="footer-columns">
+          <div class="footer-column">
+            <h3>Quick Links</h3>
+            <a href="index.html">Home</a>
+            <a href="index.html#categories">Categories</a>
+            <a href="index.html#about">About Us</a>
+          </div>
+          <div class="footer-column">
+            <h3>Support</h3>
+            <a href="#">Help Center</a>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+          </div>
+          <div class="footer-column">
+            <h3>Legal</h3>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+          </div>
+          <div class="footer-column">
+            <h3>Connect</h3>
+            <div class="social-links">
+              <a href="#" class="social-link">Twitter</a>
+              <a href="#" class="social-link">Instagram</a>
+              <a href="#" class="social-link">LinkedIn</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Rently. All Rights Reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="nav-utils.js"></script>
+    <script src="rating.js"></script>
+    <script src="item-rating.js"></script>
+    <script src="owner-rating.js"></script>
+    <script>
+      class ProductDetailPage {
+        constructor() {
+          this.baseUrl = "http://localhost:3000/api";
+          this.token = localStorage.getItem("token");
+
+          // Get product ID from URL
+          this.productId = new URLSearchParams(window.location.search).get(
+            "id"
+          );
+          
+          // Check if we should show the rating dialog
+          this.showRating = new URLSearchParams(window.location.search).get("showRating") === "true";
+
+          if (!this.productId) {
+            this.showError("Product ID is missing. Please try again.");
+            return;
+          }
+
+          this.initialize();
+        }
+
+        async initialize() {
+          // Check authentication
+          this.checkAuthStatus();
+
+          // Fetch product details
+          await this.fetchProductDetails();
+
+          // Set up event listeners
+          this.setupEventListeners();
+          
+          // If showRating is true, open the rating dialog after a short delay
+          if (this.showRating) {
+            console.log("showRating parameter detected, will open rating dialog");
+            setTimeout(() => {
+              if (window.ratingSystem && window.ratingSystem.openRatingDialog) {
+                console.log("Opening rating dialog via ratingSystem");
+                window.ratingSystem.openRatingDialog();
+              } else {
+                console.log("Opening rating dialog via DOM click");
+                // Try to click the Add Review button
+                const addReviewBtn = document.querySelector(".rating-tab[data-tab='item'] + .add-review-btn") ||
+                                    document.querySelector(".rating-toggle-btn");
+                if (addReviewBtn) {
+                  addReviewBtn.click();
+                }
+              }
+            }, 1500);
+          }
+        }
+
+        checkAuthStatus() {
+          // You can reuse the existing auth status check from other pages
+          const userActions = document.querySelector(".user-actions");
+
+          if (this.token) {
+            // Use the fetch profile logic from other pages
+            // ...
+          } else {
+            if (userActions) {
+              userActions.innerHTML = `
+                            <button class="btn btn-login" onclick="redirectToLogin()">Login</button>
+                            <button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>
+                        `;
+            }
+          }
+        }
+
+        async fetchProductDetails() {
+          try {
+            const response = await fetch(
+              `${this.baseUrl}/listings/${this.productId}`
+            );
+
+            if (!response.ok) {
+              throw new Error("Failed to fetch product details");
+            }
+
+            const product = await response.json();
+            this.renderProductDetails(product);
+
+            // Initialize the rating system
+            if (typeof ratingSystem === "undefined") {
+              window.ratingSystem = new RatingSystem();
+            }
+          } catch (error) {
+            console.error("Error fetching product details:", error);
+            this.showError(
+              "Error loading product details. Please try again later."
+            );
+          }
+        }
+
+        renderProductDetails(product) {
+          // Set product name
+          document.getElementById("productName").textContent = product.name;
+
+          // Set product category
+          document.getElementById("productCategory").textContent =
+            product.category;
+
+          // Set product price
+          document.getElementById("productPrice").textContent = `$${parseFloat(
+            product.rentalRate
+          ).toFixed(2)}`;
+
+          // Set product description
+          document.getElementById("productDescription").textContent =
+            product.description;
+
+          // Render product images
+          this.renderProductImages(product.images);
+
+          // Render product rating badge
+          this.renderRatingBadge(product.rating);
+
+          // Render seller info
+          this.renderSellerInfo(product.owner);
+
+          // Store product owner ID for rating system
+          document.getElementById("ownerRatingContainer").dataset.ownerId =
+            product.owner._id;
+          document.getElementById("itemRatingContainer").dataset.itemId =
+            product._id;
+        }
+
+        renderProductImages(images) {
+          if (!images || images.length === 0) {
+            document.getElementById("mainProductImage").src = "placeholder.jpg";
+            return;
+          }
+
+          // Set main image
+          document.getElementById("mainProductImage").src =
+            images[0].url || images[0];
+
+          // Render thumbnails
+          const thumbnailsContainer =
+            document.getElementById("imageThumbnails");
+          thumbnailsContainer.innerHTML = "";
+
+          images.forEach((image, index) => {
+            const imgUrl = image.url || image;
+
+            const thumbnail = document.createElement("div");
+            thumbnail.className = `image-thumbnail ${
+              index === 0 ? "active" : ""
+            }`;
+            thumbnail.innerHTML = `<img src="${imgUrl}" alt="Thumbnail ${
+              index + 1
+            }">`;
+
+            thumbnail.addEventListener("click", () => {
+              document.getElementById("mainProductImage").src = imgUrl;
+              document.querySelectorAll(".image-thumbnail").forEach((thumb) => {
+                thumb.classList.remove("active");
+              });
+              thumbnail.classList.add("active");
+            });
+
+            thumbnailsContainer.appendChild(thumbnail);
+          });
+        }
+
+        renderRatingBadge(rating) {
+          const ratingBadge = document.getElementById("productRatingBadge");
+
+          if (!rating || !rating.average) {
+            ratingBadge.innerHTML =
+              '<span class="no-ratings">No ratings yet</span>';
+            return;
+          }
+
+          // Generate star rating HTML
+          const starRating = this.generateStarRating(rating.average);
+
+          ratingBadge.innerHTML = `
+                    ${starRating}
+                    <span class="review-count">(${rating.count})</span>
+                `;
+        }
+
+        renderSellerInfo(owner) {
+          const sellerAvatar = document.getElementById("sellerAvatar");
+          const sellerName = document.getElementById("sellerName");
+          const sellerRating = document.getElementById("sellerRating");
+
+          // Set seller name
+          sellerName.textContent = owner.firstName || "Anonymous";
+
+          // Set seller avatar
+          if (owner.profileImage) {
+            sellerAvatar.innerHTML = `<img src="${owner.profileImage}" alt="${owner.firstName}">`;
+          } else {
+            sellerAvatar.innerHTML = `<div class="avatar-initial">${
+              owner.firstName ? owner.firstName[0] : "A"
+            }</div>`;
+          }
+
+          // Set seller rating
+          if (owner.rating && owner.rating.average) {
+            const starRating = this.generateStarRating(owner.rating.average);
+            sellerRating.innerHTML = `
+                        ${starRating}
+                        <span class="review-count">(${owner.rating.count})</span>
+                    `;
+          } else {
+            sellerRating.innerHTML =
+              '<span class="no-ratings">No ratings yet</span>';
+          }
+        }
+
+        setupEventListeners() {
+          // Rental days controls
+          const decreaseBtn = document.querySelector(".decrease-days");
+          const increaseBtn = document.querySelector(".increase-days");
+          const rentalDaysInput = document.getElementById("rentalDays");
+
+          if (decreaseBtn && increaseBtn && rentalDaysInput) {
+            decreaseBtn.addEventListener("click", () => {
+              const currentValue = parseInt(rentalDaysInput.value);
+              if (currentValue > 1) {
+                rentalDaysInput.value = currentValue - 1;
+              }
+            });
+
+            increaseBtn.addEventListener("click", () => {
+              const currentValue = parseInt(rentalDaysInput.value);
+              rentalDaysInput.value = currentValue + 1;
+            });
+
+            rentalDaysInput.addEventListener("change", () => {
+              if (parseInt(rentalDaysInput.value) < 1) {
+                rentalDaysInput.value = 1;
+              }
+            });
+          }
+
+          // Add to cart button
+          const addToCartBtn = document.getElementById("addToCartBtn");
+          if (addToCartBtn) {
+            addToCartBtn.addEventListener("click", () => {
+              this.addToCart();
+            });
+          }
+
+          // Favorite button
+          const favoriteBtn = document.getElementById("favoriteBtn");
+          if (favoriteBtn) {
+            favoriteBtn.addEventListener("click", () => {
+              this.toggleFavorite();
+            });
+
+            // Check if item is already in favorites
+            this.checkFavoriteStatus();
+          }
+        }
+
+        async addToCart() {
+          if (!this.token) {
+            this.showLoginRequired();
+            return;
+          }
+
+          const rentalDays = parseInt(
+            document.getElementById("rentalDays").value
+          );
+
+          try {
+            const response = await fetch(`${this.baseUrl}/cart`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.token}`,
+              },
+              body: JSON.stringify({
+                listingId: this.productId,
+                rentalDays,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.message || "Failed to add item to cart");
+            }
+
+            this.showMessage("Item added to cart successfully!");
+
+            // Update cart badge
+            if (typeof updateCartBadgeWithAnimation === "function") {
+              updateCartBadgeWithAnimation();
+            }
+          } catch (error) {
+            console.error("Error adding to cart:", error);
+            this.showErrorMessage(
+              error.message || "Failed to add item to cart"
+            );
+          }
+        }
+
+        async toggleFavorite() {
+          if (!this.token) {
+            this.showLoginRequired();
+            return;
+          }
+
+          const favoriteBtn = document.getElementById("favoriteBtn");
+          const isFavorite = favoriteBtn.classList.contains("active");
+
+          try {
+            let response;
+
+            if (isFavorite) {
+              // Remove from favorites
+              response = await fetch(
+                `${this.baseUrl}/favorites/remove/${this.productId}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${this.token}`,
+                  },
+                }
+              );
+            } else {
+              // Add to favorites
+              response = await fetch(`${this.baseUrl}/favorites/add`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${this.token}`,
+                },
+                body: JSON.stringify({
+                  listingId: this.productId,
+                }),
+              });
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.message || "Failed to update favorites");
+            }
+
+            // Toggle active class
+            favoriteBtn.classList.toggle("active");
+
+            // Update icon
+            const icon = favoriteBtn.querySelector("i");
+            if (icon) {
+              icon.className = favoriteBtn.classList.contains("active")
+                ? "ri-heart-fill"
+                : "ri-heart-line";
+            }
+
+            this.showMessage(
+              favoriteBtn.classList.contains("active")
+                ? "Added to favorites!"
+                : "Removed from favorites!"
+            );
+          } catch (error) {
+            console.error("Error updating favorites:", error);
+            this.showErrorMessage(
+              error.message || "Failed to update favorites"
+            );
+          }
+        }
+
+        async checkFavoriteStatus() {
+          if (!this.token) return;
+
+          try {
+            const response = await fetch(
+              `${this.baseUrl}/favorites/check/${this.productId}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${this.token}`,
+                },
+              }
+            );
+
+            if (response.ok) {
+              const data = await response.json();
+              const favoriteBtn = document.getElementById("favoriteBtn");
+
+              if (favoriteBtn && data.isFavorite) {
+                favoriteBtn.classList.add("active");
+
+                const icon = favoriteBtn.querySelector("i");
+                if (icon) {
+                  icon.className = "ri-heart-fill";
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Error checking favorite status:", error);
+          }
+        }
+
+        generateStarRating(rating) {
+          if (!rating) return "";
+
+          const fullStars = Math.floor(rating);
+          const halfStar = rating % 1 >= 0.5;
+          const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+          let html = '<div class="star-rating readonly">';
+
+          // Add full stars
+          for (let i = 0; i < fullStars; i++) {
+            html +=
+              '<i class="ri-star-fill" style="color: var(--star-filled);"></i>';
+          }
+
+          // Add half star if needed
+          if (halfStar) {
+            html +=
+              '<i class="ri-star-half-fill" style="color: var(--star-filled);"></i>';
+          }
+
+          // Add empty stars
+          for (let i = 0; i < emptyStars; i++) {
+            html +=
+              '<i class="ri-star-line" style="color: var(--star-empty);"></i>';
+          }
+
+          html += "</div>";
+          return html;
+        }
+
+        showMessage(message, isError = false) {
+          const toast = document.createElement('div');
+          toast.className = 'custom-toast' + (isError ? ' error' : '');
+          toast.textContent = message;
+          document.body.appendChild(toast);
+          setTimeout(() => {
+            toast.classList.add('show');
+          }, 100);
+          setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+              document.body.removeChild(toast);
+            }, 400);
+          }, 1800);
+        }
+
+        showErrorMessage(message) {
+          this.showMessage(message, true);
+        }
+
+        showError(message) {
+          const mainContent = document.querySelector(".main-content");
+          if (mainContent) {
+            mainContent.innerHTML = `
+                        <div class="error-container">
+                            <h2>Error</h2>
+                            <p>${message}</p>
+                            <button class="btn btn-primary" onclick="window.location.href='home.html'">
+                                Back to Home
+                            </button>
+                        </div>
+                    `;
+          }
+        }
+
+        showLoginRequired() {
+          const messageElement = document.createElement("div");
+          messageElement.className = "message error";
+
+          messageElement.innerHTML = `
+                    You need to be logged in to perform this action. 
+                    <a href="login.html" style="color: white; text-decoration: underline;">Login here</a>
+                `;
+
+          document.body.appendChild(messageElement);
+
+          setTimeout(() => {
+            messageElement.remove();
+          }, 5000);
+        }
+      }
+
+      // Initialize the product detail page
+      document.addEventListener("DOMContentLoaded", () => {
+        window.productDetailPage = new ProductDetailPage();
+      });
+    </script>
+    <script>
+      // --- Modern Toast CSS for Success/Error Messages ---
+      const toastStyle = document.createElement('style');
+      toastStyle.innerHTML = `
+      .custom-toast {
+        position: fixed;
+        top: 32px;
+        left: 50%;
+        transform: translateX(-50%) scale(0.97);
+        background: linear-gradient(135deg, #6c5ce7, #9982b1);
+        color: #fff;
+        padding: 18px 36px;
+        border-radius: 14px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        opacity: 0;
+        z-index: 9999;
+        box-shadow: 0 4px 32px rgba(44,62,80,0.15);
+        transition: opacity 0.3s, transform 0.3s;
+        pointer-events: none;
+      }
+      .custom-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.02);
+      }
+      .custom-toast.error {
+        background: linear-gradient(135deg, #e74c3c, #ff9966);
+      }
+      `;
+      document.head.appendChild(toastStyle);
+    </script>
+    <script>
+      // Override ProductDetailPage.showMessage to use modern toast
+      if (window.ProductDetailPage) {
+        window.ProductDetailPage.prototype.showMessage = function(message, isError = false) {
+          const toast = document.createElement('div');
+          toast.className = 'custom-toast' + (isError ? ' error' : '');
+          toast.textContent = message;
+          document.body.appendChild(toast);
+          setTimeout(() => {
+            toast.classList.add('show');
+          }, 100);
+          setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+              document.body.removeChild(toast);
+            }, 400);
+          }, 1800);
+        }
+      }
+    </script>
+  </body>
+</html>

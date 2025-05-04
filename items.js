@@ -59,7 +59,7 @@ class UserListingsManager {
                           <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
                           <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
                           <div class="dropdown-divider"></div>
-                          <a href="#" onclick="favoritesManager.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
+                          <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
                       </div>
                   </div>
               `;
@@ -279,103 +279,85 @@ setupDropdownListeners() {
   renderListings(listings, container, isUserListings = true) {
     if (!container) return;
 
-    // Clean up any existing carousels
-    this.cleanUpListingCarousels();
-
-    if (listings.length > 0) {
-      container.innerHTML = listings
-        .map((listing) => {
-          // Ensure images are properly formatted with the full URL
-          const images =
-            listing.images && listing.images.length > 0
-              ? listing.images.map((img) =>
-                  typeof img === "string" ? img : img.url
-                )
-              : ["./pets.jpeg"]; // Use default image if no images available
-
-          return `
-             <div class="listing-card" data-id="${listing._id}">
-                 <div class="listing-image">
-                     ${images
-                       .map(
-                         (imageUrl, index) => `
-                         <img 
-                             src="${imageUrl}" 
-                             alt="${listing.name} - Image ${index + 1}" 
-                             loading="lazy"
-                             style="display: ${index === 0 ? "block" : "none"};"
-                             onerror="this.onerror=null; this.src='./pets.jpeg';"
-                         >
-                     `
-                       )
-                       .join("")}
-                     ${
-                       images.length > 1
-                         ? `
-                         <div class="image-controls">
-                             <button class="prev-img" onclick="userListingsManager.prevImage('${listing._id}')">
-                                 <i class="ri-arrow-left-s-line"></i>
-                             </button>
-                             <span class="image-counter">1/${images.length}</span>
-                             <button class="next-img" onclick="userListingsManager.nextImage('${listing._id}')">
-                                 <i class="ri-arrow-right-s-line"></i>
-                             </button>
-                         </div>
-                     `
-                         : ""
-                     }
-                 </div>
-                 <div class="listing-details">
-                     <h3>${listing.name}</h3>
-                     <p class="listing-category">
-                         <span class="category-icon"><i class="ri-price-tag-3-line"></i></span>
-                         ${listing.category}
-                     </p>
-                     <p class="listing-price">
-                         <span class="price-icon"><i class="ri-money-dollar-circle-line"></i></span>
-                         $${listing.rentalRate}/day
-                     </p>
-                     <p class="listing-description">${listing.description}</p>
-                     <div class="listing-actions">
-                         <button class="btn btn-edit" onclick="userListingsManager.openEditModal('${
-                           listing._id
-                         }')">
-                             <i class="ri-edit-line"></i> Edit
-                         </button>
-                         <button class="btn btn-delete" onclick="userListingsManager.deleteListing('${
-                           listing._id
-                         }')">
-                             <i class="ri-delete-bin-line"></i> Delete
-                         </button>
-                     </div>
-                 </div>
-             </div>
-             `;
-        })
-        .join("");
-
-      // Setup image carousel after rendering
-      this.setupManualCarousel();
-    } else {
+    if (listings.length === 0) {
         container.innerHTML = `
-          <div class="no-listings">
-            <img src="./empty-box.png" alt="No listings" class="empty-icon">
-            <p class="no-listings-message">You don't have any listings yet.</p>
-            <p class="add-item-hint">Click the button above to start adding items <span class="pointing-arrow">↑</span></p>
-          </div>
+            <div class="no-listings">
+                <img src="./empty-box.png" alt="No listings" class="empty-icon">
+                <h3 class="no-listings-message">You don't have any listings yet</h3>
+                <p class="add-item-hint">Add your first item to start renting it out <span class="pointing-arrow">→</span></p>
+                <button class="btn btn-primary pulse-attention" onclick="userListingsManager.handleAddItemClick()">Add New Item</button>
+            </div>
         `;
+        return;
+    }
+
+    container.innerHTML = listings.map(listing => {
+        const images = listing.images && listing.images.length > 0 
+            ? listing.images.map(img => typeof img === 'object' ? img.url : img)
+            : ['placeholder.jpg'];
         
-        // Make the Add New Item button pulse/glow to draw attention
-        const addButton = document.getElementById('addItemBtn');
-        if (addButton) {
-          addButton.classList.add('pulse-attention');
-          
-          // Remove the attention-grabbing effect after 10 seconds
-          setTimeout(() => {
-            addButton.classList.remove('pulse-attention');
-          }, 10000);
-        }
-      }
+        const imageControls = images.length > 1 
+            ? `<div class="image-controls">
+                <button class="prev-img" onclick="event.stopPropagation(); userListingsManager.prevImage('${listing._id}')">
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <div class="image-counter">
+                  <span class="current-index">1</span>/<span class="total-count">${images.length}</span>
+                </div>
+                <button class="next-img" onclick="event.stopPropagation(); userListingsManager.nextImage('${listing._id}')">
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>` 
+            : '';
+        
+        // Add rating display if available
+        const ratingDisplay = listing.rating ? `
+            <div class="product-rating">
+                ${this.generateStarRating(listing.rating.average)}
+                <span class="review-count">(${listing.rating.count})</span>
+            </div>
+        ` : '';
+
+        return `
+            <div class="listing-card" data-id="${listing._id}">
+                <div class="listing-image">
+                    ${images.map((imgSrc, index) => `
+                        <img 
+                            src="${imgSrc}" 
+                            alt="${listing.name}"
+                            style="display: ${index === 0 ? 'block' : 'none'}"
+                            onerror="this.onerror=null; this.src='placeholder.jpg';"
+                        >
+                    `).join('')}
+                    ${imageControls}
+                </div>
+                <div class="listing-details">
+                    <h3>${listing.name}</h3>
+                    <p class="listing-category">
+                        <i class="ri-price-tag-3-line category-icon"></i>
+                        ${listing.category}
+                    </p>
+                    <p class="listing-price">
+                        <i class="ri-money-dollar-circle-line price-icon"></i>
+                        $${listing.rentalRate} per day
+                    </p>
+                    ${ratingDisplay}
+                    <p class="listing-description">${listing.description}</p>
+                    <div class="listing-actions">
+                        <button class="btn btn-edit" onclick="userListingsManager.openEditModal('${listing._id}')">
+                            <i class="ri-edit-line"></i> Edit
+                        </button>
+                        <button class="btn btn-delete" onclick="userListingsManager.deleteListing('${listing._id}')">
+                            <i class="ri-delete-bin-line"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Setup manual carousel controls
+    this.setupManualCarousel();
   }
 
   setupManualCarousel() {
@@ -992,6 +974,39 @@ setupDropdownListeners() {
   logout() {
     localStorage.removeItem("token");
     redirectToLogin();
+  }
+
+  /**
+   * Generate star rating HTML
+   * @param {number} rating - Rating value (0-5)
+   * @returns {string} HTML for star rating
+   */
+  generateStarRating(rating) {
+    if (!rating) return '';
+    
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+    
+    let html = '<div class="star-rating readonly">';
+    
+    // Add full stars
+    for (let i = 0; i < fullStars; i++) {
+        html += '<i class="ri-star-fill" style="color: var(--star-filled);"></i>';
+    }
+    
+    // Add half star if needed
+    if (halfStar) {
+        html += '<i class="ri-star-half-fill" style="color: var(--star-filled);"></i>';
+    }
+    
+    // Add empty stars
+    for (let i = 0; i < emptyStars; i++) {
+        html += '<i class="ri-star-line" style="color: var(--star-empty);"></i>';
+    }
+    
+    html += '</div>';
+    return html;
   }
 }
 

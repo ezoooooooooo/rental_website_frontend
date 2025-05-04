@@ -1,0 +1,2400 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rently - Item Details</title>
+    <link rel="stylesheet" href="home.css" />
+    <link rel="stylesheet" href="item.css" />
+    <link rel="stylesheet" href="item-detail.css" />
+    <link rel="stylesheet" href="nav-utils.css" />
+    <link rel="stylesheet" href="rating.css" />
+    <link rel="stylesheet" href="notifications.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="main-navigation">
+      <div class="nav-container">
+        <div class="logo-section">
+          <img src="./rent.png" alt="RentEase Logo" class="logo" />
+          <h1>Rently</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="home.html">Home</a></li>
+          <li>
+            <a href="cart.html" class="cart-icon-container">
+              Cart
+              <span id="cart-badge" class="cart-badge">0</span>
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+                alt="Cart"
+                class="cart-icon"
+              />
+            </a>
+          </li>
+          <li><a href="#about">About</a></li>
+        </ul>
+        <div class="user-actions">
+          <!-- User actions will be populated by JavaScript -->
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Item Details Section -->
+      <section class="item-detail-section">
+        <div class="container">
+          <div class="item-detail-container">
+            <div class="item-detail-left">
+              <div class="item-detail-images">
+                <!-- Images will be populated by JavaScript -->
+                <div class="main-image">
+                  <img src="./pets.jpeg" alt="Item Image" id="mainImage" />
+                </div>
+                <div class="thumbnail-images" id="thumbnailContainer">
+                  <!-- Thumbnails will be populated by JavaScript -->
+                </div>
+              </div>
+            </div>
+            <div class="item-detail-right">
+              <div class="item-detail-info">
+                <h1 id="itemName">Item Name</h1>
+                <div class="item-category-price">
+                  <span class="category" id="itemCategory">Category</span>
+                  <span class="price" id="itemPrice">$0.00</span>
+                  <span class="per-day">/day</span>
+                </div>
+
+                <div class="item-rating-summary" id="ratingSnapshot">
+                  <!-- Rating snapshot will be populated by JavaScript -->
+                </div>
+
+                <div class="item-description">
+                  <h3>Description</h3>
+                  <p id="itemDescription">Item description will appear here.</p>
+                </div>
+
+                <div class="item-actions">
+                  <button class="btn btn-cart" id="addToCartBtn">
+                    <i class="ri-shopping-cart-line"></i> Add to Cart
+                  </button>
+                  <button class="btn btn-favorite" id="addToFavoritesBtn">
+                    <i class="ri-heart-line"></i> Add to Favorites
+                  </button>
+                </div>
+
+                <div class="item-owner">
+                  <h3>Listed by</h3>
+                  <div class="owner-info" id="ownerInfo">
+                    <!-- Owner info will be populated by JavaScript -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rating System Section -->
+      <section class="rating-container" id="ratingSection">
+        <div class="container">
+          <div class="item-sections">
+            <div class="rating-tabs">
+              <button class="tab-btn active" data-tab="item-ratings">
+                Item Reviews
+              </button>
+              <button class="tab-btn" data-tab="owner-ratings">
+                Seller Reviews
+              </button>
+            </div>
+            <div
+              id="itemRatingContainer"
+              class="rating-container tab-content active"
+              data-tab="item-ratings"
+            >
+              <!-- Item ratings will be loaded here -->
+              <div class="rating-header">
+                <h3>Item Ratings & Reviews</h3>
+                <button
+                  class="rating-toggle-btn"
+                  id="addReviewBtn"
+                  type="button"
+                >
+                  + Add Review
+                </button>
+              </div>
+              <!-- Rating Dialog Modal (copied from home page) -->
+              <div
+                id="ratingDialog"
+                class="rating-dialog"
+                style="display: none"
+              >
+                <div class="rating-dialog-content">
+                  <div class="rating-dialog-header">
+                    <h3>Rate This Item</h3>
+                    <button class="close-dialog-btn" id="closeRatingDialog">
+                      &times;
+                    </button>
+                  </div>
+                  <div class="rating-dialog-body">
+                    <div
+                      class="rating-stars star-rating-large"
+                      id="dialogStarRating"
+                    >
+                      <!-- Stars will be generated by JS -->
+                    </div>
+                    <div class="comment-field">
+                      <textarea
+                        id="dialogComment"
+                        placeholder="Share your experience..."
+                      ></textarea>
+                    </div>
+                    <div class="dialog-actions">
+                      <button class="cancel-btn" id="cancelDialogBtn">
+                        Cancel
+                      </button>
+                      <button class="submit-btn" id="submitDialogBtn">
+                        Submit
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="review-list">
+                <!-- Reviews will be loaded here -->
+              </div>
+            </div>
+            <div
+              id="ownerRatingContainer"
+              class="rating-container tab-content"
+              data-tab="owner-ratings"
+            >
+              <div class="rating-header">
+                <h3>Seller Ratings & Reviews</h3>
+                <button
+                  class="rating-toggle-btn"
+                  onclick="window.ratingSystem.toggleAddReviewForm()"
+                >
+                  + Rate Seller
+                </button>
+              </div>
+              <div
+                id="sellerReviewForm"
+                class="add-review-form"
+                style="display: none"
+              >
+                <h4 class="form-title">Rate This Seller</h4>
+                <form onsubmit="window.ratingSystem.submitOwnerRating(event)">
+                  <input type="hidden" name="ownerId" id="sellerRatingOwnerId" value="" />
+
+                  <div class="rating-categories">
+                    <div class="rating-category">
+                      <label class="rating-category-label">Communication</label>
+                      <div class="star-rating">
+                        <input
+                          type="hidden"
+                          name="communicationRating"
+                          value="0"
+                        />
+                        <label
+                          data-value="5"
+                          onclick="setCategoryRating('communicationRating', 5)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="4"
+                          onclick="setCategoryRating('communicationRating', 4)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="3"
+                          onclick="setCategoryRating('communicationRating', 3)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="2"
+                          onclick="setCategoryRating('communicationRating', 2)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="1"
+                          onclick="setCategoryRating('communicationRating', 1)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                      </div>
+                    </div>
+
+                    <div class="rating-category">
+                      <label class="rating-category-label">Reliability</label>
+                      <div class="star-rating">
+                        <input
+                          type="hidden"
+                          name="reliabilityRating"
+                          value="0"
+                        />
+                        <label
+                          data-value="5"
+                          onclick="setCategoryRating('reliabilityRating', 5)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="4"
+                          onclick="setCategoryRating('reliabilityRating', 4)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="3"
+                          onclick="setCategoryRating('reliabilityRating', 3)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="2"
+                          onclick="setCategoryRating('reliabilityRating', 2)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="1"
+                          onclick="setCategoryRating('reliabilityRating', 1)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                      </div>
+                    </div>
+
+                    <div class="rating-category">
+                      <label class="rating-category-label"
+                        >Item Condition</label
+                      >
+                      <div class="star-rating">
+                        <input
+                          type="hidden"
+                          name="itemConditionRating"
+                          value="0"
+                        />
+                        <label
+                          data-value="5"
+                          onclick="setCategoryRating('itemConditionRating', 5)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="4"
+                          onclick="setCategoryRating('itemConditionRating', 4)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="3"
+                          onclick="setCategoryRating('itemConditionRating', 3)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="2"
+                          onclick="setCategoryRating('itemConditionRating', 2)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="1"
+                          onclick="setCategoryRating('itemConditionRating', 1)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                      </div>
+                    </div>
+
+                    <div class="rating-category">
+                      <label class="rating-category-label"
+                        >Overall Rating</label
+                      >
+                      <div class="star-rating">
+                        <input type="hidden" name="overallRating" value="0" />
+                        <label
+                          data-value="5"
+                          onclick="setCategoryRating('overallRating', 5)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="4"
+                          onclick="setCategoryRating('overallRating', 4)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="3"
+                          onclick="setCategoryRating('overallRating', 3)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="2"
+                          onclick="setCategoryRating('overallRating', 2)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                        <label
+                          data-value="1"
+                          onclick="setCategoryRating('overallRating', 1)"
+                          ><i class="ri-star-fill"></i
+                        ></label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rating-input">
+                    <label for="sellerComment">Your Review</label>
+                    <textarea
+                      name="comment"
+                      id="sellerComment"
+                      class="review-text"
+                      placeholder="Share your experience with this seller..."
+                    ></textarea>
+                  </div>
+
+                  <div class="review-form-actions">
+                    <button
+                      type="button"
+                      class="cancel-review-btn"
+                      onclick="window.ratingSystem.toggleAddReviewForm()"
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" class="submit-review-btn">
+                      Submit Review
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div class="seller-reviews">
+                <!-- Seller reviews will be loaded here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Related Items Section -->
+      <section class="related-items">
+        <div class="container">
+          <h2>Related Items</h2>
+          <div class="related-items-grid" id="relatedItemsContainer">
+            <!-- Related items will be populated by JavaScript -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Rating Dialog Modal (copied from home page) -->
+    <div id="ratingDialog" class="rating-dialog" style="display: none">
+      <div class="rating-dialog-content">
+        <div class="rating-dialog-header">
+          <h3>Rate This Item</h3>
+          <button class="close-dialog-btn">&times;</button>
+        </div>
+        <div class="rating-dialog-body">
+          <div class="rating-stars">
+            <p>How would you rate this item?</p>
+            <div class="star-rating-large" id="dialogStarRating">
+              <!-- Stars will be dynamically generated -->
+            </div>
+          </div>
+          <div class="comment-field">
+            <p>Add a comment (optional):</p>
+            <textarea
+              id="dialogComment"
+              rows="4"
+              placeholder="Share your experience with this item..."
+            ></textarea>
+          </div>
+          <div class="dialog-actions">
+            <button class="cancel-btn">Cancel</button>
+            <button class="submit-btn">Submit Rating</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+      <div class="footer-container">
+        <div class="footer-columns">
+          <div class="footer-column">
+            <h3>Quick Links</h3>
+            <a href="home.html">Home</a>
+            <a href="home.html">Categories</a>
+            <a href="#about">About Us</a>
+          </div>
+          <div class="footer-column">
+            <h3>Support</h3>
+            <a href="#">Help Center</a>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+          </div>
+          <div class="footer-column">
+            <h3>Legal</h3>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+          </div>
+          <div class="footer-column">
+            <h3>Connect</h3>
+            <div class="social-links">
+              <a href="#" class="social-link">Twitter</a>
+              <a href="#" class="social-link">Instagram</a>
+              <a href="#" class="social-link">LinkedIn</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Rently. All Rights Reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Add notification container at the end of body -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Item Detail JavaScript -->
+    <script>
+      // Utility to get URL parameters
+      function getUrlParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+
+      // Get the listing ID from URL
+      const listingId = getUrlParam("id") || getUrlParam("listingId") || getUrlParam("itemId");
+
+      // Base API URL
+      const baseUrl = "http://localhost:3000/api";
+
+      // Load item details
+      async function loadItemDetail() {
+        if (!listingId) {
+          showError("No item ID provided");
+          return;
+        }
+
+        try {
+          // Fetch item details
+          const response = await fetch(`${baseUrl}/listings/${listingId}`);
+          if (!response.ok) {
+            throw new Error(
+              `Failed to load item details. Status: ${response.status}`
+            );
+          }
+
+          const item = await response.json();
+          displayItemDetails(item);
+
+          // Load related items
+          loadRelatedItems(item.category);
+        } catch (error) {
+          console.error("Error loading item details:", error);
+          showError("Failed to load item details. Please try again later.");
+        }
+      }
+
+      // Display item details in the UI
+      function displayItemDetails(item) {
+        // Item basic info
+        document.getElementById("itemName").textContent = item.name;
+        document.getElementById("itemCategory").textContent = item.category;
+        document.getElementById("itemPrice").textContent = `$${parseFloat(
+          item.rentalRate
+        ).toFixed(2)}`;
+        document.getElementById("itemDescription").textContent =
+          item.description;
+
+        // Item images
+        if (item.images && item.images.length > 0) {
+          // Main image
+          const mainImage = document.getElementById("mainImage");
+          mainImage.src = item.images[0].url || "./pets.jpeg";
+          mainImage.alt = item.name;
+
+          // Thumbnails
+          const thumbnailContainer =
+            document.getElementById("thumbnailContainer");
+          thumbnailContainer.innerHTML = item.images
+            .map(
+              (image, index) => `
+            <div class="thumbnail ${index === 0 ? "active" : ""}">
+              <img src="${image.url}" alt="${
+                item.name
+              }" onclick="setMainImage('${image.url}', this)">
+            </div>
+          `
+            )
+            .join("");
+        }
+
+        // Add to cart button
+        const addToCartBtn = document.getElementById("addToCartBtn");
+        addToCartBtn.onclick = () => addToCart(item._id);
+
+        // Add to favorites button
+        const addToFavoritesBtn = document.getElementById("addToFavoritesBtn");
+        addToFavoritesBtn.onclick = () => addToFavorites(item._id);
+
+        // Check if the item is already in favorites
+        checkFavoriteStatus(item._id);
+
+        // Display rating summary
+        const ratingSnapshot = document.getElementById("ratingSnapshot");
+        if (ratingSnapshot) {
+          fetchAndDisplayRatingSummary(item._id, ratingSnapshot);
+        }
+
+        // Set document title
+        document.title = `Rently - ${item.name}`;
+
+        // Extract owner ID correctly
+        if (item.owner) {
+          // Check if owner is an object with _id or id property
+          if (
+            typeof item.owner === "object" &&
+            (item.owner._id || item.owner.id)
+          ) {
+            loadOwnerDetails(item.owner._id || item.owner.id);
+          } else {
+            // Owner might be directly the ID
+            loadOwnerDetails(item.owner);
+          }
+        } else if (item.ownerId) {
+          // Or use ownerId if available
+          loadOwnerDetails(item.ownerId);
+        }
+      }
+
+      // Set main image when thumbnail is clicked
+      function setMainImage(src, thumbnail) {
+        // Change main image src
+        document.getElementById("mainImage").src = src;
+
+        // Update active thumbnail
+        const thumbnails = document.querySelectorAll(".thumbnail");
+        thumbnails.forEach((thumb) => thumb.classList.remove("active"));
+        thumbnail.parentElement.classList.add("active");
+      }
+
+      // Load owner details
+      async function loadOwnerDetails(ownerId) {
+        try {
+          const response = await fetch(`${baseUrl}/users/${ownerId}`);
+          if (!response.ok) {
+            console.log(`Owner information not available for ID: ${ownerId}`);
+            // Display fallback owner info instead of showing an error
+            const ownerInfo = document.getElementById("ownerInfo");
+            if (ownerInfo) {
+              ownerInfo.innerHTML = `
+                <div class="owner-avatar">
+                  <div class="avatar-initial">S</div>
+                </div>
+                <div class="owner-details">
+                  <h3>Item Owner</h3>
+                  <p>Contact this seller for more information about the item.</p>
+                </div>
+              `;
+            }
+            return;
+          }
+
+          const owner = await response.json();
+          // Display owner info
+          const ownerInfo = document.getElementById("ownerInfo");
+          ownerInfo.innerHTML = `
+            <div class="owner-avatar">
+              ${
+                owner.profileImage
+                  ? `<img src="${owner.profileImage}" alt="${owner.firstName}">`
+                  : `<div class="avatar-initial">${
+                      owner.firstName?.[0] || "U"
+                    }</div>`
+              }
+            </div>
+            <div class="owner-details">
+              <h4>${owner.firstName} ${owner.lastName || ""}</h4>
+              <p>Member since ${new Date(
+                owner.createdAt
+              ).toLocaleDateString()}</p>
+              <a href="item.html?ownerId=${owner._id}">View all listings</a>
+            </div>
+          `;
+        } catch (error) {
+          console.error("Error loading owner details:", error);
+        }
+      }
+
+      // Load related items
+      async function loadRelatedItems(category) {
+        try {
+          const response = await fetch(
+            `${baseUrl}/listings?category=${category}&limit=4`
+          );
+          if (!response.ok) return;
+
+          const items = await response.json();
+          const filteredItems = items.filter((item) => item._id !== listingId);
+
+          if (filteredItems.length === 0) {
+            document.querySelector(".related-items").style.display = "none";
+            return;
+          }
+
+          // Display related items
+          const relatedItemsContainer = document.getElementById(
+            "relatedItemsContainer"
+          );
+          relatedItemsContainer.innerHTML = filteredItems
+            .slice(0, 3)
+            .map(
+              (item) => `
+            <div class="related-item-card">
+              <div class="related-item-image">
+                <img src="${item.images?.[0]?.url || "./pets.jpeg"}" alt="${
+                item.name
+              }">
+              </div>
+              <div class="related-item-details">
+                <h3>${item.name}</h3>
+                <p class="related-item-price">$${parseFloat(
+                  item.rentalRate
+                ).toFixed(2)}/day</p>
+                <a href="item-detail.html?listingId=${
+                  item._id
+                }" class="related-item-link">View Details</a>
+              </div>
+            </div>
+          `
+            )
+            .join("");
+        } catch (error) {
+          console.error("Error loading related items:", error);
+        }
+      }
+
+      // Add to cart
+      async function addToCart(itemId) {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch(`${baseUrl}/cart`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              listingId: itemId,
+              rentalDays: 1,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Error adding item to cart");
+          }
+
+          showNotification(data.message || "Item added to cart successfully");
+        } catch (error) {
+          console.error("Error adding to cart:", error);
+          showNotification(
+            error.message || "Error adding item to cart",
+            "error"
+          );
+        }
+      }
+
+      // Add to favorites
+      async function addToFavorites(itemId) {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch(`${baseUrl}/favorites/add`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              listingId: itemId,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Error adding to favorites");
+          }
+
+          const favBtn = document.getElementById("addToFavoritesBtn");
+          favBtn.innerHTML = '<i class="ri-heart-fill"></i> Added to Favorites';
+          favBtn.classList.add("active");
+
+          showNotification(data.message || "Added to favorites successfully");
+        } catch (error) {
+          console.error("Error updating favorites:", error);
+          showNotification(
+            error.message || "Error updating favorites",
+            "error"
+          );
+        }
+      }
+
+      // Check if item is in favorites
+      async function checkFavoriteStatus(itemId) {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        try {
+          const response = await fetch(`${baseUrl}/favorites/check/${itemId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.isFavorite) {
+              // Update button to show it's already favorited
+              const favBtn = document.getElementById("addToFavoritesBtn");
+              favBtn.innerHTML =
+                '<i class="ri-heart-fill"></i> In Your Favorites';
+              favBtn.classList.add("active");
+              // Change onclick to remove from favorites
+              favBtn.onclick = () => removeFromFavorites(itemId);
+            }
+          }
+        } catch (error) {
+          console.error("Error checking favorite status:", error);
+        }
+      }
+
+      // Remove from favorites
+      async function removeFromFavorites(itemId) {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        try {
+          const response = await fetch(
+            `${baseUrl}/favorites/remove/${itemId}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.ok) {
+            // Update button back to normal
+            const favBtn = document.getElementById("addToFavoritesBtn");
+            favBtn.innerHTML = '<i class="ri-heart-line"></i> Add to Favorites';
+            favBtn.classList.remove("active");
+            // Change onclick back to add favorites
+            favBtn.onclick = () => addToFavorites(itemId);
+
+            showNotification("Removed from favorites");
+          } else {
+            throw new Error("Failed to remove from favorites");
+          }
+        } catch (error) {
+          console.error("Error removing from favorites:", error);
+          showNotification(
+            error.message || "Error removing from favorites",
+            "error"
+          );
+        }
+      }
+
+      // Fetch and display rating summary in the top section
+      async function fetchAndDisplayRatingSummary(itemId, container) {
+        try {
+          const response = await fetch(`${baseUrl}/ratings/listing/${itemId}`);
+          if (!response.ok) return;
+
+          const ratingData = await response.json();
+          console.log("Rating data:", ratingData);
+
+          // Calculate average and count
+          let averageScore = 0;
+          let count = 0;
+          let userRating = 0;
+          let userHasRated = false;
+          let ratingId = null;
+          let userComment = "";
+
+          // Try to get the current user ID
+          const token = localStorage.getItem("token");
+          let userId = null;
+
+          if (token) {
+            try {
+              // Extract user ID from JWT token
+              const payload = token.split(".")[1];
+              const decoded = JSON.parse(atob(payload));
+              userId = decoded.id || decoded.userId || decoded._id;
+              console.log("Current user ID:", userId);
+            } catch (error) {
+              console.error("Error extracting user ID from token:", error);
+            }
+          }
+
+          // Process rating data based on API response format
+          if (Array.isArray(ratingData)) {
+            console.log(
+              "Rating data is an array with",
+              ratingData.length,
+              "ratings"
+            );
+            const ratings = ratingData;
+            if (ratings.length > 0) {
+              averageScore =
+                ratings.reduce((sum, r) => sum + (r.score || 0), 0) /
+                ratings.length;
+              count = ratings.length;
+
+              // Check if current user has rated
+              if (userId) {
+                console.log("Checking if user", userId, "has rated");
+                const userRatingObj = ratings.find((r) => {
+                  const ratingUserId = r.user?._id || r.userId;
+                  console.log("Comparing with rating user:", ratingUserId);
+                  return ratingUserId === userId;
+                });
+
+                if (userRatingObj) {
+                  console.log("Found user rating:", userRatingObj);
+                  userHasRated = true;
+                  userRating = userRatingObj.score || 0;
+                  ratingId = userRatingObj._id || userRatingObj.id;
+                  userComment = userRatingObj.comment || "";
+                }
+              }
+            }
+          } else if (ratingData && typeof ratingData === "object") {
+            console.log("Rating data is an object");
+            averageScore = ratingData.averageScore || ratingData.average || 0;
+            count = ratingData.count || 0;
+
+            // If it's in the format {data: Array, count: number}
+            const ratingsArray = ratingData.data || ratingData.ratings || [];
+
+            // Check if there are ratings in the data object
+            if (Array.isArray(ratingsArray) && userId) {
+              console.log(
+                "Checking ratings array with",
+                ratingsArray.length,
+                "ratings"
+              );
+              const userRatingObj = ratingsArray.find((r) => {
+                const ratingUserId = r.user?._id || r.userId;
+                return ratingUserId === userId;
+              });
+
+              if (userRatingObj) {
+                console.log("Found user rating in object data:", userRatingObj);
+                userHasRated = true;
+                userRating = userRatingObj.score || 0;
+                ratingId = userRatingObj._id || userRatingObj.id;
+                userComment = userRatingObj.comment || "";
+              }
+            }
+          }
+
+          // Store user rating information as globals for easier access
+          window.userRatingData = {
+            hasRated: userHasRated,
+            rating: userRating,
+            ratingId: ratingId || "",
+            comment: userComment,
+            listingId: itemId,
+          };
+
+          console.log("User rating info:", window.userRatingData);
+
+          // Generate stars HTML
+          const fullStars = Math.floor(averageScore);
+          const halfStar = averageScore % 1 >= 0.5;
+          const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+          // Make stars readonly, remove clickability
+          let starsHtml = `<div class="star-rating readonly">`;
+
+          // Full stars
+          for (let i = 0; i < fullStars; i++) {
+            starsHtml += '<i class="ri-star-fill"></i>';
+          }
+
+          // Half star
+          if (halfStar) {
+            starsHtml += '<i class="ri-star-half-fill"></i>';
+          }
+
+          // Empty stars
+          for (let i = 0; i < emptyStars; i++) {
+            starsHtml += '<i class="ri-star-line"></i>';
+          }
+
+          starsHtml += "</div>";
+
+          // Add user rated indicator if applicable
+          let userRatedHtml = "";
+          if (userHasRated) {
+            userRatedHtml = `<span class="user-rated">You rated: ${userRating}/5</span>`;
+          }
+
+          // Display in container
+          container.innerHTML = `
+            ${starsHtml}
+            ${userRatedHtml}
+            <span class="review-count">${count} ${
+            count === 1 ? "review" : "reviews"
+          }</span>
+            <a href="#ratingSection" class="see-all-reviews">See all reviews</a>
+          `;
+
+          // Update the Add Review button text based on whether the user has rated
+          updateAddReviewButtonText(userHasRated);
+        } catch (error) {
+          console.error("Error fetching rating summary:", error);
+        }
+      }
+
+      // Update Add Review button text based on whether user has rated
+      function updateAddReviewButtonText(userHasRated) {
+        const addReviewBtn = document.getElementById("addReviewBtn");
+        if (addReviewBtn) {
+          addReviewBtn.textContent = userHasRated
+            ? "Edit Your Rating"
+            : "+ Add Review";
+          // Ensure we remove any previous event listeners
+          const newBtn = addReviewBtn.cloneNode(true);
+          addReviewBtn.parentNode.replaceChild(newBtn, addReviewBtn);
+
+          // Add the click event to the new button
+          newBtn.addEventListener("click", handleAddReviewClick);
+        }
+      }
+
+      // Function to handle the Add Review button click
+      function handleAddReviewClick(event) {
+        event.preventDefault();
+
+        console.log("Add Review button clicked");
+
+        // Use the global user rating data
+        if (window.userRatingData) {
+          console.log("Using stored user rating data:", window.userRatingData);
+          const { hasRated, rating, ratingId, comment, listingId } =
+            window.userRatingData;
+
+          // Create a star element with the necessary data
+          const tempStarElement = document.createElement("div");
+          tempStarElement.className = "star-rating";
+          tempStarElement.setAttribute("data-listing-id", listingId);
+          tempStarElement.setAttribute("data-user-rating", rating.toString());
+          tempStarElement.setAttribute("data-rating-id", ratingId);
+          tempStarElement.setAttribute("data-user-comment", comment);
+
+          // Show the rating dialog
+          showRatingDialog(event, tempStarElement);
+        } else {
+          console.log("No user rating data available, using default");
+          // Fallback
+          const tempStarElement = document.createElement("div");
+          tempStarElement.className = "star-rating";
+          tempStarElement.setAttribute("data-listing-id", listingId);
+          tempStarElement.setAttribute("data-user-rating", "0");
+          showRatingDialog(event, tempStarElement);
+        }
+      }
+
+      // Initialize review forms - replaced with direct event listener on the button
+      function initReviewForms() {
+        // Set the item ID in the item review form
+        const itemReviewForm = document.querySelector("#reviewForm form");
+        if (itemReviewForm) {
+          const itemIdInput = itemReviewForm.querySelector(
+            'input[name="itemId"]'
+          );
+          if (itemIdInput) {
+            itemIdInput.value = listingId;
+          }
+        }
+
+        // Add click handler to the Rate Seller button
+        const rateSellerBtn = document.querySelector(
+          "#ownerRatingContainer .rating-toggle-btn"
+        );
+        if (rateSellerBtn) {
+          rateSellerBtn.addEventListener("click", toggleSellerReviewForm);
+        }
+      }
+
+      // Toggle review form visibility
+      function toggleReviewForm() {
+        const form = document.getElementById("reviewForm");
+        if (form) {
+          const isVisible = form.style.display !== "none";
+          form.style.display = isVisible ? "none" : "block";
+
+          // Update button text
+          const toggleBtn = document.querySelector(".rating-toggle-btn");
+          if (toggleBtn) {
+            toggleBtn.textContent = isVisible ? "+ Add Review" : "Cancel";
+          }
+
+          // Set the item ID in the form
+          if (!isVisible) {
+            const itemIdInput = form.querySelector('input[name="itemId"]');
+            if (itemIdInput) {
+              itemIdInput.value = listingId;
+            }
+            form.scrollIntoView({ behavior: "smooth" });
+          }
+        }
+      }
+
+      // Set rating value for the review form
+      function setReviewRating(value) {
+        // Set hidden input value
+        const ratingInput = document.getElementById("ratingValue");
+        if (ratingInput) {
+          ratingInput.value = value;
+        }
+
+        // Update visual stars
+        const labels = document.querySelectorAll(".star-rating label");
+        labels.forEach((label) => {
+          const starValue = parseInt(label.dataset.value);
+          label.classList.toggle("active", starValue <= value);
+        });
+      }
+
+      // Submit item review
+      async function submitItemReview(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const itemId = form.elements.itemId.value;
+        const rating = parseInt(form.elements.rating.value);
+        const comment = form.elements.comment.value;
+
+        // Validate inputs
+        if (!rating || rating < 1 || rating > 5) {
+          showMessage("Please select a rating between 1 and 5 stars", true);
+          return;
+        }
+
+        if (!comment.trim()) {
+          showMessage("Please enter a review comment", true);
+          return;
+        }
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+          showMessage("You must be logged in to submit a review", true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${baseUrl}/ratings`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              listingId: itemId,
+              score: rating,
+              comment: comment,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to submit review");
+          }
+
+          // Show success message
+          showMessage("Your review has been submitted successfully!");
+
+          // Reset form and hide it
+          form.reset();
+          toggleReviewForm();
+
+          // Reload ratings to show the new review
+          setTimeout(() => {
+            loadItemRatingsDirectly(itemId);
+          }, 1000);
+        } catch (error) {
+          console.error("Error submitting review:", error);
+          showMessage(
+            error.message || "Failed to submit review. Please try again.",
+            true
+          );
+        }
+      }
+
+      // Toggle seller review form visibility
+      function toggleSellerReviewForm() {
+        const form = document.getElementById("sellerReviewForm");
+        if (form) {
+          const isVisible = form.style.display !== "none";
+          form.style.display = isVisible ? "none" : "block";
+
+          // Update button text
+          const toggleBtn = document.querySelector(".rating-toggle-btn");
+          if (toggleBtn) {
+            toggleBtn.textContent = isVisible ? "+ Rate Seller" : "Cancel";
+          }
+
+          // Set the seller ID in the form
+          if (!isVisible) {
+            const sellerIdInput = form.querySelector('input[name="sellerId"]');
+            if (sellerIdInput) {
+              sellerIdInput.value = listingId;
+            }
+            form.scrollIntoView({ behavior: "smooth" });
+          }
+        }
+      }
+
+      // Set rating value for the seller review form
+      function setCategoryRating(category, value) {
+        // Set hidden input value
+        const ratingInput = document.querySelector(`input[name="${category}"]`);
+        if (ratingInput) {
+          ratingInput.value = value;
+        }
+
+        // Update visual stars
+        const labels = document.querySelectorAll(
+          `.rating-categories .${category} .star-rating label`
+        );
+        labels.forEach((label) => {
+          const starValue = parseInt(label.dataset.value);
+          label.classList.toggle("active", starValue <= value);
+        });
+      }
+
+      // Submit seller review
+      async function submitSellerReview(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const sellerId = form.elements.sellerId.value;
+        const communicationRating = parseInt(
+          form.elements.communicationRating.value
+        );
+        const reliabilityRating = parseInt(
+          form.elements.reliabilityRating.value
+        );
+        const itemConditionRating = parseInt(
+          form.elements.itemConditionRating.value
+        );
+        const overallRating = parseInt(form.elements.overallRating.value);
+        const comment = form.elements.comment.value;
+
+        // Validate inputs
+        if (
+          !communicationRating ||
+          communicationRating < 1 ||
+          communicationRating > 5
+        ) {
+          showMessage(
+            "Please select a communication rating between 1 and 5 stars",
+            true
+          );
+          return;
+        }
+
+        if (
+          !reliabilityRating ||
+          reliabilityRating < 1 ||
+          reliabilityRating > 5
+        ) {
+          showMessage(
+            "Please select a reliability rating between 1 and 5 stars",
+            true
+          );
+          return;
+        }
+
+        if (
+          !itemConditionRating ||
+          itemConditionRating < 1 ||
+          itemConditionRating > 5
+        ) {
+          showMessage(
+            "Please select an item condition rating between 1 and 5 stars",
+            true
+          );
+          return;
+        }
+
+        if (!overallRating || overallRating < 1 || overallRating > 5) {
+          showMessage(
+            "Please select an overall rating between 1 and 5 stars",
+            true
+          );
+          return;
+        }
+
+        if (!comment.trim()) {
+          showMessage("Please enter a review comment", true);
+          return;
+        }
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+          showMessage("You must be logged in to submit a review", true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${baseUrl}/owner-ratings`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              ownerId: sellerId,
+              score: overallRating,
+              comment: comment,
+              communication: communicationRating,
+              reliability: reliabilityRating,
+              itemCondition: itemConditionRating,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to submit review");
+          }
+
+          // Show success message
+          showMessage("Your review has been submitted successfully!");
+
+          // Reset form and hide it
+          form.reset();
+          toggleSellerReviewForm();
+
+          // Reload ratings to show the new review
+          setTimeout(() => {
+            loadSellerRatingsDirectly(sellerId);
+          }, 1000);
+        } catch (error) {
+          console.error("Error submitting review:", error);
+          showMessage(
+            error.message || "Failed to submit review. Please try again.",
+            true
+          );
+        }
+      }
+
+      // Load seller ratings directly
+      async function loadSellerRatingsDirectly(sellerId) {
+        console.log("Loading seller ratings directly for seller:", sellerId);
+
+        try {
+          const response = await fetch(
+            `${baseUrl}/owner-ratings/owner/${sellerId}`
+          );
+
+          let html = "";
+          if (response.ok) {
+            const ratingsData = await response.json();
+            console.log("Owner ratings:", ratingsData);
+
+            // Show ratings data
+            html = `
+              <div class="rating-header">
+                <h3>Seller Ratings & Reviews</h3>
+                <button class="rating-toggle-btn" onclick="toggleSellerReviewForm()">+ Rate Seller</button>
+              </div>
+              <div class="rating-summary">
+                <div class="rating-average">
+                  <div class="rating-average-value">4.5</div>
+                  <div class="rating-average-stars">
+                    <div class="star-rating readonly">
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-half-fill"></i>
+                    </div>
+                  </div>
+                  <div class="rating-count">Seller Rating</div>
+                </div>
+              </div>
+              <div class="seller-rating-explanation">
+                <p>The seller rating reflects the quality of service provided by this seller based on customer reviews. Ratings cover communication, reliability, and the condition of items as described.</p>
+              </div>
+            `;
+          } else {
+            html =
+              '<div class="no-ratings">No ratings available for this seller yet.</div>';
+          }
+
+          // Set the HTML and mark as loaded
+          const ownerContainer = document.getElementById(
+            "ownerRatingContainer"
+          );
+          ownerContainer.innerHTML = html;
+          ownerContainer.dataset.loaded = "true";
+        } catch (error) {
+          console.error("Error loading owner ratings:", error);
+          const ownerContainer = document.getElementById(
+            "ownerRatingContainer"
+          );
+          ownerContainer.innerHTML =
+            '<div class="error-message">Failed to load seller ratings. Please try again later.</div>';
+        }
+      }
+
+      // --- Rating Dialog Modal Logic (mirroring home page) ---
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM loaded in item-detail.html");
+        // --- RATING DIALOG LOGIC (mirroring home page) ---
+        const addReviewBtn = document.getElementById("addReviewBtn");
+        const ratingDialog = document.getElementById("ratingDialog");
+        const closeDialogBtn = document.getElementById("closeRatingDialog");
+        const cancelDialogBtn = document.getElementById("cancelDialogBtn");
+        const submitDialogBtn = document.getElementById("submitDialogBtn");
+        const dialogComment = document.getElementById("dialogComment");
+        let selectedRating = 0;
+        let ratingId = null;
+
+        console.log("Rating dialog elements:", {
+          addReviewBtn: !!addReviewBtn,
+          ratingDialog: !!ratingDialog,
+          closeDialogBtn: !!closeDialogBtn,
+          submitDialogBtn: !!submitDialogBtn,
+        });
+
+        // Ensure listingId is globally available
+        window.listingId = getUrlParam("id") || getUrlParam("listingId") || getUrlParam("itemId");
+        console.log("Listing ID from URL:", window.listingId);
+
+        // Generate star rating for dialog
+        function generateStars() {
+          const dialogStarRating = document.getElementById("dialogStarRating");
+          if (!dialogStarRating) {
+            console.error("dialogStarRating element not found");
+            return;
+          }
+
+          dialogStarRating.innerHTML = "";
+          for (let i = 1; i <= 5; i++) {
+            const star = document.createElement("i");
+            star.className = "ri-star-line";
+            star.dataset.value = i;
+            star.addEventListener("click", () => {
+              selectedRating = i;
+              updateStars();
+            });
+            dialogStarRating.appendChild(star);
+          }
+          console.log("Stars generated for rating dialog");
+        }
+
+        function updateStars() {
+          const stars = document.querySelectorAll("#dialogStarRating i");
+          stars.forEach((star, idx) => {
+            if (idx < selectedRating) {
+              star.classList.add("ri-star-fill");
+              star.classList.remove("ri-star-line");
+            } else {
+              star.classList.add("ri-star-line");
+              star.classList.remove("ri-star-fill");
+            }
+          });
+          console.log("Stars updated to rating:", selectedRating);
+        }
+
+        async function checkExistingRating() {
+          const token = localStorage.getItem("token");
+          if (!token || !window.listingId) {
+            console.log("Cannot check existing rating: missing token or listingId");
+            return null;
+          }
+
+          try {
+            console.log(`Checking existing rating for listing ${window.listingId}`);
+            // Using the correct endpoint from the API documentation
+            const res = await fetch(`http://localhost:3000/api/ratings/listing/${window.listingId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (!res.ok) {
+              console.error("Failed to fetch existing ratings:", res.status);
+              return null;
+            }
+
+            const response = await res.json();
+            console.log("Received ratings response:", response);
+            
+            // Handle API response format according to documentation
+            let ratingsArray = [];
+            
+            // According to the API docs, the response should have this structure:
+            // { "success": true, "count": number, "data": [ {...rating objects} ] }
+            if (response.success && response.data && Array.isArray(response.data)) {
+              console.log(`Found ${response.count} ratings in response data array`);
+              ratingsArray = response.data;
+            }
+            // Fallback handling for other possible response formats
+            else if (Array.isArray(response)) {
+              console.log("Response is a direct ratings array");
+              ratingsArray = response;
+            }
+            else if (response.ratings && Array.isArray(response.ratings)) {
+              console.log("Response has ratings array property");
+              ratingsArray = response.ratings;
+            }
+            else {
+              console.log("Could not find ratings array in response, using empty array");
+              ratingsArray = [];
+            }
+            
+            console.log("Processed ratings array:", ratingsArray);
+
+            // Find rating by current user
+            const userId = localStorage.getItem("userId");
+            console.log("Looking for ratings by user ID:", userId);
+            
+            const userRating = ratingsArray.find(r => r && r.userId === userId);
+            console.log("User's existing rating:", userRating);
+            return userRating;
+          } catch (error) {
+            console.error("Error checking existing rating:", error);
+            return null;
+          }
+        }
+
+        async function openRatingDialog() {
+          console.log("Opening rating dialog");
+          if (!ratingDialog) {
+            console.error("Rating dialog element not found");
+            return;
+          }
+
+          generateStars();
+          if (dialogComment) dialogComment.value = "";
+          ratingId = null;
+          selectedRating = 0;
+
+          // Load existing rating if present
+          try {
+            const existing = await checkExistingRating();
+            if (existing) {
+              selectedRating = existing.score || existing.rating || 0;
+              if (dialogComment) dialogComment.value = existing.comment || "";
+              ratingId = existing._id || existing.id;
+              updateStars();
+              console.log("Loaded existing rating:", { score: selectedRating, comment: existing.comment, id: ratingId });
+            }
+          } catch (error) {
+            console.error("Error loading existing rating:", error);
+          }
+
+          ratingDialog.style.display = "flex";
+          console.log("Rating dialog opened");
+        }
+
+        // Make these functions globally available
+        window.openItemRatingDialog = openRatingDialog;
+        window.globalOpenRatingDialog = openRatingDialog;
+
+        function closeRatingDialog() {
+          console.log("Closing rating dialog");
+          if (ratingDialog) ratingDialog.style.display = "none";
+        }
+
+        // Add event listeners
+        if (addReviewBtn) {
+          console.log("Adding click listener to Add Review button");
+          addReviewBtn.addEventListener("click", function (event) {
+            event.preventDefault();
+            console.log("Add Review button clicked");
+            openRatingDialog();
+          });
+        } else {
+          console.error("Add Review button not found");
+        }
+
+        if (closeDialogBtn) {
+          closeDialogBtn.addEventListener("click", closeRatingDialog);
+        }
+
+        if (cancelDialogBtn) {
+          cancelDialogBtn.addEventListener("click", closeRatingDialog);
+        }
+
+        if (submitDialogBtn) {
+          submitDialogBtn.addEventListener("click", async () => {
+            console.log("Submit button clicked");
+            const comment = dialogComment ? dialogComment.value.trim() : "";
+            const token = localStorage.getItem("token");
+
+            if (!selectedRating) {
+              alert("Please select a star rating.");
+              return;
+            }
+
+            if (!window.listingId) {
+              alert("Item ID is missing. Please refresh the page.");
+              return;
+            }
+
+            if (!token) {
+              alert("You must be logged in to submit a review.");
+              return;
+            }
+
+            try {
+              console.log("Submitting rating:", {
+                listingId: window.listingId,
+                score: selectedRating,
+                comment,
+                isUpdate: !!ratingId,
+              });
+
+              let response;
+              if (ratingId) {
+                // Update existing rating
+                console.log(`Updating rating with ID ${ratingId}`);
+                response = await fetch(`http://localhost:3000/api/ratings/${ratingId}`, {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({ score: selectedRating, comment }),
+                });
+              } else {
+                // Create new rating
+                console.log(`Creating new rating for listing ${window.listingId}`);
+                response = await fetch("http://localhost:3000/api/ratings", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({ listingId: window.listingId, score: selectedRating, comment }),
+                });
+              }
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Rating submission error:", errorData);
+                
+                // Handle API error format according to documentation
+                if (errorData.success === false) {
+                  throw new Error(errorData.message || "Failed to submit review");
+                } else {
+                  throw new Error("Failed to submit review");
+                }
+              }
+              
+              const result = await response.json();
+              console.log("Rating submission successful:", result);
+              
+              // Handle API success response according to documentation
+              // { "success": true, "data": {...rating object} }
+              if (result.success && result.data) {
+                console.log("Rating saved with ID:", result.data._id);
+                // Update ratingId in case we need to update it later
+                ratingId = result.data._id;
+              }
+              
+              // Close the dialog
+              closeRatingDialog();
+              
+              // Show success message
+              alert(ratingId ? "Your review has been updated!" : "Your review has been submitted!");
+              
+              // Reload ratings
+              if (window.ratingSystem && typeof window.ratingSystem.loadItemRatings === "function") {
+                window.ratingSystem.loadItemRatings(window.listingId);
+              } else {
+                // Fallback to reloading the page after a short delay
+                setTimeout(() => location.reload(), 500);
+              }
+            } catch (err) {
+              console.error("Error submitting review:", err);
+              alert("Error submitting review: " + (err.message || "Unknown error"));
+            }
+          });
+        } else {
+          console.error("Submit button not found");
+        }
+
+        // Check if we need to open the rating dialog based on URL parameters
+        const scrollToRating = getUrlParam("scrollToRating");
+        if (scrollToRating === "true") {
+          console.log("scrollToRating parameter detected, will open dialog");
+          setTimeout(openRatingDialog, 1500);
+        }
+      });
+
+      // Add back the showMessage function and other removed code
+      function showMessage(message, isError = false) {
+        const messageElement = document.createElement("div");
+        messageElement.className = `message ${isError ? "error" : "success"}`;
+        messageElement.textContent = message;
+        document.body.appendChild(messageElement);
+
+        setTimeout(() => {
+          messageElement.remove();
+        }, 3000);
+      }
+
+      // Show error message
+      function showError(message) {
+        showMessage(message, true);
+      }
+
+      // Define a global openRatingDialog function that will be called when showRating=true
+      let globalOpenRatingDialog;
+
+      // Function to set category rating
+      function setCategoryRating(categoryName, value) {
+        console.log(`Setting ${categoryName} to ${value}`);
+        const input = document.querySelector(`input[name="${categoryName}"]`);
+        if (input) {
+          input.value = value;
+        }
+        
+        // Update visual state
+        const stars = document.querySelectorAll(`div.star-rating input[name="${categoryName}"] ~ label`);
+        stars.forEach(star => {
+          const starValue = parseInt(star.dataset.value);
+          if (starValue <= value) {
+            star.classList.add('active');
+          } else {
+            star.classList.remove('active');
+          }
+        });
+      }
+      
+      // Make the function globally available
+      window.setCategoryRating = setCategoryRating;
+      
+      // Initialize when DOM is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        // Check authentication status
+        checkAuthStatus();
+
+        // Load item details
+        loadItemDetail();
+
+        // Initialize the review forms
+        initReviewForms();
+
+        // Check for URL parameters
+        setTimeout(() => {
+          // Check if scrollToRating parameter is present in URL
+          const scrollToRating = getUrlParam("scrollToRating");
+          if (scrollToRating === "true") {
+            console.log("scrollToRating parameter detected");
+            // Scroll to the rating section
+            const ratingSection = document.getElementById("ratingSection");
+            if (ratingSection) {
+              console.log("Scrolling to rating section");
+              ratingSection.scrollIntoView({ behavior: "smooth" });
+
+              // Make sure the item ratings tab is active
+              const itemRatingsTab = document.querySelector(".tab-btn[data-tab='item-ratings']");
+              if (itemRatingsTab) {
+                itemRatingsTab.click();
+              }
+
+              // Highlight the rating section
+              ratingSection.classList.add("highlight-section");
+              setTimeout(() => {
+                ratingSection.classList.remove("highlight-section");
+              }, 2000);
+
+              // Open the rating dialog after a short delay
+              setTimeout(() => {
+                console.log("Attempting to open rating dialog");
+                if (typeof window.openItemRatingDialog === "function") {
+                  console.log("Using window.openItemRatingDialog");
+                  window.openItemRatingDialog();
+                } else {
+                  console.log("Direct click on addReviewBtn");
+                  const addReviewBtn = document.getElementById("addReviewBtn");
+                  if (addReviewBtn) {
+                    addReviewBtn.click();
+                  } else {
+                    console.error("Could not find a way to open the rating dialog");
+                  }
+                }
+              }, 2000);
+            }
+          }
+        }, 1500);
+      });
+
+      // Check auth status and update UI
+      function checkAuthStatus() {
+        const token = localStorage.getItem("token");
+        const userActions = document.querySelector(".user-actions");
+
+        if (token) {
+          // User is logged in - fetch profile data
+          fetch(`${baseUrl}/profile`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`Failed to fetch profile: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((userData) => {
+              // Create profile UI with actual user data
+              if (userActions) {
+                userActions.innerHTML = `
+                <div class="user-profile-dropdown">
+                  <button class="profile-button">
+                    ${
+                      userData.profileImage
+                        ? `<img src="${userData.profileImage}" alt="Profile" class="avatar-img">`
+                        : userData.firstName
+                        ? `<div class="avatar-initial">${userData.firstName[0]}</div>`
+                        : `<i class="ri-user-line profile-icon"></i>`
+                    }
+                    <span class="username">${
+                      userData.firstName || "Profile"
+                    }</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a href="favorite.html"><i class="ri-heart-3-line"></i> My Favorites</a>
+                    <a href="./item.html"><i class="ri-shopping-bag-3-line"></i> My Items</a>
+                    <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
+                    <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" onclick="logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
+                  </div>
+                </div>
+              `;
+
+                setupDropdownListeners();
+              }
+            })
+            .catch((error) => {
+              console.error("Profile fetch error:", error);
+
+              // Fallback UI
+              if (userActions) {
+                userActions.innerHTML = `
+                <div class="user-profile-dropdown">
+                  <button class="profile-button">
+                    <div class="avatar-initial">U</div>
+                    <span class="username">Profile</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a href="./item.html"><i class="ri-shopping-bag-line"></i> My Items</a>
+                    <a href="my-orders.html"><i class="ri-shopping-cart-line"></i> My Orders</a>
+                    <a href="favorite.html"><i class="ri-heart-line"></i> My Favorites</a>
+                    <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" onclick="logout()"><i class="ri-logout-box-line"></i> Logout</a>
+                  </div>
+                </div>
+              `;
+
+                setupDropdownListeners();
+              }
+            });
+        } else {
+          // User not logged in - show login/signup buttons
+          if (userActions) {
+            userActions.innerHTML = `
+              <button class="btn btn-login" onclick="redirectToLogin()">Login</button>
+              <button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>
+            `;
+          }
+        }
+      }
+
+      // Setup dropdown listeners
+      function setupDropdownListeners() {
+        const profileButton = document.querySelector(".profile-button");
+        const dropdownMenu = document.querySelector(".dropdown-menu");
+
+        if (profileButton && dropdownMenu) {
+          // Define the toggle function
+          const toggleDropdown = (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle("show");
+          };
+
+          // Add the listener
+          profileButton.addEventListener("click", toggleDropdown);
+
+          // Close dropdown when clicking outside
+          document.addEventListener("click", () => {
+            dropdownMenu.classList.remove("show");
+          });
+        }
+      }
+
+      // Logout function
+      function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+      }
+
+      // Redirect to login page
+      function redirectToLogin() {
+        window.location.href = "login.html";
+      }
+
+      // Redirect to signup page
+      function redirectToSignup() {
+        window.location.href = "signup.html";
+      }
+
+      function showNotification(message, type = "success") {
+        const container = document.getElementById("notificationContainer");
+        const notification = document.createElement("div");
+        notification.className = `notification ${type}`;
+
+        const icon =
+          type === "success"
+            ? "ri-checkbox-circle-fill"
+            : "ri-error-warning-fill";
+
+        notification.innerHTML = `
+            <i class="${icon} notification-icon"></i>
+            <div class="notification-content">
+                <div class="notification-title">${
+                  type === "success" ? "Success" : "Error"
+                }</div>
+                <div class="notification-message">${message}</div>
+            </div>
+            <button class="notification-close" onclick="this.parentElement.remove()">
+                <i class="ri-close-line"></i>
+            </button>
+        `;
+
+        container.appendChild(notification);
+
+        // Trigger animation
+        setTimeout(() => {
+          notification.classList.add("show");
+        }, 10);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+          notification.classList.remove("show");
+          setTimeout(() => {
+            notification.remove();
+          }, 300);
+        }, 3000);
+      }
+    </script>
+
+    <!-- Tab switcher for ratings -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll(".tab-btn");
+        const tabContents = document.querySelectorAll(".tab-content");
+
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const tabName = button.getAttribute("data-tab");
+
+            // Update active tab button
+            tabButtons.forEach((btn) => {
+              btn.classList.remove("active");
+            });
+            button.classList.add("active");
+
+            // Show the selected tab content
+            tabContents.forEach((content) => {
+              if (content.getAttribute("data-tab") === tabName) {
+                content.classList.add("active");
+              } else {
+                content.classList.remove("active");
+              }
+            });
+
+            // Load owner ratings if owner tab is selected
+            if (tabName === "owner-ratings") {
+              // Use the RatingSystem's loadOwnerRatings method if available
+              if (window.ratingSystem) {
+                // First get the owner ID from the item details
+                fetch(`${baseUrl}/listings/${listingId}`)
+                  .then(response => response.json())
+                  .then(itemData => {
+                    const ownerId = itemData.ownerId || itemData.owner?.id || itemData.owner;
+                    if (ownerId && typeof ownerId !== "object") {
+                      window.ratingSystem.loadOwnerRatings(ownerId);
+                    }
+                  })
+                  .catch(error => console.error("Error fetching owner ID:", error));
+              } else {
+                // Fall back to the original function if RatingSystem is not available
+                loadOwnerRatings();
+              }
+            }
+          });
+        });
+
+        // Load owner ratings function
+        async function loadOwnerRatings() {
+          const ownerContainer = document.getElementById(
+            "ownerRatingContainer"
+          );
+          if (!ownerContainer || ownerContainer.dataset.loaded === "true")
+            return;
+
+          try {
+            // First, we need to get the item details to get the owner ID
+            const itemResponse = await fetch(
+              `${baseUrl}/listings/${listingId}`
+            );
+            if (!itemResponse.ok)
+              throw new Error("Failed to load item details");
+
+            const itemData = await itemResponse.json();
+            const ownerId =
+              itemData.ownerId || itemData.owner?.id || itemData.owner;
+
+            // Log the owner ID for debugging
+            console.log("Owner ID extracted:", ownerId);
+
+            if (!ownerId || typeof ownerId === "object") {
+              ownerContainer.innerHTML =
+                '<div class="no-ratings">Owner information not available</div>';
+              return;
+            }
+
+            // Store the owner ID in the form for later use
+            const sellerReviewForm = document.getElementById("sellerReviewForm");
+            if (sellerReviewForm) {
+              const ownerIdInput = sellerReviewForm.querySelector('input[name="sellerId"]');
+              if (ownerIdInput) {
+                ownerIdInput.value = ownerId;
+              }
+            }
+
+            // Use the RatingSystem to load owner ratings
+            if (window.ratingSystem) {
+              window.ratingSystem.loadOwnerRatings(ownerId);
+            } else {
+              console.error("RatingSystem not initialized");
+              ownerContainer.innerHTML =
+                '<div class="error-message">Rating system not available. Please refresh the page.</div>';
+            }
+
+            // Mark as loaded
+            ownerContainer.dataset.loaded = "true";
+          } catch (error) {
+            console.error("Error loading owner ratings:", error);
+            ownerContainer.innerHTML =
+              '<div class="error-message">Failed to load seller ratings. Please try again later.</div>';
+          }
+        }
+      });
+    </script>
+    <script src="nav-utils.js"></script>
+    <script src="rating.js"></script>
+    <script src="item-rating.js"></script>
+    
+    <style>
+      /* Additional styles for the rating dialog */
+      .rating-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      
+      .rating-dialog-content {
+        background-color: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+      
+      .rating-dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      
+      .rating-dialog-header h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+      
+      .close-dialog-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+      }
+      
+      .rating-stars {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      
+      .rating-stars i {
+        font-size: 30px;
+        color: #ddd;
+        margin: 0 5px;
+        cursor: pointer;
+      }
+      
+      .rating-stars i.ri-star-fill {
+        color: #ffcc33;
+      }
+      
+      .comment-field {
+        margin-bottom: 20px;
+      }
+      
+      .comment-field textarea {
+        width: 100%;
+        height: 100px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: none;
+      }
+      
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+      
+      .dialog-actions button {
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+      
+      .cancel-btn {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+      }
+      
+      .submit-btn {
+        background-color: #6c5ce7;
+        color: white;
+        border: none;
+      }
+    </style>
+    <script src="owner-rating.js"></script>
+    <script src="item-detail.js"></script>
+    <script src="item-rating-modal.js"></script>
+    <script>
+      // Set owner ID for rating form
+      function setOwnerIdForRating(ownerId) {
+        console.log('Setting owner ID for rating:', ownerId);
+        const ownerIdInput = document.getElementById('sellerRatingOwnerId');
+        if (ownerIdInput) {
+          ownerIdInput.value = ownerId;
+        }
+      }
+      
+      // Make the function globally available
+      window.setOwnerIdForRating = setOwnerIdForRating;
+      
+      // Check auth status and update UI
+      document.addEventListener("DOMContentLoaded", function () {
+        // Find the Add Review button and rating dialog elements
+        const addReviewBtn = document.getElementById("addReviewBtn");
+        const ratingDialog = document.getElementById("ratingDialog");
+        const closeBtn = document.getElementById("closeRatingDialog");
+        const cancelBtn = document.getElementById("cancelDialogBtn");
+        const submitBtn = document.getElementById("submitDialogBtn");
+        const dialogStarRating = document.getElementById("dialogStarRating");
+        const dialogComment = document.getElementById("dialogComment");
+        
+        console.log("Rating elements:", { 
+          addReviewBtn, 
+          ratingDialog, 
+          closeBtn, 
+          cancelBtn, 
+          submitBtn, 
+          dialogStarRating, 
+          dialogComment 
+        });
+
+        let selectedRating = 0;
+        let ratingId = null;
+
+        // Generate stars for the dialog
+        function generateStars() {
+          dialogStarRating.innerHTML = "";
+          for (let i = 1; i <= 5; i++) {
+            const label = document.createElement("label");
+            label.dataset.value = i;
+            label.innerHTML = `<i class="ri-star-fill"></i>`;
+            dialogStarRating.appendChild(label);
+
+            // Add click event to each star
+            label.addEventListener("click", () => {
+              selectedRating = i;
+              updateStars();
+            });
+          }
+        }
+
+        // Update stars based on selection
+        function updateStars() {
+          const stars = dialogStarRating.querySelectorAll("label");
+          stars.forEach((star) => {
+            const value = parseInt(star.getAttribute("data-value"));
+            if (value <= selectedRating) {
+              star.classList.add("active");
+            } else {
+              star.classList.remove("active");
+            }
+          });
+        }
+
+        // Check if user has already rated this item
+        async function checkExistingRating() {
+          const listingId = getUrlParam("listingId") || getUrlParam("itemId");
+          const token = localStorage.getItem("token");
+
+          if (!token || !listingId) return null;
+
+          try {
+            const response = await fetch(
+              `${baseUrl}/ratings/listing/${listingId}`
+            );
+            if (!response.ok) return null;
+
+            const data = await response.json();
+            const ratings = data.ratings || [];
+
+            // Get current user ID
+            const profileResponse = await fetch(`${baseUrl}/profile`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (!profileResponse.ok) return null;
+
+            const userData = await profileResponse.json();
+            const userId = userData.id || userData._id;
+
+            // Find user's rating
+            const userRating = ratings.find(
+              (rating) => rating.userId === userId
+            );
+            return userRating || null;
+          } catch (error) {
+            console.error("Error checking existing rating:", error);
+            return null;
+          }
+        }
+
+        // Open the rating dialog
+        async function openRatingDialog() {
+          console.log("Opening rating dialog");
+          if (!ratingDialog) {
+            console.error("Rating dialog element not found");
+            return;
+          }
+          
+          // Generate stars
+          generateStars();
+
+          // Check if user has already rated
+          const existingRating = await checkExistingRating();
+          console.log("Existing rating:", existingRating);
+
+          if (existingRating) {
+            selectedRating = existingRating.score || existingRating.rating || 0;
+            if (dialogComment) dialogComment.value = existingRating.comment || "";
+            ratingId = existingRating._id || existingRating.id;
+            updateStars();
+
+            // Update dialog title for editing
+            const titleElement = ratingDialog.querySelector(".rating-dialog-header h3");
+            if (titleElement) titleElement.textContent = "Edit Your Rating";
+            if (submitBtn) submitBtn.textContent = "Update Rating";
+          } else {
+            selectedRating = 0;
+            if (dialogComment) dialogComment.value = "";
+            ratingId = null;
+
+            // Reset dialog title for new rating
+            const titleElement = ratingDialog.querySelector(".rating-dialog-header h3");
+            if (titleElement) titleElement.textContent = "Rate This Item";
+            if (submitBtn) submitBtn.textContent = "Submit Rating";
+          }
+
+          // Show the dialog
+          ratingDialog.style.display = "flex";
+        }
+
+        // Close the rating dialog
+        function closeRatingDialog() {
+          ratingDialog.style.display = "none";
+        }
+
+        // Submit the rating
+        async function submitRating() {
+          console.log("Submitting rating", { selectedRating, dialogComment });
+          
+          if (selectedRating === 0) {
+            alert("Please select a rating");
+            return;
+          }
+
+          const token = localStorage.getItem("token");
+          if (!token) {
+            alert("You must be logged in to rate items");
+            return;
+          }
+
+          const listingId = getUrlParam("listingId") || getUrlParam("itemId") || getUrlParam("id");
+          if (!listingId) {
+            console.error("No listing ID found in URL");
+            alert("Error: Could not determine which item to rate");
+            return;
+          }
+          
+          const comment = dialogComment ? dialogComment.value.trim() : "";
+          console.log("Rating submission data:", { listingId, selectedRating, comment, ratingId });
+
+          try {
+            let url, method;
+            const body = { score: selectedRating, comment };
+
+            if (ratingId) {
+              // Update existing rating
+              url = `${baseUrl}/ratings/${ratingId}`;
+              method = "PUT";
+            } else {
+              // Create new rating
+              url = `${baseUrl}/ratings`;
+              method = "POST";
+              body.listingId = listingId;
+            }
+
+            const response = await fetch(url, {
+              method: method,
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(body),
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || "Failed to submit rating");
+            }
+
+            // Close dialog and refresh ratings
+            closeRatingDialog();
+
+            // Reload ratings to show the new/updated rating
+            if (window.ratingSystem) {
+              window.ratingSystem.loadItemRatings(listingId);
+            } else {
+              // Fallback: reload the page
+              location.reload();
+            }
+
+            // Show success message
+            const message = ratingId
+              ? "Rating updated successfully!"
+              : "Thank you for your rating!";
+            showNotification(message);
+          } catch (error) {
+            console.error("Error submitting rating:", error);
+            showNotification(
+              error.message || "Failed to submit rating",
+              "error"
+            );
+          }
+        }
+
+        // Add event listeners
+        if (addReviewBtn) {
+          console.log("Adding click listener to Add Review button");
+          addReviewBtn.addEventListener("click", openRatingDialog);
+        } else {
+          console.warn("Add Review button not found");
+        }
+
+        if (closeBtn) {
+          closeBtn.addEventListener("click", closeRatingDialog);
+        } else {
+          console.warn("Close button not found");
+        }
+
+        if (cancelBtn) {
+          cancelBtn.addEventListener("click", closeRatingDialog);
+        } else {
+          console.warn("Cancel button not found");
+        }
+
+        if (submitBtn) {
+          console.log("Adding click listener to Submit button");
+          submitBtn.addEventListener("click", submitRating);
+        } else {
+          console.warn("Submit button not found");
+        }
+
+        // Close dialog when clicking outside
+        if (ratingDialog) {
+          ratingDialog.addEventListener("click", function (event) {
+            if (event.target === ratingDialog) {
+              closeRatingDialog();
+            }
+          });
+        }
+        
+        // Expose functions globally for direct access
+        window.openItemRatingDialog = openRatingDialog;
+        window.submitItemRating = submitRating;
+        window.closeItemRatingDialog = closeRatingDialog;
+        
+        // Also assign to the global variable for use outside this scope
+        globalOpenRatingDialog = openRatingDialog;
+      });
+    </script>
+  </body>
+</html>
