@@ -42,9 +42,47 @@ async function updateCartBadgeWithAnimation() {
  }, 500);
 }
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', updateCartBadge);
+/**
+ * Shared logout function for all pages
+ * Removes the token from localStorage and redirects to login page
+ */
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("userId");
+  window.location.href = "login.html";
+}
 
-// Make both functions globally available
+/**
+ * Set up event listeners for logout buttons with data-action attribute
+ * This should be called when the DOM is loaded on each page
+ */
+function setupLogoutListeners() {
+  document.addEventListener('click', function(event) {
+    const target = event.target.closest('[data-action="logout"]');
+    if (target) {
+      event.preventDefault();
+      logout();
+    }
+  });
+}
+
+// Set up logout listeners when the DOM is loaded
+document.addEventListener('DOMContentLoaded', setupLogoutListeners);
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  updateCartBadge();
+  
+  // Add event listener to all logout links
+  document.querySelectorAll('[data-action="logout"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      logout();
+    });
+  });
+});
+
+// Make functions globally available
 window.updateCartBadge = updateCartBadge;
 window.updateCartBadgeWithAnimation = updateCartBadgeWithAnimation;
+window.logout = logout;

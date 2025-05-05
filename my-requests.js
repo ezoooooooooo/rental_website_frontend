@@ -602,20 +602,11 @@ class RequestsManager {
                 <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
                 <a href="my-requests.html"><i class="ri-file-list-3-line"></i> Requests</a>
                 <div class="dropdown-divider"></div>
-                <a href="#" id="logoutBtn"><i class="ri-logout-box-r-line"></i> Logout</a>
+                <a href="#" data-action="logout"><i class="ri-logout-box-r-line"></i> Logout</a>
               </div>
             </div>
           `;
           this.setupDropdownListeners();
-          const logoutBtn = document.getElementById('logoutBtn');
-          if (logoutBtn) {
-            logoutBtn.addEventListener('click', (e) => {
-              e.preventDefault();
-              localStorage.removeItem('token');
-              localStorage.removeItem('userId');
-              window.location.href = 'login.html';
-            });
-          }
         })
         .catch(() => {
           userActions.innerHTML = `<button class="btn btn-login" onclick="redirectToLogin()">Login</button><button class="btn btn-signup" onclick="redirectToSignup()">Sign Up</button>`;

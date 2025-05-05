@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="home.css" />
     <link rel="stylesheet" href="nav-utils.css" />
     <link rel="stylesheet" href="ratings.css" />
+    <link rel="stylesheet" href="rating-fixes.css" />
     <link rel="stylesheet" href="my-orders.css" />
     <!-- Removed inline <style> block for modern CSS only -->
   </head>
@@ -46,7 +47,18 @@
         <!-- Orders will be rendered here by JS -->
       </section>
       <div id="loadingIndicator" class="loading-indicator">Loading...</div>
-      <div id="emptyState" class="empty-state" style="display:none;">No orders yet.</div>
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div class="empty-state-container">
+          <div class="empty-state-icon">
+            <i class="ri-shopping-bag-3-line"></i>
+          </div>
+          <h3>No Orders Yet</h3>
+          <p>You haven't made any orders yet. Start exploring our amazing products and rent what you need!</p>
+          <a href="home.html" class="btn btn-primary empty-state-btn">
+            <i class="ri-home-4-line"></i> Explore Products
+          </a>
+        </div>
+      </div>
       <div id="errorState" class="error-state" style="display:none;">Failed to load orders.</div>
     </main>
 
@@ -85,7 +97,9 @@
       </div>
     </footer>
     <script src="nav-utils.js"></script>
-    <script src="ratings.js"></script>
+    <script src="consolidated-rating.js"></script>
+    <script src="consolidated-rating-item.js"></script>
+    <script src="consolidated-rating-owner.js"></script>
     <script src="my-orders.js"></script>
     <script src="lightbox.js"></script>
   </body>

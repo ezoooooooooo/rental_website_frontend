@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
             <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
             <div class="dropdown-divider"></div>
-            <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
+            <a href="#" data-action="logout"><i class="ri-logout-box-r-line"></i> Logout</a>
         </div>
     </div>
 `;
@@ -423,14 +423,18 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (data.success) {
         // Refresh the cart after successful removal
         fetchCart();
+        // Show success message to user
+        showToast("Item removed from cart successfully", "success");
       } else {
         console.error("Failed to remove item:", data.message);
-        alert(`Failed to remove item: ${data.message}`);
+        // Show error message to user
+        showToast(`Failed to remove item: ${data.message}`, "error");
       }
       updateCartBadgeWithAnimation();
     } catch (error) {
       console.error("Error removing item from cart:", error);
-      alert("Error removing item from cart. Please try again.");
+      // Show error message to user
+      showToast("Error removing item from cart. Please try again.", "error");
     }
   }
 
@@ -460,13 +464,17 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (data.success) {
         // Refresh the cart after successful update
         fetchCart();
+        // Show success message to user
+        showToast("Cart item updated successfully", "success");
       } else {
         console.error("Failed to update item:", data.message);
-        alert(`Failed to update item: ${data.message}`);
+        // Show error message to user
+        showToast(`Failed to update item: ${data.message}`, "error");
       }
     } catch (error) {
       console.error("Error updating item in cart:", error);
-      alert("Error updating item in cart. Please try again.");
+      // Show error message to user
+      showToast("Error updating item in cart. Please try again.", "error");
     }
   }
 
@@ -493,14 +501,18 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (data.success) {
         console.log("Cart cleared successfully");
         fetchCart(); // Refresh the cart display
+        // Show success message to user
+        showToast("Cart cleared successfully", "success");
       } else {
         console.error("Failed to clear cart:", data.message);
-        alert(`Failed to clear cart: ${data.message}`);
+        // Show error message to user
+        showToast(`Failed to clear cart: ${data.message}`, "error");
       }
       updateCartBadgeWithAnimation();
     } catch (error) {
       console.error("Error clearing cart:", error);
-      alert("Error clearing cart. Please try again.");
+      // Show error message to user
+      showToast("Error clearing cart. Please try again.", "error");
     }
   }
 
@@ -514,4 +526,62 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Load cart data from the server
   fetchCart();
+  
+  /**
+   * Show a toast notification
+   * @param {string} message - Message to display
+   * @param {string} type - Type of notification (success or error)
+   */
+  function showToast(message, type = "success") {
+    // Check if notification container exists, create if not
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+      toastContainer = document.createElement("div");
+      toastContainer.id = "toast-container";
+      toastContainer.className = "notification-container";
+      document.body.appendChild(toastContainer);
+    }
+    
+    // Create toast element
+    const toast = document.createElement("div");
+    toast.className = `notification ${type}`;
+    
+    // Set icon based on type
+    const icon = type === "success" 
+      ? '<i class="ri-check-line notification-icon"></i>' 
+      : '<i class="ri-error-warning-line notification-icon"></i>';
+    
+    // Create toast content
+    toast.innerHTML = `
+      ${icon}
+      <div class="notification-content">
+        <div class="notification-message">${message}</div>
+      </div>
+      <button class="notification-close">&times;</button>
+    `;
+    
+    // Add to container
+    toastContainer.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add("show"), 10);
+    
+    // Add event listener to close button
+    const closeBtn = toast.querySelector(".notification-close");
+    closeBtn.addEventListener("click", () => {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 300);
+    });
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+      }
+    }, 5000);
+  }
+  
+  // Make showToast available globally
+  window.showToast = showToast;
 });

@@ -534,7 +534,7 @@ class OrdersManager {
                 <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
                 <a href="my-requests.html"><i class="ri-file-list-3-line"></i> Requests</a>
                 <div class="dropdown-divider"></div>
-                <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
+                <a href="#" data-action="logout"><i class="ri-logout-box-r-line"></i> Logout</a>
               </div>
             </div>
           `;

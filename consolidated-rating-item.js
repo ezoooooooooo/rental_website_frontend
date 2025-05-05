@@ -3,7 +3,7 @@
  * Handles rendering and UI generation for item ratings
  */
 
-// Extend the base RatingSystem class
+// Extend the base RatingSystem class with item rating functionality
 RatingSystem.prototype.renderItemRatings = function (data) {
   const container = document.getElementById("itemRatingContainer");
   if (!container) return;
@@ -208,27 +208,26 @@ RatingSystem.prototype.generateItemRatingHTML = function (
         </div>
         <div class="review-form-actions">
           <button type="button" class="cancel-review-btn" onclick="ratingSystem.toggleAddReviewForm()">Cancel</button>
-          <button type="submit" class="submit-review-btn">${
-            userHasRated ? "Update Review" : "Submit Review"
-          }</button>
+          <button type="submit" class="submit-review-btn">Submit Review</button>
         </div>
       </form>
     </div>
   `
       : "";
 
-  // Generate the reviews list HTML
+  // Generate reviews list HTML
   const reviewsListHTML = `
-    <div class="review-list">
+    <div class="reviews-list">
       ${
-        ratings.length === 0
-          ? '<div class="no-reviews">No reviews yet. Be the first to leave a review!</div>'
-          : ratings.map((rating) => this.generateReviewHTML(rating)).join("")
+        ratings.length > 0
+          ? ratings
+              .map((review) => this.generateReviewHTML(review))
+              .join("")
+          : '<div class="no-reviews">No reviews yet. Be the first to leave a review!</div>'
       }
     </div>
   `;
 
-  // Combine all sections
   return `
     ${ratingSummaryHTML}
     ${reviewFormHTML}
@@ -242,39 +241,30 @@ RatingSystem.prototype.generateItemRatingHTML = function (
  * @param {boolean} readonly - Whether this is a readonly display
  * @returns {string} HTML for star rating
  */
-RatingSystem.prototype.generateStarRatingHTML = function (
-  rating,
-  readonly = false
-) {
+RatingSystem.prototype.generateStarRatingHTML = function (rating, readonly = false) {
   const fullStars = Math.floor(rating);
-  const halfStar = rating % 1 >= 0.5;
-  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-  return `
-    <div class="star-rating ${readonly ? "readonly" : ""}">
-      ${Array(fullStars)
-        .fill()
-        .map(
-          () => `
-        <i class="ri-star-fill" style="color: var(--star-filled);"></i>
-      `
-        )
-        .join("")}
-      ${
-        halfStar
-          ? `<i class="ri-star-half-fill" style="color: var(--star-filled);"></i>`
-          : ""
-      }
-      ${Array(emptyStars)
-        .fill()
-        .map(
-          () => `
-        <i class="ri-star-line" style="color: var(--star-empty);"></i>
-      `
-        )
-        .join("")}
-    </div>
-  `;
+  let html = `<div class="star-rating ${readonly ? "readonly" : ""}">`;
+
+  // Full stars
+  for (let i = 0; i < fullStars; i++) {
+    html += '<i class="ri-star-fill"></i>';
+  }
+
+  // Half star
+  if (hasHalfStar) {
+    html += '<i class="ri-star-half-fill"></i>';
+  }
+
+  // Empty stars
+  for (let i = 0; i < emptyStars; i++) {
+    html += '<i class="ri-star-line"></i>';
+  }
+
+  html += "</div>";
+  return html;
 };
 
 /**
@@ -282,41 +272,23 @@ RatingSystem.prototype.generateStarRatingHTML = function (
  * @param {Object} distribution - Object with keys 1-5 and values as counts
  * @returns {string} HTML for distribution bars
  */
-RatingSystem.prototype.generateRatingDistributionHTML = function (
-  distribution
-) {
+RatingSystem.prototype.generateRatingDistributionHTML = function (distribution) {
+  // Calculate total ratings for percentage
+  const total = Object.values(distribution).reduce((sum, count) => sum + count, 0);
+
+  // Generate HTML for each star level
   let html = "";
-  console.log("Rating distribution data:", distribution);
-
-  // Make sure distribution is an object
-  if (!distribution || typeof distribution !== "object") {
-    distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    console.warn("Distribution is not valid, using default empty distribution");
-  }
-
-  // Calculate total across all ratings
-  const total = Object.values(distribution).reduce(
-    (sum, val) => sum + (parseInt(val) || 0),
-    0
-  );
-
-  console.log("Total ratings for distribution:", total);
-
-  // Create a bar for each rating level (5 to 1)
   for (let i = 5; i >= 1; i--) {
-    // Get count for this rating, default to 0 if missing
-    const count = parseInt(distribution[i]) || 0;
-
-    // Calculate percentage width for the bar
-    const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+    const count = distribution[i] || 0;
+    const percentage = total > 0 ? (count / total) * 100 : 0;
 
     html += `
       <div class="rating-bar">
-        <span class="rating-bar-label">${i}</span>
+        <div class="rating-bar-label">${i}</div>
         <div class="rating-bar-outer">
-          <div class="rating-bar-inner" style="width: ${percentage}%"></div>
+          <div class="rating-bar-inner" style="width: ${percentage}%;"></div>
         </div>
-        <span class="rating-bar-count">${count}</span>
+        <div class="rating-bar-count">${count}</div>
       </div>
     `;
   }
@@ -330,97 +302,52 @@ RatingSystem.prototype.generateRatingDistributionHTML = function (
  * @returns {string} HTML for the review
  */
 RatingSystem.prototype.generateReviewHTML = function (review) {
-  // Debug the review object structure
-  console.log("Processing review:", review);
-
-  const isCurrentUser = this.token && review.userId === this.getUserId();
-
-  // Handle different date formats
-  let createdAt = "Unknown date";
-  if (review.createdAt) {
-    try {
-      createdAt = new Date(review.createdAt).toLocaleDateString("en-US", {
+  // Format date
+  const date = new Date(review.createdAt || review.date);
+  const formattedDate = isNaN(date.getTime())
+    ? "Unknown date"
+    : date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       });
-    } catch (e) {
-      console.error("Error formatting date:", e);
-    }
-  }
 
-  // Use score instead of rating field, with fallbacks
-  const score = review.score || review.rating || 0;
+  // Get user info
+  const userName = review.user?.firstName || review.userName || "Anonymous";
+  const firstChar = userName.charAt(0).toUpperCase();
+  const userImageHtml = review.user?.profileImage 
+    ? `<img src="${review.user.profileImage}" alt="${userName}" class="reviewer-avatar">` 
+    : `<div class="avatar-initial">${firstChar}</div>`;
 
-  // Handle different user data structures
-  let userName = "Anonymous";
-  let userInitial = "U";
-  let userImage = null;
+  // Check if this is the current user's review
+  const isCurrentUserReview = this.token && review.userId === this.getUserId();
 
-  // Check for user object
-  if (review.user) {
-    userName =
-      review.user.firstName ||
-      review.user.name ||
-      review.user.username ||
-      "Anonymous";
-    userInitial = userName.charAt(0).toUpperCase();
-    userImage = review.user.profileImage || review.user.avatar;
-  }
-  // Check for userName property
-  else if (review.userName) {
-    userName = review.userName;
-    userInitial = userName.charAt(0).toUpperCase();
-  }
-  // Check for author property
-  else if (review.author) {
-    if (typeof review.author === "object") {
-      userName =
-        review.author.name ||
-        review.author.firstName ||
-        review.author.username ||
-        "Anonymous";
-      userInitial = userName.charAt(0).toUpperCase();
-      userImage = review.author.profileImage || review.author.avatar;
-    } else {
-      userName = review.author;
-      userInitial = userName.charAt(0).toUpperCase();
-    }
-  }
-
+  // Generate HTML
   return `
-    <div class="review" data-id="${review._id || review.id || ""}">
+    <div class="review-item ${isCurrentUserReview ? "current-user-review" : ""}">
       <div class="review-header">
         <div class="reviewer-info">
-          ${
-            userImage
-              ? `<img src="${userImage}" alt="${userName}" class="reviewer-avatar">`
-              : `<div class="avatar-initial">${userInitial}</div>`
-          }
-          <div>
+          ${userImageHtml}
+          <div class="reviewer-details">
             <div class="reviewer-name">${userName}</div>
-            <div class="review-date">${createdAt}</div>
+            <div class="review-date">${formattedDate}</div>
           </div>
         </div>
         <div class="review-rating">
-          ${this.generateStarRatingHTML(score, true)}
+          ${this.generateStarRatingHTML(review.score || review.rating, true)}
         </div>
       </div>
       <div class="review-content">
-        ${
-          review.comment ||
-          review.text ||
-          review.content ||
-          "No comment provided."
-        }
+        <p>${review.comment || review.text || ""}</p>
       </div>
       ${
-        isCurrentUser
+        isCurrentUserReview
           ? `
         <div class="review-actions">
-          <button class="review-action-btn delete-review-btn" onclick="ratingSystem.deleteRating('${
-            review._id
-          }', 'item', '${review.listingId || review.itemId}')">
+          <button class="edit-review-btn" onclick="ratingSystem.editReview('${review._id}')">
+            <i class="ri-edit-line"></i> Edit
+          </button>
+          <button class="delete-review-btn" onclick="ratingSystem.deleteRating('${review._id}', 'item', '${review.listingId}')">
             <i class="ri-delete-bin-line"></i> Delete
           </button>
         </div>
@@ -437,18 +364,16 @@ RatingSystem.prototype.generateReviewHTML = function (review) {
  * @returns {string} HTML for user review data
  */
 RatingSystem.prototype.getUserReviewData = function (ratings) {
+  if (!this.token) return "";
+
   const userId = this.getUserId();
-  const userReview = ratings.find((rating) => rating.userId === userId);
+  const userRating = ratings.find((rating) => rating.userId === userId);
 
-  if (userReview) {
-    return `
-      <input type="hidden" name="ratingId" value="${
-        userReview._id || userReview.id
-      }">
-    `;
-  }
+  if (!userRating) return "";
 
-  return "";
+  return `
+    <input type="hidden" name="ratingId" value="${userRating._id}">
+  `;
 };
 
 /**
@@ -457,34 +382,33 @@ RatingSystem.prototype.getUserReviewData = function (ratings) {
  * @param {Array} ratings - Array of ratings
  */
 RatingSystem.prototype.initializeReviewForm = function (form, ratings) {
+  if (!this.token) return;
+
   const userId = this.getUserId();
-  const userReview = ratings.find((rating) => rating.userId === userId);
+  const userRating = ratings.find((rating) => rating.userId === userId);
 
-  if (userReview && form) {
-    // Set the rating
-    const ratingInput = form.querySelector('input[name="rating"]');
-    if (ratingInput) {
-      ratingInput.value = userReview.score || userReview.rating || 0;
-    }
+  if (!userRating) return;
 
-    // Set the comment
-    const commentInput = form.querySelector('textarea[name="comment"]');
-    if (commentInput) {
-      commentInput.value =
-        userReview.comment || userReview.text || userReview.content || "";
-    }
+  // Set the rating
+  const ratingInput = form.querySelector('input[name="rating"]');
+  if (ratingInput) {
+    ratingInput.value = userRating.score || userRating.rating || 0;
+  }
 
-    // Highlight the stars
-    const score = userReview.score || userReview.rating || 0;
-    const stars = form.querySelectorAll(".star-rating label");
-    stars.forEach((star) => {
-      const value = parseInt(star.dataset.value);
-      if (value <= score) {
-        star.classList.add("active");
-        const icon = star.querySelector("i");
-        if (icon) icon.style.color = "var(--star-filled)";
-      }
-    });
+  // Update the star visuals
+  const stars = form.querySelectorAll(".star-rating label");
+  stars.forEach((star) => {
+    const value = parseInt(star.dataset.value);
+    star.classList.toggle(
+      "active",
+      value <= (userRating.score || userRating.rating || 0)
+    );
+  });
+
+  // Set the comment
+  const commentInput = form.querySelector('textarea[name="comment"]');
+  if (commentInput) {
+    commentInput.value = userRating.comment || userRating.text || "";
   }
 };
 
@@ -493,49 +417,28 @@ RatingSystem.prototype.initializeReviewForm = function (form, ratings) {
  * @param {HTMLElement} container - The rating container element
  */
 RatingSystem.prototype.setupItemRatingEvents = function (container) {
-  // Initialize star ratings in the container
-  const starRatings = container.querySelectorAll(".star-rating:not(.readonly)");
+  // Toggle review form
+  const toggleBtn = container.querySelector(".rating-toggle-btn");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => this.toggleAddReviewForm());
+  }
 
+  // Initialize star ratings
+  const starRatings = container.querySelectorAll(".star-rating:not(.readonly)");
   starRatings.forEach((ratingContainer) => {
     const stars = ratingContainer.querySelectorAll("label");
-    const hiddenInput = ratingContainer.querySelector('input[type="hidden"]');
+    const input = ratingContainer.querySelector('input[type="hidden"]');
 
     stars.forEach((star) => {
       star.addEventListener("click", () => {
         const value = star.dataset.value;
-        if (hiddenInput) hiddenInput.value = value;
+        input.value = value;
 
         // Update visual state
         stars.forEach((s) => {
-          if (parseInt(s.dataset.value) <= parseInt(value)) {
-            s.classList.add("active");
-            if (s.querySelector("i"))
-              s.querySelector("i").style.color = "var(--star-filled)";
-          } else {
-            s.classList.remove("active");
-            if (s.querySelector("i"))
-              s.querySelector("i").style.color = "var(--star-empty)";
-          }
+          s.classList.toggle("active", parseInt(s.dataset.value) <= value);
         });
       });
     });
   });
-};
-
-/**
- * Get the current user ID from token
- * @returns {string} The user ID or null if not logged in
- */
-RatingSystem.prototype.getUserId = function () {
-  if (!this.token) return null;
-
-  try {
-    // Extract user ID from JWT token
-    const payload = this.token.split(".")[1];
-    const decoded = JSON.parse(atob(payload));
-    return decoded.id || decoded.userId || decoded._id;
-  } catch (error) {
-    console.error("Error extracting user ID from token:", error);
-    return null;
-  }
 };

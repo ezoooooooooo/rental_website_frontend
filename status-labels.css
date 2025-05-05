@@ -1,0 +1,42 @@
+/* Status labels for items */
+.status-label {
+  position: absolute;
+  top: 10px;
+  left: 10px; /* Changed from right to left */
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  text-transform: capitalize;
+  z-index: 10;
+}
+
+.status-label.reserved {
+  background-color: #ff9800; /* Orange for reserved */
+}
+
+.status-label.rented {
+  background-color: #f44336; /* Red for rented */
+}
+
+/* For item detail page */
+.item-status-container {
+  margin-bottom: 15px;
+}
+
+.item-status-label {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.item-status-label.reserved {
+  background-color: #ff9800; /* Orange for reserved */
+}
+
+.item-status-label.rented {
+  background-color: #f44336; /* Red for rented */
+}

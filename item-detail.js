@@ -87,6 +87,17 @@ class ItemDetailManager {
       // Use the rating system to load ratings if available
       if (window.ratingSystem) {
         await window.ratingSystem.loadItemRatings(this.listingId);
+        
+        // Connect the Add Review button to the rating dialog
+        const addReviewBtn = document.getElementById('addReviewBtn');
+        if (addReviewBtn) {
+          // Remove any existing click listeners by replacing the node
+          const newAddReviewBtn = addReviewBtn.cloneNode(true);
+          addReviewBtn.parentNode.replaceChild(newAddReviewBtn, addReviewBtn);
+          newAddReviewBtn.addEventListener('click', () => {
+            openRatingDialog();
+          });
+        }
       } else {
         // Fallback to direct API call
         const response = await fetch(
@@ -324,7 +335,7 @@ class ItemDetailManager {
     // Update item name, category, price, and description
     document.getElementById("itemName").textContent = item.name || "Item Name";
     document.getElementById("itemCategory").textContent = item.category || "Category";
-    
+  
     // Format price
     let formattedPrice = item.rentalRate;
     if (typeof formattedPrice === "string") {
@@ -332,6 +343,25 @@ class ItemDetailManager {
     }
     formattedPrice = `$${parseFloat(formattedPrice).toFixed(2)}`;
     document.getElementById("itemPrice").textContent = formattedPrice;
+  
+    // Add status label if item is reserved or rented
+    const itemStatusContainer = document.getElementById("itemStatusContainer");
+    if (itemStatusContainer) {
+      if (item.status && (item.status === 'reserved' || item.status === 'rented')) {
+        itemStatusContainer.innerHTML = `<div class="item-status-label ${item.status}">${item.status === 'reserved' ? 'Reserved' : 'Rented'}</div>`;
+        itemStatusContainer.style.display = 'block';
+        
+        // Disable the Add to Cart button if the item is not available
+        const addToCartBtn = document.getElementById("addToCartBtn");
+        if (addToCartBtn) {
+          addToCartBtn.disabled = true;
+          addToCartBtn.classList.add("disabled");
+          addToCartBtn.title = `This item is currently ${item.status} and not available for rent`;
+        }
+      } else {
+        itemStatusContainer.style.display = 'none';
+      }
+    }
     
     // Update description
     document.getElementById("itemDescription").textContent = item.description || "No description available.";
@@ -678,14 +708,53 @@ class ItemDetailManager {
    * @param {boolean} isError - Whether this is an error message
    */
   showMessage(message, isError = false) {
-    const messageElement = document.createElement("div");
-    messageElement.className = `message ${isError ? "error" : "success"}`;
-    messageElement.textContent = message;
-    document.body.appendChild(messageElement);
-
+    // Check if notification container exists, create if not
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+      toastContainer = document.createElement("div");
+      toastContainer.id = "toast-container";
+      toastContainer.className = "notification-container";
+      document.body.appendChild(toastContainer);
+    }
+    
+    // Create toast element
+    const toast = document.createElement("div");
+    toast.className = `notification ${isError ? 'error' : 'success'}`;
+    
+    // Set icon based on type
+    const icon = !isError
+      ? '<i class="ri-check-line notification-icon"></i>' 
+      : '<i class="ri-error-warning-line notification-icon"></i>';
+    
+    // Create toast content
+    toast.innerHTML = `
+      ${icon}
+      <div class="notification-content">
+        <div class="notification-message">${message}</div>
+      </div>
+      <button class="notification-close">&times;</button>
+    `;
+    
+    // Add to container
+    toastContainer.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add("show"), 10);
+    
+    // Add event listener to close button
+    const closeBtn = toast.querySelector(".notification-close");
+    closeBtn.addEventListener("click", () => {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 300);
+    });
+    
+    // Auto remove after 5 seconds
     setTimeout(() => {
-      messageElement.remove();
-    }, 3000);
+      if (document.body.contains(toast)) {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+      }
+    }, 5000);
   }
 
   /**
@@ -711,7 +780,371 @@ function redirectToSignup() {
   window.location.href = "signup.html";
 }
 
+/**
+ * Set owner ID for rating form
+ * @param {string} ownerId - ID of the owner
+ */
+function setOwnerIdForRating(ownerId) {
+  console.log('Setting owner ID for rating:', ownerId);
+  const ownerIdInput = document.getElementById('sellerRatingOwnerId');
+  if (ownerIdInput) {
+    ownerIdInput.value = ownerId;
+  }
+}
+
+// Make the function globally available
+window.setOwnerIdForRating = setOwnerIdForRating;
+
+/**
+ * Initialize the rating dialog functionality
+ */
+function initRatingDialog() {
+  console.log("Initializing rating dialog");
+  const baseUrl = "http://localhost:3000/api";
+  const token = localStorage.getItem("token");
+  const params = new URLSearchParams(window.location.search);
+  const listingId =
+    params.get("listingId") || params.get("itemId") || params.get("id");
+
+  // Get references to elements
+  const addReviewBtn = document.getElementById("addReviewBtn");
+  const ratingDialog = document.getElementById("ratingDialog");
+  const closeBtn = document.getElementById("closeRatingDialog");
+  const cancelBtn = document.getElementById("cancelDialogBtn"); // Updated to match HTML
+  const submitBtn = document.getElementById("submitDialogBtn"); // Updated to match HTML
+  const rateSellerBtn = document.getElementById("rateSellerBtn");
+  const sellerRatingForm = document.getElementById("sellerRatingForm");
+  const dialogStarRating = document.getElementById("dialogStarRating");
+  const dialogComment = document.getElementById("dialogComment");
+  
+  console.log("Rating dialog elements:", {
+    addReviewBtn,
+    ratingDialog,
+    closeBtn,
+    cancelBtn,
+    submitBtn,
+    dialogStarRating,
+    dialogComment
+  });
+
+  // Check if user is logged in
+  if (!token && addReviewBtn) {
+    addReviewBtn.addEventListener("click", () => {
+      showNotification(
+        "Please log in to rate this item",
+        "error"
+      );
+    });
+    return;
+  }
+
+  let ratingId = null;
+  let selectedRating = 0;
+
+  // Function to check if user has already rated this item
+  async function checkExistingRating() {
+    const listingId = getUrlParam("listingId") || getUrlParam("itemId") || getUrlParam("id");
+    const token = localStorage.getItem("token");
+
+    if (!token || !listingId) return null;
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/ratings/user/listing/${listingId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) return null;
+
+      const data = await response.json();
+      return data.rating || null;
+    } catch (error) {
+      console.error("Error checking existing rating:", error);
+      return null;
+    }
+  }
+
+  // Function to generate stars for the dialog
+  function generateStars() {
+    dialogStarRating.innerHTML = "";
+    for (let i = 1; i <= 5; i++) {
+      const label = document.createElement("label");
+      label.dataset.value = i;
+      label.innerHTML = `<i class="ri-star-fill"></i>`;
+      dialogStarRating.appendChild(label);
+
+      // Add click event to each star
+      label.addEventListener("click", () => {
+        selectedRating = i;
+        updateStars();
+      });
+    }
+  }
+
+  // Update stars based on selection
+  function updateStars() {
+    const stars = dialogStarRating.querySelectorAll("label");
+    stars.forEach((star) => {
+      const value = parseInt(star.getAttribute("data-value"));
+      if (value <= selectedRating) {
+        star.classList.add("active");
+      } else {
+        star.classList.remove("active");
+      }
+    });
+  }
+
+  // Check if user has already rated this item
+  async function checkExistingRating() {
+    const listingId = getUrlParam("listingId") || getUrlParam("itemId");
+    const token = localStorage.getItem("token");
+
+    if (!token || !listingId) return null;
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/ratings/user/listing/${listingId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) return null;
+
+      const data = await response.json();
+      return data.rating || null;
+    } catch (error) {
+      }
+    }
+    starLabels.forEach((label, index) => {
+      const ratingValue = index + 1;
+      label.addEventListener("click", () => {
+        starLabels.forEach(l => l.classList.remove("active"));
+        for (let i = 0; i <= index; i++) {
+          starLabels[i].classList.add("active");
+        }
+        selectedRating = ratingValue;
+      });
+    });
+    const closeDialog = () => {
+      dialog.classList.add("fade-out");
+      setTimeout(() => document.body.removeChild(dialog), 300);
+    if (ratingDialog) {
+      ratingDialog.style.display = "none";
+    }
+  }
+
+  // Submit the rating
+  async function submitRating() {
+    const baseUrl = "http://localhost:3000/api";
+    const token = localStorage.getItem("token");
+
+    console.log("Submitting rating", { selectedRating, dialogComment });
+    
+    if (selectedRating === 0) {
+      alert("Please select a rating");
+      return;
+    }
+
+    const comment = dialogComment ? dialogComment.value.trim() : "";
+    if (!comment) {
+      showNotification("Please enter a comment", "error");
+      return;
+    }
+
+    const listingId = getUrlParam("listingId") || getUrlParam("itemId") || getUrlParam("id");
+    if (!listingId) {
+      console.error("No listing ID found in URL");
+      alert("Error: Could not determine which item to rate");
+      return;
+    }
+
+    // Prepare request body
+    const body = {
+      score: selectedRating,
+      comment: comment,
+    };
+
+    let url, method;
+    if (ratingId) {
+      // Update existing rating
+      url = `${baseUrl}/ratings/${ratingId}`;
+      method = "PUT";
+    } else {
+      // Create new rating
+      url = `${baseUrl}/ratings`;
+      method = "POST";
+      body.listingId = listingId;
+    }
+
+    try {
+      console.log(`Submitting ${method} request to ${url} with body:`, body);
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to submit rating");
+      }
+
+      const responseData = await response.json();
+      console.log("Rating submitted successfully:", responseData);
+
+      // Close dialog and refresh ratings
+      closeRatingDialog();
+
+      // Reload ratings to show the new/updated rating
+      if (window.ratingSystem) {
+        window.ratingSystem.loadItemRatings(listingId);
+      } else {
+        // Fallback: reload the page
+        location.reload();
+      }
+
+      // Show success message
+      const message = ratingId
+        ? "Rating updated successfully!"
+        : "Thank you for your rating!";
+      showNotification(message);
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+      showNotification(
+        error.message || "Failed to submit rating",
+        "error"
+      );
+    }
+  }
+
+  // Generate stars for the dialog if needed
+  if (dialogStarRating && dialogStarRating.children.length === 0) {
+    generateStars();
+  }
+
+  // Add event listeners
+  if (addReviewBtn) {
+    console.log("Adding click listener to Add Review button");
+    // Remove any existing listeners to prevent duplicates
+    addReviewBtn.removeEventListener("click", openRatingDialog);
+    addReviewBtn.addEventListener("click", openRatingDialog);
+  } else {
+    console.warn("Add Review button not found");
+  }
+  
+  // Add event listener for Rate Seller button
+  if (rateSellerBtn && window.ratingSystem) {
+    console.log("Adding click listener to Rate Seller button");
+    rateSellerBtn.addEventListener("click", function() {
+      window.ratingSystem.toggleAddReviewForm();
+    });
+  } else {
+    console.warn("Rate Seller button not found or rating system not available");
+  }
+  
+  // Add event listener for seller rating form submission
+  if (sellerRatingForm && window.ratingSystem) {
+    console.log("Adding submit listener to Seller Rating form");
+    sellerRatingForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      window.ratingSystem.submitOwnerRating(event);
+    });
+  } else {
+    console.warn("Seller Rating form not found or rating system not available");
+  }
+
+  if (closeBtn) {
+    closeBtn.removeEventListener("click", closeRatingDialog);
+    closeBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeRatingDialog();
+    });
+    console.log("Close button event listener added");
+  } else {
+    console.warn("Close button not found");
+  }
+
+  if (cancelBtn) {
+    cancelBtn.removeEventListener("click", closeRatingDialog);
+    cancelBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeRatingDialog();
+    });
+    console.log("Cancel button event listener added");
+  } else {
+    console.warn("Cancel button not found");
+  }
+
+  if (submitBtn) {
+    console.log("Adding click listener to Submit button");
+    submitBtn.removeEventListener("click", submitRating);
+    submitBtn.addEventListener("click", submitRating);
+  } else {
+    console.warn("Submit button not found");
+  }
+
+  // Close dialog when clicking outside
+  if (ratingDialog) {
+    ratingDialog.removeEventListener("click", null);
+    ratingDialog.addEventListener("click", function (event) {
+      if (event.target === ratingDialog) {
+        console.log("Clicked outside dialog content, closing dialog");
+        closeRatingDialog();
+      }
+    });
+    console.log("Dialog background click listener added");
+  }
+  
+  // Expose functions globally for direct access
+  window.openItemRatingDialog = openRatingDialog;
+  window.submitItemRating = submitRating;
+  window.closeItemRatingDialog = closeRatingDialog;
+}
+
+/**
+ * Helper function to show notifications
+ * @param {string} message - Message to display
+ * @param {string} type - Type of notification (success, error)
+ */
+function showNotification(message, type = "success") {
+  // Check if the notification function exists in the global scope
+  if (typeof window.showToast === "function") {
+    window.showToast(message, type);
+  } else {
+    // Fallback to alert
+    alert(message);
+  }
+}
+
+/**
+ * Helper function to get URL parameters
+ * @param {string} name - Parameter name
+ * @returns {string} Parameter value
+ */
+function getUrlParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
 // Initialize the manager when the page loads
 document.addEventListener("DOMContentLoaded", () => {
   window.itemDetailManager = new ItemDetailManager();
+  initRatingDialog();
+  
+  // Make showMessage available globally
+  window.showToast = (message, type) => {
+    window.itemDetailManager.showMessage(message, type === 'error');
+  };
 });

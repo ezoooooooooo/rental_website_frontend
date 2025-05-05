@@ -64,6 +64,8 @@
   70% { box-shadow: 0 0 0 15px rgba(108, 92, 231, 0); }
   100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); }
 }
+
+.rating-container {
   padding: 25px;
   margin: 30px 0;
 }
@@ -75,10 +77,108 @@
 }
 
 /* Color coding for high ratings */
+
+/* Additional styles for the rating dialog that were inline in HTML */
+.rating-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none; /* Hidden by default */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.rating-dialog-content {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.rating-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.rating-dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close-dialog-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.rating-stars i {
+  font-size: 30px;
+  color: #ddd;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.rating-stars i.ri-star-fill {
+  color: #ffcc33;
+}
+
+.comment-field {
+  margin-bottom: 20px;
+}
+
+.comment-field textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: none;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dialog-actions button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+}
+
+.submit-btn {
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+}
 .product-rating[data-rating="5"] .star-rating i.ri-star-fill,
 .product-rating[data-rating="4.5"] .star-rating i.ri-star-fill {
   background: linear-gradient(to bottom, #ffcc33, #ff9900);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -736,6 +836,7 @@
   padding: 25px;
   margin-bottom: 30px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  display: none; /* Hidden by default */
 }
 
 .form-title {

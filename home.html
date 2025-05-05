@@ -6,6 +6,8 @@
     <title>RentEase - Home</title>
     <link rel="stylesheet" href="home.css" />
     <link rel="stylesheet" href="nav-utils.css" />
+    <link rel="stylesheet" href="rating-fixes.css" />
+    <link rel="stylesheet" href="status-labels.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
       rel="stylesheet"
@@ -52,7 +54,7 @@
                 ><i class="ri-file-list-line"></i> My Requests</a
               >
               <div class="dropdown-divider"></div>
-              <a href="#" onclick="rentEaseApp.logout()"
+              <a href="#" data-action="logout"
                 ><i class="ri-logout-box-line"></i> Logout</a
               >
             </div>
@@ -326,8 +328,8 @@
     </div>
 
     <!-- Rating system scripts -->
-    <script src="rating.js"></script>
-    <script src="item-rating.js"></script>
+    <script src="consolidated-rating.js"></script>
+    <script src="consolidated-rating-item.js"></script>
 
     <script src="home.js"></script>
     <script src="nav-utils.js"></script>

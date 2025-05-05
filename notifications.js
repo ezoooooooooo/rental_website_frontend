@@ -361,7 +361,7 @@ class NotificationsManager {
                 <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
                 <a href="notifications.html"><i class="ri-notification-3-line"></i> Notifications</a>
                 <div class="dropdown-divider"></div>
-                <a href="#" onclick="notificationsManager.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
+                <a href="#" data-action="logout"><i class="ri-logout-box-r-line"></i> Logout</a>
               </div>
             </div>
           `;
@@ -392,13 +392,8 @@ class NotificationsManager {
   }
 
   /**
-   * Handle user logout
+   * Using shared logout function from nav-utils.js
    */
-  logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    window.location.href = "login.html";
-  }
 
   /**
    * Show a toast notification

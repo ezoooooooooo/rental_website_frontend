@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="item-detail.css" />
     <link rel="stylesheet" href="nav-utils.css" />
     <link rel="stylesheet" href="rating.css" />
+    <link rel="stylesheet" href="rating-fixes.css" />
     <link rel="stylesheet" href="notifications.css" />
+    <link rel="stylesheet" href="status-labels.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
       rel="stylesheet"
@@ -69,6 +71,8 @@
                   <span class="price" id="itemPrice">$0.00</span>
                   <span class="per-day">/day</span>
                 </div>
+                
+                <div class="item-status-container" id="itemStatusContainer" style="display: none;"></div>
 
                 <div class="item-rating-summary" id="ratingSnapshot">
                   <!-- Rating snapshot will be populated by JavaScript -->
@@ -132,7 +136,7 @@
               <div
                 id="ratingDialog"
                 class="rating-dialog"
-                style="display: none"
+                style="display: none;"
               >
                 <div class="rating-dialog-content">
                   <div class="rating-dialog-header">
@@ -158,7 +162,7 @@
                       <button class="cancel-btn" id="cancelDialogBtn">
                         Cancel
                       </button>
-                      <button class="submit-btn" id="submitDialogBtn">
+                      <button class="submit-btn" id="submitRatingBtn">
                         Submit
                       </button>
                     </div>
@@ -178,7 +182,7 @@
                 <h3>Seller Ratings & Reviews</h3>
                 <button
                   class="rating-toggle-btn"
-                  onclick="window.ratingSystem.toggleAddReviewForm()"
+                  id="rateSellerBtn"
                 >
                   + Rate Seller
                 </button>
@@ -186,10 +190,9 @@
               <div
                 id="sellerReviewForm"
                 class="add-review-form"
-                style="display: none"
               >
                 <h4 class="form-title">Rate This Seller</h4>
-                <form onsubmit="window.ratingSystem.submitOwnerRating(event)">
+                <form id="sellerRatingForm">
                   <input type="hidden" name="ownerId" id="sellerRatingOwnerId" value="" />
 
                   <div class="rating-categories">
@@ -1790,7 +1793,7 @@
                     <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
                     <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
                     <div class="dropdown-divider"></div>
-                    <a href="#" onclick="logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
+                    <a href="#" data-action="logout"><i class="ri-logout-box-r-line"></i> Logout</a>
                   </div>
                 </div>
               `;
@@ -1816,7 +1819,7 @@
                     <a href="favorite.html"><i class="ri-heart-line"></i> My Favorites</a>
                     <a href="my-requests.html"><i class="ri-file-list-line"></i> My Requests</a>
                     <div class="dropdown-divider"></div>
-                    <a href="#" onclick="logout()"><i class="ri-logout-box-line"></i> Logout</a>
+                    <a href="#" data-action="logout"><i class="ri-logout-box-line"></i> Logout</a>
                   </div>
                 </div>
               `;
@@ -1857,11 +1860,7 @@
         }
       }
 
-      // Logout function
-      function logout() {
-        localStorage.removeItem("token");
-        window.location.href = "login.html";
-      }
+      // Using shared logout function from nav-utils.js
 
       // Redirect to login page
       function redirectToLogin() {
@@ -2018,383 +2017,11 @@
         }
       });
     </script>
+
     <script src="nav-utils.js"></script>
-    <script src="rating.js"></script>
-    <script src="item-rating.js"></script>
-    
-    <style>
-      /* Additional styles for the rating dialog */
-      .rating-dialog {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      }
-      
-      .rating-dialog-content {
-        background-color: white;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 500px;
-        padding: 20px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
-      
-      .rating-dialog-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 10px;
-      }
-      
-      .rating-dialog-header h3 {
-        margin: 0;
-        font-size: 18px;
-      }
-      
-      .close-dialog-btn {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-      }
-      
-      .rating-stars {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-      }
-      
-      .rating-stars i {
-        font-size: 30px;
-        color: #ddd;
-        margin: 0 5px;
-        cursor: pointer;
-      }
-      
-      .rating-stars i.ri-star-fill {
-        color: #ffcc33;
-      }
-      
-      .comment-field {
-        margin-bottom: 20px;
-      }
-      
-      .comment-field textarea {
-        width: 100%;
-        height: 100px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        resize: none;
-      }
-      
-      .dialog-actions {
-        display: flex;
-        justify-content: flex-end;
-      }
-      
-      .dialog-actions button {
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-left: 10px;
-      }
-      
-      .cancel-btn {
-        background-color: #f5f5f5;
-        border: 1px solid #ddd;
-      }
-      
-      .submit-btn {
-        background-color: #6c5ce7;
-        color: white;
-        border: none;
-      }
-    </style>
-    <script src="owner-rating.js"></script>
+    <script src="consolidated-rating.js"></script>
+    <script src="consolidated-rating-item.js"></script>
+    <script src="consolidated-rating-owner.js"></script>
     <script src="item-detail.js"></script>
-    <script src="item-rating-modal.js"></script>
-    <script>
-      // Set owner ID for rating form
-      function setOwnerIdForRating(ownerId) {
-        console.log('Setting owner ID for rating:', ownerId);
-        const ownerIdInput = document.getElementById('sellerRatingOwnerId');
-        if (ownerIdInput) {
-          ownerIdInput.value = ownerId;
-        }
-      }
-      
-      // Make the function globally available
-      window.setOwnerIdForRating = setOwnerIdForRating;
-      
-      // Check auth status and update UI
-      document.addEventListener("DOMContentLoaded", function () {
-        // Find the Add Review button and rating dialog elements
-        const addReviewBtn = document.getElementById("addReviewBtn");
-        const ratingDialog = document.getElementById("ratingDialog");
-        const closeBtn = document.getElementById("closeRatingDialog");
-        const cancelBtn = document.getElementById("cancelDialogBtn");
-        const submitBtn = document.getElementById("submitDialogBtn");
-        const dialogStarRating = document.getElementById("dialogStarRating");
-        const dialogComment = document.getElementById("dialogComment");
-        
-        console.log("Rating elements:", { 
-          addReviewBtn, 
-          ratingDialog, 
-          closeBtn, 
-          cancelBtn, 
-          submitBtn, 
-          dialogStarRating, 
-          dialogComment 
-        });
-
-        let selectedRating = 0;
-        let ratingId = null;
-
-        // Generate stars for the dialog
-        function generateStars() {
-          dialogStarRating.innerHTML = "";
-          for (let i = 1; i <= 5; i++) {
-            const label = document.createElement("label");
-            label.dataset.value = i;
-            label.innerHTML = `<i class="ri-star-fill"></i>`;
-            dialogStarRating.appendChild(label);
-
-            // Add click event to each star
-            label.addEventListener("click", () => {
-              selectedRating = i;
-              updateStars();
-            });
-          }
-        }
-
-        // Update stars based on selection
-        function updateStars() {
-          const stars = dialogStarRating.querySelectorAll("label");
-          stars.forEach((star) => {
-            const value = parseInt(star.getAttribute("data-value"));
-            if (value <= selectedRating) {
-              star.classList.add("active");
-            } else {
-              star.classList.remove("active");
-            }
-          });
-        }
-
-        // Check if user has already rated this item
-        async function checkExistingRating() {
-          const listingId = getUrlParam("listingId") || getUrlParam("itemId");
-          const token = localStorage.getItem("token");
-
-          if (!token || !listingId) return null;
-
-          try {
-            const response = await fetch(
-              `${baseUrl}/ratings/listing/${listingId}`
-            );
-            if (!response.ok) return null;
-
-            const data = await response.json();
-            const ratings = data.ratings || [];
-
-            // Get current user ID
-            const profileResponse = await fetch(`${baseUrl}/profile`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-
-            if (!profileResponse.ok) return null;
-
-            const userData = await profileResponse.json();
-            const userId = userData.id || userData._id;
-
-            // Find user's rating
-            const userRating = ratings.find(
-              (rating) => rating.userId === userId
-            );
-            return userRating || null;
-          } catch (error) {
-            console.error("Error checking existing rating:", error);
-            return null;
-          }
-        }
-
-        // Open the rating dialog
-        async function openRatingDialog() {
-          console.log("Opening rating dialog");
-          if (!ratingDialog) {
-            console.error("Rating dialog element not found");
-            return;
-          }
-          
-          // Generate stars
-          generateStars();
-
-          // Check if user has already rated
-          const existingRating = await checkExistingRating();
-          console.log("Existing rating:", existingRating);
-
-          if (existingRating) {
-            selectedRating = existingRating.score || existingRating.rating || 0;
-            if (dialogComment) dialogComment.value = existingRating.comment || "";
-            ratingId = existingRating._id || existingRating.id;
-            updateStars();
-
-            // Update dialog title for editing
-            const titleElement = ratingDialog.querySelector(".rating-dialog-header h3");
-            if (titleElement) titleElement.textContent = "Edit Your Rating";
-            if (submitBtn) submitBtn.textContent = "Update Rating";
-          } else {
-            selectedRating = 0;
-            if (dialogComment) dialogComment.value = "";
-            ratingId = null;
-
-            // Reset dialog title for new rating
-            const titleElement = ratingDialog.querySelector(".rating-dialog-header h3");
-            if (titleElement) titleElement.textContent = "Rate This Item";
-            if (submitBtn) submitBtn.textContent = "Submit Rating";
-          }
-
-          // Show the dialog
-          ratingDialog.style.display = "flex";
-        }
-
-        // Close the rating dialog
-        function closeRatingDialog() {
-          ratingDialog.style.display = "none";
-        }
-
-        // Submit the rating
-        async function submitRating() {
-          console.log("Submitting rating", { selectedRating, dialogComment });
-          
-          if (selectedRating === 0) {
-            alert("Please select a rating");
-            return;
-          }
-
-          const token = localStorage.getItem("token");
-          if (!token) {
-            alert("You must be logged in to rate items");
-            return;
-          }
-
-          const listingId = getUrlParam("listingId") || getUrlParam("itemId") || getUrlParam("id");
-          if (!listingId) {
-            console.error("No listing ID found in URL");
-            alert("Error: Could not determine which item to rate");
-            return;
-          }
-          
-          const comment = dialogComment ? dialogComment.value.trim() : "";
-          console.log("Rating submission data:", { listingId, selectedRating, comment, ratingId });
-
-          try {
-            let url, method;
-            const body = { score: selectedRating, comment };
-
-            if (ratingId) {
-              // Update existing rating
-              url = `${baseUrl}/ratings/${ratingId}`;
-              method = "PUT";
-            } else {
-              // Create new rating
-              url = `${baseUrl}/ratings`;
-              method = "POST";
-              body.listingId = listingId;
-            }
-
-            const response = await fetch(url, {
-              method: method,
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify(body),
-            });
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.message || "Failed to submit rating");
-            }
-
-            // Close dialog and refresh ratings
-            closeRatingDialog();
-
-            // Reload ratings to show the new/updated rating
-            if (window.ratingSystem) {
-              window.ratingSystem.loadItemRatings(listingId);
-            } else {
-              // Fallback: reload the page
-              location.reload();
-            }
-
-            // Show success message
-            const message = ratingId
-              ? "Rating updated successfully!"
-              : "Thank you for your rating!";
-            showNotification(message);
-          } catch (error) {
-            console.error("Error submitting rating:", error);
-            showNotification(
-              error.message || "Failed to submit rating",
-              "error"
-            );
-          }
-        }
-
-        // Add event listeners
-        if (addReviewBtn) {
-          console.log("Adding click listener to Add Review button");
-          addReviewBtn.addEventListener("click", openRatingDialog);
-        } else {
-          console.warn("Add Review button not found");
-        }
-
-        if (closeBtn) {
-          closeBtn.addEventListener("click", closeRatingDialog);
-        } else {
-          console.warn("Close button not found");
-        }
-
-        if (cancelBtn) {
-          cancelBtn.addEventListener("click", closeRatingDialog);
-        } else {
-          console.warn("Cancel button not found");
-        }
-
-        if (submitBtn) {
-          console.log("Adding click listener to Submit button");
-          submitBtn.addEventListener("click", submitRating);
-        } else {
-          console.warn("Submit button not found");
-        }
-
-        // Close dialog when clicking outside
-        if (ratingDialog) {
-          ratingDialog.addEventListener("click", function (event) {
-            if (event.target === ratingDialog) {
-              closeRatingDialog();
-            }
-          });
-        }
-        
-        // Expose functions globally for direct access
-        window.openItemRatingDialog = openRatingDialog;
-        window.submitItemRating = submitRating;
-        window.closeItemRatingDialog = closeRatingDialog;
-        
-        // Also assign to the global variable for use outside this scope
-        globalOpenRatingDialog = openRatingDialog;
-      });
-    </script>
   </body>
 </html>

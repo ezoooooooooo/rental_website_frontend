@@ -129,7 +129,7 @@ class FavoritesManager {
                         <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
                         <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
+                        <a href="#" data-action="logout"><i class="ri-logout-box-r-line"></i> Logout</a>
                     </div>
                 </div>
             `;
@@ -622,40 +622,53 @@ class FavoritesManager {
   * @param {string} type - Type of toast (success or error)
   */
  showToast(message, type = 'success') {
-     // Create a message element if toast container doesn't exist
-     if (!this.toastContainer) {
-         const messageElement = document.createElement('div');
-         messageElement.className = `message ${type === 'error' ? 'error' : 'success'}`;
-         messageElement.textContent = message;
-         document.body.appendChild(messageElement);
-
-         setTimeout(() => {
-             messageElement.remove();
-         }, 3000);
-         return;
+     // Check if notification container exists, create if not
+     let toastContainer = document.getElementById("toast-container");
+     if (!toastContainer) {
+         toastContainer = document.createElement("div");
+         toastContainer.id = "toast-container";
+         toastContainer.className = "notification-container";
+         document.body.appendChild(toastContainer);
      }
      
-     const toast = document.createElement('div');
-     toast.className = `toast ${type}`;
+     // Create toast element
+     const toast = document.createElement("div");
+     toast.className = `notification ${type}`;
      
-     const icon = type === 'success' 
-         ? '<i class="ri-check-line toast-icon"></i>' 
-         : '<i class="ri-error-warning-line toast-icon"></i>';
+     // Set icon based on type
+     const icon = type === "success" 
+         ? '<i class="ri-check-line notification-icon"></i>' 
+         : '<i class="ri-error-warning-line notification-icon"></i>';
      
-     toast.innerHTML = `${icon}<span>${message}</span>`;
+     // Create toast content
+     toast.innerHTML = `
+         ${icon}
+         <div class="notification-content">
+             <div class="notification-message">${message}</div>
+         </div>
+         <button class="notification-close">&times;</button>
+     `;
      
-     this.toastContainer.appendChild(toast);
+     // Add to container
+     toastContainer.appendChild(toast);
      
-     // Remove after 3 seconds
+     // Trigger animation
+     setTimeout(() => toast.classList.add("show"), 10);
+     
+     // Add event listener to close button
+     const closeBtn = toast.querySelector(".notification-close");
+     closeBtn.addEventListener("click", () => {
+         toast.classList.remove("show");
+         setTimeout(() => toast.remove(), 300);
+     });
+     
+     // Auto remove after 5 seconds
      setTimeout(() => {
-         toast.style.opacity = '0';
-         toast.style.transform = 'translateX(100%)';
-         toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-         
-         setTimeout(() => {
-             toast.remove();
-         }, 300);
-     }, 3000);
+         if (document.body.contains(toast)) {
+             toast.classList.remove("show");
+             setTimeout(() => toast.remove(), 300);
+         }
+     }, 5000);
  }
  
  /**
@@ -688,6 +701,9 @@ class FavoritesManager {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
  window.favoritesManager = new FavoritesManager();
+ 
+ // Make showToast available globally
+ window.showToast = (message, type) => window.favoritesManager.showToast(message, type);
 });
 
 // Helper functions for redirect

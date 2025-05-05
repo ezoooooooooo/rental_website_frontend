@@ -787,3 +787,106 @@ body {
   .lightbox-thumbs { gap: 6px; }
   .lightbox-thumb { width: 38px; height: 38px; }
 }
+
+/* Enhanced Empty State Styles */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  width: 100%;
+}
+
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 500px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f9fafe 0%, #f0f2f9 100%);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(44, 62, 80, 0.08);
+  border: 1px solid rgba(236, 236, 236, 0.5);
+  transition: all 0.3s ease;
+}
+
+.empty-state-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 50px rgba(108, 92, 231, 0.15);
+}
+
+.empty-state-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 25px rgba(108, 92, 231, 0.2);
+}
+
+.empty-state-icon i {
+  font-size: 60px;
+  color: white;
+}
+
+.empty-state h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.empty-state p {
+  font-size: 18px;
+  color: var(--secondary-color);
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.empty-state-btn {
+  padding: 12px 30px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.empty-state-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 30px rgba(108, 92, 231, 0.25);
+}
+
+.empty-state-btn i {
+  font-size: 20px;
+}
+
+@media (max-width: 600px) {
+  .empty-state-container {
+    padding: 30px 15px;
+  }
+  
+  .empty-state-icon {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .empty-state-icon i {
+    font-size: 50px;
+  }
+  
+  .empty-state h3 {
+    font-size: 24px;
+  }
+  
+  .empty-state p {
+    font-size: 16px;
+  }
+}

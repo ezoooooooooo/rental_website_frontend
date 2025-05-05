@@ -658,6 +658,11 @@ class RentEaseApp {
           </div>
         `;
 
+        // Check if the item is reserved or rented
+        const statusLabel = listing.status && (listing.status === 'reserved' || listing.status === 'rented') ? 
+          `<div class="status-label ${listing.status}">${listing.status === 'reserved' ? 'Reserved' : 'Rented'}</div>` : 
+          '';
+          
         return `
           <div class="listing-card" data-id="${
             listing._id
@@ -668,6 +673,7 @@ class RentEaseApp {
         }" loading="lazy" onerror="this.onerror=null; this.src='./pets.jpeg';">
               ${imageDots}
               ${topRatedBadge}
+              ${statusLabel}
               ${
                 showFavoriteButton
                   ? `<div class="favorite-button${
