@@ -351,12 +351,19 @@ class ItemDetailManager {
         itemStatusContainer.innerHTML = `<div class="item-status-label ${item.status}">${item.status === 'reserved' ? 'Reserved' : 'Rented'}</div>`;
         itemStatusContainer.style.display = 'block';
         
-        // Disable the Add to Cart button if the item is not available
+        // Keep the Add to Cart button enabled but add a data attribute to indicate status
         const addToCartBtn = document.getElementById("addToCartBtn");
         if (addToCartBtn) {
-          addToCartBtn.disabled = true;
-          addToCartBtn.classList.add("disabled");
+          // Instead of disabling, store the status as a data attribute
+          addToCartBtn.dataset.itemStatus = item.status;
           addToCartBtn.title = `This item is currently ${item.status} and not available for rent`;
+          
+          // Add a click handler to show a message when clicked
+          addToCartBtn.onclick = (e) => {
+            e.preventDefault();
+            alert(`This item is currently ${item.status}. It's not available for rent at the moment.`);
+            return false;
+          };
         }
       } else {
         itemStatusContainer.style.display = 'none';
@@ -583,10 +590,10 @@ class ItemDetailManager {
       redirectToLogin();
       return;
     }
-
+  
     const rentalDaysInput = document.getElementById("rentalDays");
     const rentalDays = parseInt(rentalDaysInput?.value) || 1;
-
+  
     try {
       const response = await fetch(`${this.baseUrl}/cart`, {
         method: "POST",
@@ -599,21 +606,24 @@ class ItemDetailManager {
           rentalDays,
         }),
       });
-
+      
       const data = await response.json();
-
+  
+      // This is the key part: Always show the message from the backend
+      // if the response is not ok (includes 400 status for reserved/rented items)
       if (!response.ok) {
-        throw new Error(data.message || "Error adding item to cart");
+        this.showErrorMessage(data.message || "Error adding item to cart");
+        return;
       }
-
+  
       this.showMessage(data.message || "Item added to cart");
-
+  
       // Update cart badge if function exists
       if (typeof updateCartBadgeWithAnimation === "function") {
         updateCartBadgeWithAnimation();
       }
     } catch (error) {
-      console.error("Error adding to cart:", error);
+      console.error("Exception caught while adding to cart:", error);
       this.showErrorMessage(error.message || "Error adding item to cart");
     }
   }
