@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Rently</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="home.css" />
+    <link rel="stylesheet" href="nav-utils.css" />
+    <link rel="stylesheet" href="status-labels.css" />
+    <link rel="stylesheet" href="admin-dashboard.css" />
+    <link rel="stylesheet" href="toast-notifications.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="main-navigation">
+      <div class="nav-container">
+        <div class="logo-section">
+          <img src="./rent.png" alt="Rently Logo" class="logo" />
+          <h1>Rently Admin</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="admin-dashboard.html" class="active"><i class="ri-dashboard-line"></i> Dashboard</a></li>
+          <li><a href="admin-orders.html"><i class="ri-shopping-cart-2-line"></i> Orders</a></li>
+          <li><a href="admin-users.html"><i class="ri-user-line"></i> Users</a></li>
+          <li><a href="admin-listings.html"><i class="ri-store-2-line"></i> Listings</a></li>
+          <li><a href="admin-analytics.html"><i class="ri-bar-chart-line"></i> Analytics</a></li>
+        </ul>
+        <div class="user-actions"><!-- Admin profile dropdown rendered by JS --></div>
+      </div>
+    </nav>
+
+    <main class="admin-main-content">
+      <div class="admin-sidebar">
+        <div class="sidebar-header">
+          <h3>Admin Panel</h3>
+        </div>
+        <ul class="sidebar-menu">
+          <li class="active">
+            <a href="admin-dashboard.html"><i class="ri-dashboard-line"></i> Dashboard</a>
+          </li>
+          <li>
+            <a href="admin-orders.html"><i class="ri-shopping-cart-2-line"></i> Orders</a>
+          </li>
+          <li>
+            <a href="admin-users.html"><i class="ri-user-line"></i> Users</a>
+          </li>
+          <li>
+            <a href="admin-listings.html"><i class="ri-store-2-line"></i> Listings</a>
+          </li>
+          <li>
+            <a href="admin-analytics.html"><i class="ri-bar-chart-line"></i> Analytics</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="admin-content">
+        <header class="admin-header">
+          <h2 class="gradient-text">Admin Dashboard</h2>
+          <div class="admin-actions">
+            <div class="date-display" id="currentDate"></div>
+            <div class="admin-profile" id="adminProfile">
+              <!-- Admin profile will be rendered here by JS -->
+            </div>
+          </div>
+        </header>
+
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <div class="stat-icon users-icon">
+              <i class="ri-user-line"></i>
+            </div>
+            <div class="stat-content">
+              <h3>Total Users</h3>
+              <p class="stat-value" id="totalUsers">--</p>
+              <p class="stat-change" id="newUsers">+0 today</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon orders-icon">
+              <i class="ri-shopping-cart-2-line"></i>
+            </div>
+            <div class="stat-content">
+              <h3>Total Orders</h3>
+              <p class="stat-value" id="totalOrders">--</p>
+              <p class="stat-change" id="todayOrders">+0 today</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon listings-icon">
+              <i class="ri-store-2-line"></i>
+            </div>
+            <div class="stat-content">
+              <h3>Active Listings</h3>
+              <p class="stat-value" id="activeListings">--</p>
+              <p class="stat-change" id="totalListings">-- total</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon revenue-icon">
+              <i class="ri-money-dollar-circle-line"></i>
+            </div>
+            <div class="stat-content">
+              <h3>Monthly Revenue</h3>
+              <p class="stat-value" id="monthlyRevenue">$--</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-sections">
+          <section class="dashboard-section">
+            <div class="section-header">
+              <h3>Order Status</h3>
+              <a href="admin-orders.html" class="view-all">View All</a>
+            </div>
+            <div class="status-cards">
+              <div class="status-card pending-card">
+                <div class="status-icon">
+                  <i class="ri-time-line"></i>
+                </div>
+                <div class="status-content">
+                  <h4>Pending</h4>
+                  <p class="status-count" id="pendingOrders">--</p>
+                </div>
+              </div>
+              
+              <div class="status-card approved-card">
+                <div class="status-icon">
+                  <i class="ri-check-line"></i>
+                </div>
+                <div class="status-content">
+                  <h4>Approved</h4>
+                  <p class="status-count" id="approvedOrders">--</p>
+                </div>
+              </div>
+              
+              <div class="status-card completed-card">
+                <div class="status-icon">
+                  <i class="ri-checkbox-circle-line"></i>
+                </div>
+                <div class="status-content">
+                  <h4>Completed</h4>
+                  <p class="status-count" id="completedOrders">--</p>
+                </div>
+              </div>
+              
+              <div class="status-card cancelled-card">
+                <div class="status-icon">
+                  <i class="ri-close-circle-line"></i>
+                </div>
+                <div class="status-content">
+                  <h4>Cancelled/Rejected</h4>
+                  <p class="status-count" id="cancelledRejectedOrders">--</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard-section">
+            <div class="section-header">
+              <h3>Recent Orders</h3>
+              <a href="admin-orders.html" class="view-all">View All</a>
+            </div>
+            <div class="recent-orders-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>User</th>
+                    <th>Item</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recentOrdersTable">
+                  <tr class="loading-row">
+                    <td colspan="6">Loading recent orders...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="dashboard-section">
+            <div class="section-header">
+              <h3>Popular Listings</h3>
+              <a href="admin-listings.html" class="view-all">View All</a>
+            </div>
+            <div class="popular-listings" id="popularListings">
+              <div class="loading-indicator">Loading popular listings...</div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="admin-dashboard.js"></script>
+  </body>
+</html>

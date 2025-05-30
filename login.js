@@ -70,10 +70,18 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   if (response.ok) {
       const data = await response.json(); 
       localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.user.id);
+      localStorage.setItem('userRole', data.user.role);
       message.textContent = 'Login successful!';
       message.className = 'message success';
+      
+      // Check if user is admin and redirect accordingly
       setTimeout(() => {
-          window.location.href = './home.html';
+          if (data.user.role === 'admin') {
+              window.location.href = './admin-dashboard.html';
+          } else {
+              window.location.href = './home.html';
+          }
       }, 1500);
   } else {
       

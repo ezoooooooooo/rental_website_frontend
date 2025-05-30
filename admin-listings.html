@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Listings - Rently</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="home.css" />
+    <link rel="stylesheet" href="nav-utils.css" />
+    <link rel="stylesheet" href="admin-dashboard.css" />
+    <link rel="stylesheet" href="admin-listings.css" />
+    <link rel="stylesheet" href="toast-notifications.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="main-navigation">
+      <div class="nav-container">
+        <div class="logo-section">
+          <img src="./rent.png" alt="Rently Logo" class="logo" />
+          <h1>Rently Admin</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="admin-dashboard.html"><i class="ri-dashboard-line"></i> Dashboard</a></li>
+          <li><a href="admin-orders.html"><i class="ri-shopping-cart-2-line"></i> Orders</a></li>
+          <li><a href="admin-users.html"><i class="ri-user-line"></i> Users</a></li>
+          <li><a href="admin-listings.html" class="active"><i class="ri-store-2-line"></i> Listings</a></li>
+          <li><a href="admin-analytics.html"><i class="ri-bar-chart-line"></i> Analytics</a></li>
+        </ul>
+        <div class="user-actions"><!-- Admin profile dropdown rendered by JS --></div>
+      </div>
+    </nav>
+
+    <main class="admin-main-content">
+      <div class="admin-sidebar">
+        <div class="sidebar-header">
+          <h3>Admin Panel</h3>
+        </div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="admin-dashboard.html"><i class="ri-dashboard-line"></i> Dashboard</a>
+          </li>
+          <li>
+            <a href="admin-orders.html"><i class="ri-shopping-cart-2-line"></i> Orders</a>
+          </li>
+          <li>
+            <a href="admin-users.html"><i class="ri-user-line"></i> Users</a>
+          </li>
+          <li class="active">
+            <a href="admin-listings.html"><i class="ri-store-2-line"></i> Listings</a>
+          </li>
+          <li>
+            <a href="admin-analytics.html"><i class="ri-bar-chart-line"></i> Analytics</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="admin-content">
+        <header class="admin-header">
+          <h2 class="gradient-text">Listings Management</h2>
+          <div class="admin-actions">
+            <div class="date-display" id="currentDate"></div>
+            <div class="admin-profile" id="adminProfile">
+              <!-- Admin profile will be rendered here by JS -->
+            </div>
+          </div>
+        </header>
+
+        <div class="listings-filters">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label for="statusFilter">Status</label>
+              <select id="statusFilter" class="filter-select">
+                <option value="">All Statuses</option>
+                <option value="available">Available</option>
+                <option value="rented">Rented</option>
+                <option value="unavailable">Unavailable</option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="featuredFilter">Featured</label>
+              <select id="featuredFilter" class="filter-select">
+                <option value="">All</option>
+                <option value="true">Featured</option>
+                <option value="false">Not Featured</option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="searchFilter">Search</label>
+              <div class="search-input-wrapper">
+                <input type="text" id="searchFilter" placeholder="Search by name or description...">
+                <i class="ri-search-line search-icon"></i>
+              </div>
+            </div>
+            
+            <div class="filter-actions">
+              <button id="applyFiltersBtn" class="btn btn-primary">
+                <i class="ri-filter-3-line"></i> Apply Filters
+              </button>
+              <button id="resetFiltersBtn" class="btn btn-secondary">
+                <i class="ri-refresh-line"></i> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="listings-view-toggle">
+          <button id="gridViewBtn" class="view-toggle-btn active">
+            <i class="ri-grid-fill"></i> Grid
+          </button>
+          <button id="listViewBtn" class="view-toggle-btn">
+            <i class="ri-list-check"></i> List
+          </button>
+        </div>
+
+        <div id="listingsGridView" class="listings-grid-view">
+          <!-- Listings grid will be rendered here by JS -->
+          <div class="loading-indicator">Loading listings...</div>
+        </div>
+
+        <div id="listingsTableView" class="listings-table-view" style="display: none;">
+          <div class="listings-table-container">
+            <div class="table-header">
+              <div class="table-title">
+                <h3>All Listings</h3>
+                <span id="listingCount" class="count-badge">0</span>
+              </div>
+              <div class="table-actions">
+                <button id="refreshBtn" class="icon-btn" title="Refresh">
+                  <i class="ri-refresh-line"></i>
+                </button>
+                <div class="pagination">
+                  <button id="prevPageBtn" class="pagination-btn" disabled>
+                    <i class="ri-arrow-left-s-line"></i>
+                  </button>
+                  <span id="paginationInfo">Page 1 of 1</span>
+                  <button id="nextPageBtn" class="pagination-btn" disabled>
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="listings-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Owner</th>
+                    <th>Price/Day</th>
+                    <th>Status</th>
+                    <th>Featured</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="listingsTableBody">
+                  <tr class="loading-row">
+                    <td colspan="7">Loading listings...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="pagination-controls">
+          <button id="prevPageBtnBottom" class="pagination-btn" disabled>
+            <i class="ri-arrow-left-s-line"></i> Previous
+          </button>
+          <span id="paginationInfoBottom">Page 1 of 1</span>
+          <button id="nextPageBtnBottom" class="pagination-btn" disabled>
+            Next <i class="ri-arrow-right-s-line"></i>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Listing Details Modal -->
+    <div id="listingDetailsModal" class="modal">
+      <div class="modal-content modal-lg">
+        <div class="modal-header">
+          <h3>Listing Details</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="listingDetailsContent">
+          <!-- Listing details will be loaded here -->
+          <div class="loading-indicator">Loading listing details...</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary close-modal">Close</button>
+          <a id="viewOnSiteBtn" href="#" class="btn btn-primary" target="_blank">View on Site</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Listing Status Modal -->
+    <div id="editListingStatusModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Listing Status</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="listing-info-display" id="editListingInfo">
+            <!-- Listing info will be displayed here -->
+          </div>
+          
+          <div class="form-group">
+            <label for="listingStatus">Status</label>
+            <select id="listingStatus" class="form-control">
+              <option value="available">Available</option>
+              <option value="unavailable">Unavailable</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="listingFeatured">Featured</label>
+            <div class="toggle-switch-container">
+              <label class="toggle-switch">
+                <input type="checkbox" id="listingFeatured">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">Feature this listing on homepage</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelStatusEditBtn" class="btn btn-secondary">Cancel</button>
+          <button id="saveStatusBtn" class="btn btn-primary">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="admin-listings.js"></script>
+  </body>
+</html>

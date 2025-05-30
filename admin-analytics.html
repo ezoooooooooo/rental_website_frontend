@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Analytics | Rental Website</title>
+    <!-- Remixicon CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="home.css" />
+    <link rel="stylesheet" href="nav-styles.css">
+    <link rel="stylesheet" href="nav-utils.css" />
+    <link rel="stylesheet" href="status-labels.css" />
+    <link rel="stylesheet" href="admin-dashboard.css">
+    <link rel="stylesheet" href="admin-analytics.css">
+    <link rel="stylesheet" href="toast-notifications.css" />
+</head>
+<body style="height: 100vh; overflow-y: auto;">
+    <div class="admin-container" style="height: 100%; overflow-y: auto;">
+
+      <div class="admin-content" style="height: 100%; overflow-y: auto;">
+        <header class="admin-header">
+          <h2 class="gradient-text">Analytics Dashboard</h2>
+          <div class="admin-actions">
+            <div class="date-display" id="currentDate">Monday, January 1, 2023</div>
+            <div class="admin-profile" id="adminProfile">
+              <!-- Admin profile will be rendered here by JS -->
+            </div>
+          </div>
+        </header>
+
+        <!-- Analytics Content -->
+        <div class="analytics-container">
+          <!-- Time Period Selector -->
+          <div class="time-period-selector">
+            <label for="timePeriod">Time Period:</label>
+            <select id="timePeriod">
+              <option value="7">Last 7 Days</option>
+              <option value="30" selected>Last 30 Days</option>
+              <option value="90">Last 90 Days</option>
+              <option value="365">Last Year</option>
+            </select>
+            <button id="refreshAnalyticsBtn" class="refresh-btn">
+              <i class="ri-refresh-line"></i> Refresh
+            </button>
+          </div>
+
+          <!-- Revenue Overview -->
+          <section class="analytics-card revenue-overview">
+            <div class="analytics-card-header">
+              <h2>Revenue Overview</h2>
+              <div class="card-actions">
+                <button class="card-action-btn" id="downloadRevenueBtn" title="Download CSV">
+                  <i class="ri-download-line"></i>
+                </button>
+              </div>
+            </div>
+            <div class="analytics-card-body">
+              <div class="revenue-summary">
+                <div class="revenue-total">
+                  <h3>Total Revenue</h3>
+                  <p id="totalRevenue">$0.00</p>
+                  <span id="revenueChange" class="revenue-change">+0.0% vs previous period</span>
+                </div>
+                <div class="revenue-stat">
+                  <h4>Total Orders</h4>
+                  <p id="totalOrders">0</p>
+                </div>
+                <div class="revenue-stat">
+                  <h4>Avg. Order Value</h4>
+                  <p id="avgOrderValue">$0.00</p>
+                </div>
+              </div>
+              <div class="revenue-chart-container">
+                <canvas id="revenueChart"></canvas>
+              </div>
+            </div>
+          </section>
+
+          <div class="analytics-grid">
+            <!-- Popular Listings -->
+            <section class="analytics-card popular-listings">
+              <div class="analytics-card-header">
+                <h2>Popular Listings</h2>
+                <div class="card-actions">
+                  <button class="card-action-btn" id="downloadPopularListingsBtn" title="Download CSV">
+                    <i class="ri-download-line"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="analytics-card-body">
+                <div id="popularListingsList" class="popular-listings-list">
+                  <div class="loading-indicator">Loading popular listings...</div>
+                </div>
+              </div>
+            </section>
+
+            <!-- User Activity -->
+            <section class="analytics-card user-activity">
+              <div class="analytics-card-header">
+                <h2>User Activity</h2>
+                <div class="card-actions">
+                  <button class="card-action-btn" id="downloadUserActivityBtn" title="Download CSV">
+                    <i class="ri-download-line"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="analytics-card-body">
+                <div class="user-activity-chart-container">
+                  <canvas id="userActivityChart"></canvas>
+                </div>
+                <div class="user-activity-metrics">
+                  <div class="metric">
+                    <h4>New Users</h4>
+                    <p id="newUsers">0</p>
+                  </div>
+                  <div class="metric">
+                    <h4>Active Users</h4>
+                    <p id="activeUsers">0</p>
+                  </div>
+                  <div class="metric">
+                    <h4>Conversion Rate</h4>
+                    <p id="conversionRate">0%</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Category Performance -->
+            <section class="analytics-card category-performance">
+              <div class="analytics-card-header">
+                <h2>Category Performance</h2>
+                <div class="card-actions">
+                  <button class="card-action-btn" id="downloadCategoryBtn" title="Download CSV">
+                    <i class="ri-download-line"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="analytics-card-body">
+                <div class="category-chart-container">
+                  <canvas id="categoryChart"></canvas>
+                </div>
+              </div>
+            </section>
+
+            <!-- Order Status -->
+            <section class="analytics-card order-status">
+              <div class="analytics-card-header">
+                <h2>Order Status</h2>
+                <div class="card-actions">
+                  <button class="card-action-btn" id="downloadOrderStatusBtn" title="Download CSV">
+                    <i class="ri-download-line"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="analytics-card-body">
+                <div class="order-status-chart-container">
+                  <canvas id="orderStatusChart"></canvas>
+                </div>
+                <div class="order-status-legend" id="orderStatusLegend">
+                  <!-- Will be populated by JS -->
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <!-- Admin Analytics JS -->
+    <script src="admin-analytics.js"></script>
+</body>
+</html>

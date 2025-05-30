@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Users - Rently</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="home.css" />
+    <link rel="stylesheet" href="nav-utils.css" />
+    <link rel="stylesheet" href="admin-dashboard.css" />
+    <link rel="stylesheet" href="admin-users.css" />
+    <link rel="stylesheet" href="toast-notifications.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="main-navigation">
+      <div class="nav-container">
+        <div class="logo-section">
+          <img src="./rent.png" alt="Rently Logo" class="logo" />
+          <h1>Rently Admin</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="admin-dashboard.html"><i class="ri-dashboard-line"></i> Dashboard</a></li>
+          <li><a href="admin-orders.html"><i class="ri-shopping-cart-2-line"></i> Orders</a></li>
+          <li><a href="admin-users.html" class="active"><i class="ri-user-line"></i> Users</a></li>
+          <li><a href="admin-listings.html"><i class="ri-store-2-line"></i> Listings</a></li>
+          <li><a href="admin-analytics.html"><i class="ri-bar-chart-line"></i> Analytics</a></li>
+        </ul>
+        <div class="user-actions"><!-- Admin profile dropdown rendered by JS --></div>
+      </div>
+    </nav>
+
+    <main class="admin-main-content">
+      <div class="admin-sidebar">
+        <div class="sidebar-header">
+          <h3>Admin Panel</h3>
+        </div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="admin-dashboard.html"><i class="ri-dashboard-line"></i> Dashboard</a>
+          </li>
+          <li>
+            <a href="admin-orders.html"><i class="ri-shopping-cart-2-line"></i> Orders</a>
+          </li>
+          <li class="active">
+            <a href="admin-users.html"><i class="ri-user-line"></i> Users</a>
+          </li>
+          <li>
+            <a href="admin-listings.html"><i class="ri-store-2-line"></i> Listings</a>
+          </li>
+          <li>
+            <a href="admin-analytics.html"><i class="ri-bar-chart-line"></i> Analytics</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="admin-content">
+        <header class="admin-header">
+          <h2 class="gradient-text">User Management</h2>
+          <div class="admin-actions">
+            <div class="date-display" id="currentDate"></div>
+            <div class="admin-profile" id="adminProfile">
+              <!-- Admin profile will be rendered here by JS -->
+            </div>
+          </div>
+        </header>
+
+        <div class="users-filters">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label for="roleFilter">Role</label>
+              <select id="roleFilter" class="filter-select">
+                <option value="">All Roles</option>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="searchFilter">Search</label>
+              <div class="search-input-wrapper">
+                <input type="text" id="searchFilter" placeholder="Search by name or email...">
+                <i class="ri-search-line search-icon"></i>
+              </div>
+            </div>
+            
+            <div class="filter-actions">
+              <button id="applyFiltersBtn" class="btn btn-primary">
+                <i class="ri-filter-3-line"></i> Apply Filters
+              </button>
+              <button id="resetFiltersBtn" class="btn btn-secondary">
+                <i class="ri-refresh-line"></i> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="users-table-container">
+          <div class="table-header">
+            <div class="table-title">
+              <h3>All Users</h3>
+              <span id="userCount" class="count-badge">0</span>
+            </div>
+            <div class="table-actions">
+              <button id="refreshBtn" class="icon-btn" title="Refresh">
+                <i class="ri-refresh-line"></i>
+              </button>
+              <div class="pagination">
+                <button id="prevPageBtn" class="pagination-btn" disabled>
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <span id="paginationInfo">Page 1 of 1</span>
+                <button id="nextPageBtn" class="pagination-btn" disabled>
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="users-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Joined</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr class="loading-row">
+                  <td colspan="7">Loading users...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- User Details Modal -->
+    <div id="userDetailsModal" class="modal">
+      <div class="modal-content modal-lg">
+        <div class="modal-header">
+          <h3>User Details</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="userDetailsContent">
+          <!-- User details will be loaded here -->
+          <div class="loading-indicator">Loading user details...</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary close-modal">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit User Role Modal -->
+    <div id="editUserRoleModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit User Role</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="user-info-display" id="editUserInfo">
+            <!-- User info will be displayed here -->
+          </div>
+          
+          <div class="form-group">
+            <label for="userRole">Role</label>
+            <select id="userRole" class="form-control">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="roleChangeNote">Note (Optional)</label>
+            <textarea id="roleChangeNote" class="form-control" rows="3" placeholder="Add a note about this role change..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelRoleEditBtn" class="btn btn-secondary">Cancel</button>
+          <button id="saveRoleBtn" class="btn btn-primary">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="admin-users.js"></script>
+  </body>
+</html>
