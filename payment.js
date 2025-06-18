@@ -395,7 +395,11 @@ document
     
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Please log in to complete your purchase");
+      if (window.showToast) {
+        window.showToast("Please log in to complete your purchase", "error");
+      } else {
+        alert("Please log in to complete your purchase");
+      }
       window.location.href = "login.html";
       return;
     }
@@ -452,7 +456,11 @@ document
       showSuccessAndRedirect('Purchase successful! Redirecting to home...', 'home.html');
       
     } catch (error) {
-      alert(`Payment failed: ${error.message}`);
+      if (window.showToast) {
+        window.showToast(`Payment failed: ${error.message}`, "error");
+      } else {
+        alert(`Payment failed: ${error.message}`);
+      }
       console.error("Payment error:", error);
     }
   });

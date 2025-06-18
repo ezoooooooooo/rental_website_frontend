@@ -17,12 +17,14 @@
     <nav class="main-navigation">
       <div class="nav-container">
         <div class="logo-section">
-          <img src="./rent.png" alt="RentEase Logo" class="logo" />
-          <h1>Rently</h1>
+          <a href="home.html" class="logo-link">
+            <img src="./rent.png" alt="RentEase Logo" class="logo" />
+            <h1>Rently</h1>
+          </a>
         </div>
         <ul class="nav-links">
           <li><a href="home.html">Home</a></li>
-          <li><a href="#about">About</a></li>
+          <li><a href="#footer">About</a></li>
         </ul>
         <div class="user-actions">
           <a href="login.html" class="btn btn-login">Login</a>
@@ -41,41 +43,65 @@
             class="illustration"
           />
           <h1 id="hh">Login</h1>
-          <h1 class="opacity"></h1>
           <form id="loginForm">
             <input type="email" id="email" placeholder="EMAIL" required />
-            <input
-              type="password"
-              id="password"
-              placeholder="PASSWORD"
-              required
-            />
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="password"
+                placeholder="PASSWORD"
+                required
+              />
+              <i class="ri-eye-off-line password-toggle" data-target="password"></i>
+            </div>
             <button type="submit" class="opacity">LOGIN</button>
             <div id="message" class="message"></div>
           </form>
           <div class="register-forget">
             <a href="./signup.html" class="signup-link">Create Account</a>
             <span class="divider">|</span>
-            <a href="#" id="forgotPasswordLink" class="forgot-link">Forgot Password?</a>
+            <a href="./forgot-password.html" class="forgot-link">Forgot Password?</a>
           </div>
         </div>
         <div class="circle circle-two"></div>
       </div>
     </section>
 
-    <!-- Forgot Password Modal -->
-    <div id="forgotPasswordModal" class="modal">
-      <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2>Reset Password</h2>
-        <p>Enter your email address and we'll send you a link to reset your password.</p>
-        <form id="forgotPasswordForm">
-          <input type="email" id="resetEmail" placeholder="Enter your email" required />
-          <button type="submit" class="reset-btn">Send Reset Link</button>
-          <div id="resetMessage" class="message"></div>
-        </form>
+    <!-- Footer -->
+    <footer id="footer" class="main-footer">
+      <div class="footer-container">
+        <div class="footer-columns">
+          <div class="footer-column">
+            <h4>Quick Links</h4>
+            <a href="home.html">Home</a>
+            <a href="item.html">Browse Items</a>
+            <a href="signup.html">Sign Up</a>
+          </div>
+          <div class="footer-column">
+            <h4>Support</h4>
+            <a href="#">Help Center</a>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+          </div>
+          <div class="footer-column">
+            <h4>Legal</h4>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+          </div>
+          <div class="footer-column">
+            <h4>Connect</h4>
+            <div class="social-links">
+              <a href="#" class="social-link">Twitter</a>
+              <a href="#" class="social-link">Instagram</a>
+              <a href="#" class="social-link">LinkedIn</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Rently. All Rights Reserved.</p>
+        </div>
       </div>
-    </div>
+    </footer>
 
     <script src="./login.js"></script>
   </body>

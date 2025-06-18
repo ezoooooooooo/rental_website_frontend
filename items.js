@@ -464,7 +464,7 @@ setupDropdownListeners() {
     const token = this.getToken();
 
     if (!token) {
-      alert("Please log in to add a listing");
+      window.showToast("Please log in to add a listing", "error");
       return;
     }
 
@@ -481,14 +481,14 @@ setupDropdownListeners() {
 
     // Validation checks
     if (!nameInput.value.trim()) {
-      alert("Please enter an item name");
+      window.showToast("Please enter an item name", "error");
       nameInput.focus();
       return;
     }
 
     const rentalRate = Number(rentalRateInput.value);
     if (isNaN(rentalRate) || rentalRate <= 0) {
-      alert("Please enter a valid rental rate (must be a positive number)");
+      window.showToast("Please enter a valid rental rate (must be a positive number)", "error");
       rentalRateInput.focus();
       return;
     }
@@ -534,11 +534,11 @@ setupDropdownListeners() {
         this.showMessage("Listing added successfully");
       } else {
         const errorData = await response.json();
-        alert(errorData.message || "Failed to add listing");
+        window.showToast(errorData.message || "Failed to add listing", "error");
       }
     } catch (error) {
       console.error("Failed to add listing:", error);
-      alert("Failed to add listing. Please try again.");
+      window.showToast("Failed to add listing. Please try again.", "error");
     } finally {
       loader.remove();
     }
@@ -841,7 +841,7 @@ setupDropdownListeners() {
     const token = this.getToken();
 
     if (!token) {
-      alert("Please log in to delete a listing");
+      window.showToast("Please log in to delete a listing", "error");
       return;
     }
 

@@ -17,12 +17,14 @@
     <nav class="main-navigation">
       <div class="nav-container">
         <div class="logo-section">
-          <img src="./rent.png" alt="RentEase Logo" class="logo" />
-          <h1>Rently</h1>
+          <a href="home.html" class="logo-link">
+            <img src="./rent.png" alt="RentEase Logo" class="logo" />
+            <h1>Rently</h1>
+          </a>
         </div>
         <ul class="nav-links">
           <li><a href="home.html">Home</a></li>
-          <li><a href="#about">About</a></li>
+          <li><a href="#footer">About</a></li>
         </ul>
         <div class="user-actions">
           <a href="login.html" class="btn btn-login">Login</a>
@@ -40,58 +42,150 @@
             alt="illustration"
             class="illustration"
           />
-          <h1 id="hh">Sign Up</h1>
-          <h1 class="opacity"></h1>
+          
+          <!-- Step 1: Signup Form -->
+          <div id="signupStep" class="step-container">
+            <h1 id="hh">Sign Up</h1>
 
-          <form id="signupForm">
-            <div class="input-group">
+            <form id="signupForm">
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="firstname"
+                  placeholder="FIRST NAME"
+                  required
+                />
+                <input
+                  type="text"
+                  id="lastname"
+                  placeholder="LAST NAME"
+                  required
+                />
+              </div>
+
+              <input type="text" id="address" placeholder="ADDRESS" required />
               <input
-                type="text"
-                id="firstname"
-                placeholder="FIRST NAME"
+                type="email"
+                id="email"
+                placeholder="EMAIL ADDRESS"
                 required
               />
               <input
-                type="text"
-                id="lastname"
-                placeholder="LAST NAME"
+                type="tel"
+                id="phone"
+                pattern="[0-9]{11}"
+                maxlength="11"
+                placeholder="PHONE NUMBER (11 DIGITS)"
                 required
               />
+              <div class="password-input-container">
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="PASSWORD"
+                  required
+                />
+                <i class="ri-eye-off-line password-toggle" data-target="password"></i>
+              </div>
+
+              <button type="submit" class="opacity" id="signupBtn">
+                <span id="signupBtnText">CREATE ACCOUNT</span>
+                <span id="signupLoader" class="loader hidden">⏳</span>
+              </button>
+              <div id="signupMessage" class="message"></div>
+            </form>
+
+            <div class="login-link">
+              <a href="./login.html">Already have an account? Login</a>
             </div>
-
-            <input type="text" id="address" placeholder="ADDRESS" required />
-            <input
-              type="email"
-              id="email"
-              placeholder="EMAIL ADDRESS"
-              required
-            />
-            <input
-              type="tel"
-              id="phone"
-              pattern="[0-9]{11}"
-              maxlength="11"
-              placeholder="PHONE NUMBER (11 DIGITS)"
-              required
-            />
-            <input
-              type="password"
-              id="password"
-              placeholder="PASSWORD"
-              required
-            />
-
-            <button type="submit" class="opacity">CREATE ACCOUNT</button>
-            <div id="message" class="message"></div>
-          </form>
-
-          <div class="login-link">
-            <a href="./login.html">Already have an account? Login</a>
           </div>
+
+          <!-- Step 2: Verification Code -->
+          <div id="verificationStep" class="step-container hidden">
+            <h1 id="hh">Verify Your Email</h1>
+            <p class="verification-info">
+              We've sent a 6-digit verification code to:<br>
+              <span id="verificationEmail" class="email-display"></span>
+            </p>
+            <p class="verification-instruction">
+              Enter the code below to complete your registration:
+            </p>
+
+            <form id="verificationForm">
+              <div class="verification-input-container">
+                <input
+                  type="text"
+                  id="verificationCode"
+                  placeholder="000000"
+                  maxlength="6"
+                  pattern="[0-9]{6}"
+                  class="verification-input"
+                  required
+                />
+              </div>
+
+              <button type="submit" class="opacity" id="verifyBtn">
+                <span id="verifyBtnText">VERIFY & CREATE ACCOUNT</span>
+                <span id="verifyLoader" class="loader hidden">⏳</span>
+              </button>
+              
+              <div class="verification-actions">
+                <button type="button" id="resendBtn" class="resend-btn">
+                  Resend Code
+                </button>
+                <div id="countdown" class="countdown hidden">
+                  Resend available in <span id="countdownTimer">60</span>s
+                </div>
+              </div>
+
+              <div id="verificationMessage" class="message"></div>
+            </form>
+
+            <div class="back-link">
+              <a href="#" id="backToSignup">← Back to signup form</a>
+            </div>
+          </div>
+
         </div>
         <div class="circle circle-two"></div>
       </div>
     </section>
+
+    <!-- Footer -->
+    <footer id="footer" class="main-footer">
+      <div class="footer-container">
+        <div class="footer-columns">
+          <div class="footer-column">
+            <h4>Quick Links</h4>
+            <a href="home.html">Home</a>
+            <a href="item.html">Browse Items</a>
+            <a href="login.html">Login</a>
+          </div>
+          <div class="footer-column">
+            <h4>Support</h4>
+            <a href="#">Help Center</a>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+          </div>
+          <div class="footer-column">
+            <h4>Legal</h4>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+          </div>
+          <div class="footer-column">
+            <h4>Connect</h4>
+            <div class="social-links">
+              <a href="#" class="social-link">Twitter</a>
+              <a href="#" class="social-link">Instagram</a>
+              <a href="#" class="social-link">LinkedIn</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Rently. All Rights Reserved.</p>
+        </div>
+      </div>
+    </footer>
 
     <script src="./signup.js"></script>
   </body>

@@ -12,25 +12,62 @@
     <link rel="stylesheet" href="nav-utils.css" />
     <link rel="stylesheet" href="status-labels.css" />
     <link rel="stylesheet" href="admin-dashboard.css" />
+    <link rel="stylesheet" href="admin-nav-shared.css" />
     <link rel="stylesheet" href="admin-orders.css" />
     <link rel="stylesheet" href="toast-notifications.css" />
   </head>
   <body>
-    <!-- Navigation -->
-    <nav class="main-navigation">
-      <div class="nav-container">
-        <div class="logo-section">
-          <img src="./rent.png" alt="Rently Logo" class="logo" />
+    <!-- Standardized Admin Navigation -->
+    <nav class="admin-main-navigation">
+      <div class="admin-nav-container">
+        <div class="admin-logo-section">
+          <img src="./rent.png" alt="Rently Logo" class="admin-logo" />
           <h1>Rently Admin</h1>
         </div>
-        <ul class="nav-links">
-          <li><a href="admin-dashboard.html"><i class="ri-dashboard-line"></i> Dashboard</a></li>
-          <li><a href="admin-orders.html" class="active"><i class="ri-shopping-cart-2-line"></i> Orders</a></li>
-          <li><a href="admin-users.html"><i class="ri-user-line"></i> Users</a></li>
-          <li><a href="admin-listings.html"><i class="ri-store-2-line"></i> Listings</a></li>
-          <li><a href="admin-analytics.html"><i class="ri-bar-chart-line"></i> Analytics</a></li>
+        
+        <ul class="admin-nav-links">
+          <li>
+            <a href="admin-dashboard.html">
+              <i class="ri-dashboard-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="admin-orders.html" class="active">
+              <i class="ri-shopping-cart-2-line"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li>
+            <a href="admin-users.html">
+              <i class="ri-user-line"></i>
+              <span>Users</span>
+            </a>
+          </li>
+          <li>
+            <a href="admin-listings.html">
+              <i class="ri-store-2-line"></i>
+              <span>Listings</span>
+            </a>
+          </li>
+          <li>
+            <a href="admin-analytics.html">
+              <i class="ri-bar-chart-line"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
         </ul>
-        <div class="user-actions"><!-- Admin profile dropdown rendered by JS --></div>
+        
+        <div class="admin-user-actions">
+          <a href="home.html" class="back-to-site-link">
+            <i class="ri-external-link-line"></i>
+            <span>Back to Site</span>
+          </a>
+          
+          <div class="admin-profile-dropdown">
+            <!-- Profile will be rendered by JavaScript -->
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -61,12 +98,6 @@
       <div class="admin-content">
         <header class="admin-header">
           <h2 class="gradient-text">Order Management</h2>
-          <div class="admin-actions">
-            <div class="date-display" id="currentDate"></div>
-            <div class="admin-profile" id="adminProfile">
-              <!-- Admin profile will be rendered here by JS -->
-            </div>
-          </div>
         </header>
 
         <div class="orders-filters">
@@ -109,7 +140,7 @@
               <i class="ri-refresh-line"></i> Reset
             </button>
             <button id="batchActionsBtn" class="btn btn-accent" disabled>
-              <i class="ri-list-check"></i> Batch Actions
+              <i class="ri-check-double-line"></i> Batch Actions
             </button>
           </div>
         </div>
@@ -209,11 +240,84 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary close-modal">Close</button>
-          <button id="editOrderBtn" class="btn btn-primary">Edit Order</button>
         </div>
       </div>
     </div>
 
+    <!-- Edit Order Modal -->
+    <div id="editOrderModal" class="modal">
+      <div class="modal-content modal-lg">
+        <div class="modal-header">
+          <h3>Edit Order</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="edit-order-form">
+            <div class="form-section">
+              <h4>Order Information</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="editOrderId">Order ID</label>
+                  <input type="text" id="editOrderId" readonly class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="editOrderStatus">Status</label>
+                  <select id="editOrderStatus" class="form-control">
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="editTotalPrice">Total Amount ($)</label>
+                  <input type="number" id="editTotalPrice" step="0.01" min="0" class="form-control" readonly>
+                </div>
+              </div>
+            </div>
+            
+
+            
+            <div class="form-section">
+              <h4>Customer & Item Information</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="editCustomerName">Customer Name</label>
+                  <input type="text" id="editCustomerName" readonly class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="editCustomerEmail">Customer Email</label>
+                  <input type="email" id="editCustomerEmail" readonly class="form-control">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="editItemName">Item Name</label>
+                  <input type="text" id="editItemName" readonly class="form-control">
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-section">
+              <h4>Admin Notes</h4>
+              <div class="form-group">
+                <label for="editAdminNotes">Internal Notes</label>
+                <textarea id="editAdminNotes" rows="3" class="form-control" placeholder="Add any internal notes about this order..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary close-modal">Cancel</button>
+          <button id="saveOrderChanges" class="btn btn-primary">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="admin-nav-shared.js"></script>
     <script src="admin-orders.js"></script>
   </body>
 </html>

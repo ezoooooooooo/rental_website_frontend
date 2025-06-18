@@ -96,6 +96,13 @@ body {
   margin-bottom: 40px;
 }
 
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
 .enter-btn {
   padding: 15px 40px;
   font-size: 16px;
@@ -111,6 +118,29 @@ body {
 .enter-btn:hover {
   transform: translateY(-2px) scale(1.03);
   box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+}
+
+.admin-btn {
+  padding: 15px 40px;
+  font-size: 16px;
+  background: transparent;
+  border: 2px solid #9982b1;
+  border-radius: 8px;
+  color: #6c5ce7;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.admin-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  background: rgba(153, 130, 177, 0.1);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2);
+}
+
+.admin-note {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-top: 10px;
 }
 
 .hidden {
@@ -130,6 +160,11 @@ body {
   .container {
     padding: 30px;
   }
+  
+  .button-container {
+    flex-direction: column;
+    gap: 15px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -145,8 +180,9 @@ body {
     padding: 20px;
   }
   
-  .enter-btn {
+  .enter-btn, .admin-btn {
     padding: 12px 30px;
     font-size: 14px;
+    width: 100%;
   }
 }

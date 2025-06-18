@@ -24,45 +24,75 @@ class AdminOrdersManager {
     // Selected orders for batch actions
     this.selectedOrders = new Set();
     
+    // Store loaded orders data for view/edit operations
+    this.ordersData = new Map();
+    
     // Initialize orders page
-    this.initOrdersPage();
+    this.init();
   }
 
   /**
-   * Initialize the orders page
+   * Initialize the admin orders page
    */
-  async initOrdersPage() {
-    try {
-      // Check if user is logged in and is admin
-      if (!this.token) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      // Set current date
-      this.updateCurrentDate();
-      
-      // Setup admin profile
-      await this.setupAdminProfile();
-      
-      // Load orders
-      await this.loadOrders();
-      
-      // Setup event listeners
-      this.setupEventListeners();
-      
-    } catch (error) {
-      console.error("Error initializing admin orders page:", error);
-      this.showToast("Error loading orders page", "error");
+  async init() {
+    console.log("Initializing Admin Orders...");
+    
+    // Check authentication
+    if (!this.token) {
+      console.log("No token found, redirecting to login");
+      window.location.href = 'login.html';
+      return;
     }
+
+    // Load admin profile
+    await this.loadAdminProfile();
+    
+    // Update current date display
+    this.updateCurrentDate();
+    
+    // Check for URL parameters (status filter from dashboard)
+    const urlParams = new URLSearchParams(window.location.search);
+    const statusFilter = urlParams.get('status');
+    
+    if (statusFilter) {
+      // Set the status filter dropdown
+      const statusSelect = document.getElementById('statusFilter');
+      if (statusSelect) {
+        statusSelect.value = statusFilter;
+        this.filters.status = statusFilter;
+      }
+    }
+
+    // Load orders
+    await this.loadOrders();
+    
+    // Attach event listeners
+    this.attachEventListeners();
+    
+    // Test: temporarily enable batch actions button for debugging
+    setTimeout(() => {
+      const testBtn = document.getElementById('batchActionsBtn');
+      if (testBtn) {
+        console.log('Testing batch actions button...');
+        testBtn.disabled = false;
+        testBtn.style.opacity = '1';
+        testBtn.style.pointerEvents = 'auto';
+        testBtn.style.cursor = 'pointer';
+      }
+    }, 2000);
+    
+    // Setup modal close functionality
+    this.setupModalHandlers();
+    
+    console.log("Admin Orders initialized successfully");
   }
 
   /**
    * Update the current date display
    */
   updateCurrentDate() {
-    const dateElement = document.getElementById("currentDate");
-    if (dateElement) {
+    const currentDateElement = document.getElementById("currentDate");
+    if (currentDateElement) {
       const now = new Date();
       const options = { 
         weekday: 'long', 
@@ -70,190 +100,190 @@ class AdminOrdersManager {
         month: 'long', 
         day: 'numeric' 
       };
-      dateElement.textContent = now.toLocaleDateString('en-US', options);
+      currentDateElement.textContent = now.toLocaleDateString('en-US', options);
     }
   }
 
   /**
-   * Set up the admin profile dropdown
+   * Load admin profile from multiple possible endpoints
    */
-  async setupAdminProfile() {
-    try {
-      const response = await fetch(`${this.baseUrl}/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${this.token}`
-        }
-      });
+  async loadAdminProfile() {
+    const profileEndpoints = [
+      `${this.baseUrl}/auth/me`,
+      `${this.baseUrl}/auth/profile`,
+      `${this.baseUrl}/users/me`,
+      `${this.baseUrl}/profile`,
+      `${this.baseUrl}/users/profile`,
+      `${this.baseUrl}/user/profile`
+    ];
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch admin profile");
-      }
-
-      const userData = await response.json();
-      
-      // Check if user is admin
-      if (userData.role !== "admin") {
-        this.showToast("Access denied. Admin privileges required.", "error");
-        setTimeout(() => {
-          window.location.href = "home.html";
-        }, 2000);
-        return;
-      }
-
-      const adminProfileElement = document.getElementById("adminProfile");
-      if (adminProfileElement) {
-        adminProfileElement.innerHTML = `
-          <div class="admin-avatar">
-            ${userData.profileImage 
-              ? `<img src="${userData.profileImage}" alt="Admin" />` 
-              : `<div class="avatar-initial">${userData.firstName ? userData.firstName[0] : 'A'}</div>`}
-          </div>
-          <div class="admin-info">
-            <span class="admin-name">${userData.firstName} ${userData.lastName}</span>
-            <span class="admin-role">Administrator</span>
-          </div>
-          <i class="ri-arrow-down-s-line"></i>
-          <div class="dropdown-menu">
-            <a href="home.html"><i class="ri-home-line"></i> Main Site</a>
-            <div class="dropdown-divider"></div>
-            <a href="#" id="logoutBtn"><i class="ri-logout-box-r-line"></i> Logout</a>
-          </div>
-        `;
-
-        // Set up dropdown toggle
-        const profileElement = adminProfileElement;
-        const dropdownMenu = profileElement.querySelector(".dropdown-menu");
+    for (const endpoint of profileEndpoints) {
+      try {
+        console.log("Trying profile endpoint:", endpoint);
         
-        profileElement.addEventListener("click", (e) => {
-          e.stopPropagation();
-          dropdownMenu.classList.toggle("show");
-        });
-        
-        document.addEventListener("click", (e) => {
-          if (!profileElement.contains(e.target)) {
-            dropdownMenu.classList.remove("show");
+        const response = await fetch(endpoint, {
+          headers: {
+            Authorization: `Bearer ${this.token}`
           }
         });
-        
-        // Set up logout button
-        const logoutBtn = document.getElementById("logoutBtn");
-        if (logoutBtn) {
-          logoutBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            this.logout();
-          });
+
+        if (response.ok) {
+          const profile = await response.json();
+          console.log("Profile loaded successfully from:", endpoint);
+          this.setupAdminProfileUI(profile);
+          return;
         }
+      } catch (error) {
+        console.log(`Failed to load profile from ${endpoint}:`, error.message);
+        continue;
       }
-    } catch (error) {
-      console.error("Error setting up admin profile:", error);
+    }
+
+    console.log("All profile endpoints failed, using fallback");
+    this.setupAdminProfileUI(null);
+  }
+
+  /**
+   * Setup admin profile UI
+   */
+  setupAdminProfileUI(profile) {
+    const adminProfileElement = document.getElementById("adminProfile");
+    if (!adminProfileElement) return;
+
+    const adminName = profile?.firstName 
+      ? `${profile.firstName} ${profile.lastName || ''}`.trim()
+      : profile?.name || "Admin User";
+    
+    const adminRole = profile?.role || "Administrator";
+    const adminAvatar = profile?.profileImage || profile?.avatar;
+    const adminInitial = adminName.charAt(0).toUpperCase();
+
+    adminProfileElement.innerHTML = `
+      <div class="admin-avatar">
+        ${adminAvatar 
+          ? `<img src="${adminAvatar}" alt="${adminName}" />` 
+          : `<div class="avatar-initial">${adminInitial}</div>`}
+      </div>
+      <div class="admin-info">
+        <span class="admin-name">${adminName}</span>
+        <span class="admin-role">${adminRole}</span>
+      </div>
+      <i class="ri-arrow-down-s-line"></i>
+      <div class="dropdown-menu">
+        <a href="home.html"><i class="ri-home-line"></i> Main Site</a>
+        <div class="dropdown-divider"></div>
+        <a href="#" id="logoutBtn"><i class="ri-logout-box-r-line"></i> Logout</a>
+      </div>
+    `;
+
+    // Set up dropdown functionality
+    const dropdownMenu = adminProfileElement.querySelector(".dropdown-menu");
+    
+    adminProfileElement.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("show");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!adminProfileElement.contains(e.target)) {
+        dropdownMenu.classList.remove("show");
+      }
+    });
+
+    // Set up logout button
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.logout();
+      });
     }
   }
 
   /**
-   * Set up event listeners for the page
+   * Attach event listeners
    */
-  setupEventListeners() {
-    // Filter buttons
-    const applyFiltersBtn = document.getElementById("applyFiltersBtn");
-    if (applyFiltersBtn) {
-      applyFiltersBtn.addEventListener("click", () => {
-        this.applyFilters();
-      });
-    }
-    
-    const resetFiltersBtn = document.getElementById("resetFiltersBtn");
-    if (resetFiltersBtn) {
-      resetFiltersBtn.addEventListener("click", () => {
-        this.resetFilters();
-      });
-    }
-    
-    // Pagination buttons
-    const prevPageBtn = document.getElementById("prevPageBtn");
-    if (prevPageBtn) {
-      prevPageBtn.addEventListener("click", () => {
-        if (this.currentPage > 1) {
-          this.currentPage--;
-          this.loadOrders();
-        }
-      });
-    }
-    
-    const nextPageBtn = document.getElementById("nextPageBtn");
-    if (nextPageBtn) {
-      nextPageBtn.addEventListener("click", () => {
-        if (this.currentPage < this.totalPages) {
-          this.currentPage++;
-          this.loadOrders();
-        }
-      });
-    }
-    
-    // Refresh button
-    const refreshBtn = document.getElementById("refreshBtn");
-    if (refreshBtn) {
-      refreshBtn.addEventListener("click", () => {
+  attachEventListeners() {
+    // Status filter
+    const statusFilter = document.getElementById('statusFilter');
+    if (statusFilter) {
+      statusFilter.addEventListener('change', (e) => {
+        this.filters.status = e.target.value;
         this.loadOrders();
       });
     }
     
-    // Select all checkbox
-    const selectAllCheckbox = document.getElementById("selectAllOrders");
-    if (selectAllCheckbox) {
-      selectAllCheckbox.addEventListener("change", (e) => {
-        this.toggleSelectAllOrders(e.target.checked);
+    // Search functionality
+    const searchInput = document.getElementById('searchFilter');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(this.searchTimeout);
+        this.searchTimeout = setTimeout(() => {
+          this.filters.search = e.target.value;
+          this.loadOrders();
+        }, 500);
+      });
+    }
+    
+    // Date filters
+    const startDateFilter = document.getElementById('startDateFilter');
+    const endDateFilter = document.getElementById('endDateFilter');
+    
+    if (startDateFilter) {
+      startDateFilter.addEventListener('change', (e) => {
+        this.filters.startDate = e.target.value;
+        this.loadOrders();
+      });
+    }
+    
+    if (endDateFilter) {
+      endDateFilter.addEventListener('change', (e) => {
+        this.filters.endDate = e.target.value;
+        this.loadOrders();
       });
     }
     
     // Batch actions button
-    const batchActionsBtn = document.getElementById("batchActionsBtn");
+    const batchActionsBtn = document.getElementById('batchActionsBtn');
     if (batchActionsBtn) {
-      batchActionsBtn.addEventListener("click", () => {
+      // Remove any existing listeners first
+      const newBtn = batchActionsBtn.cloneNode(true);
+      batchActionsBtn.parentNode.replaceChild(newBtn, batchActionsBtn);
+      
+      // Add fresh event listener
+      newBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Batch actions button clicked!');
+        
+        if (newBtn.disabled) {
+          console.log('Button is disabled, not opening modal');
+          this.showToast('Please select at least one order first', 'warning');
+          return;
+        }
+        
         this.openBatchActionsModal();
       });
-    }
-    
-    // Batch modal buttons
-    const cancelBatchBtn = document.getElementById("cancelBatchBtn");
-    if (cancelBatchBtn) {
-      cancelBatchBtn.addEventListener("click", () => {
-        this.closeBatchActionsModal();
+      
+      // Also add a test click handler
+      newBtn.addEventListener('mousedown', () => {
+        console.log('Button mousedown event triggered');
       });
     }
     
-    const applyBatchBtn = document.getElementById("applyBatchBtn");
+    // Apply batch actions button
+    const applyBatchBtn = document.getElementById('applyBatchBtn');
     if (applyBatchBtn) {
-      applyBatchBtn.addEventListener("click", () => {
+      applyBatchBtn.addEventListener('click', () => {
         this.applyBatchActions();
       });
     }
     
-    // Close modals when clicking on close button or outside
-    const closeModalButtons = document.querySelectorAll(".close-modal");
-    closeModalButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        this.closeAllModals();
-      });
-    });
-    
-    // Close modals when clicking outside
-    const modals = document.querySelectorAll(".modal");
-    modals.forEach(modal => {
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-          this.closeAllModals();
-        }
-      });
-    });
-    
-    // Edit order button in details modal
-    const editOrderBtn = document.getElementById("editOrderBtn");
-    if (editOrderBtn) {
-      editOrderBtn.addEventListener("click", () => {
-        const orderId = editOrderBtn.getAttribute("data-order-id");
-        if (orderId) {
-          window.location.href = `admin-edit-order.html?id=${orderId}`;
-        }
+    // Select all checkbox
+    const selectAllCheckbox = document.getElementById('selectAllOrders');
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', (e) => {
+        this.toggleSelectAllOrders(e.target.checked);
       });
     }
   }
@@ -262,137 +292,312 @@ class AdminOrdersManager {
    * Load orders from the API
    */
   async loadOrders() {
-    try {
-      const tableBody = document.getElementById("ordersTableBody");
-      tableBody.innerHTML = `
-        <tr class="loading-row">
-          <td colspan="8">Loading orders...</td>
-        </tr>
-      `;
-      
-      // Build query parameters
-      let queryParams = new URLSearchParams({
-        page: this.currentPage,
-        limit: this.pageSize,
-        sort: "-createdAt"
-      });
-      
-      // Add filters if they exist
-      if (this.filters.status) {
-        queryParams.append("status", this.filters.status);
-      }
-      
-      if (this.filters.startDate && this.filters.endDate) {
-        queryParams.append("startDate", this.filters.startDate);
-        queryParams.append("endDate", this.filters.endDate);
-      }
-      
-      if (this.filters.search) {
-        queryParams.append("search", this.filters.search);
-      }
-      
-      const response = await fetch(`${this.baseUrl}/admin/orders?${queryParams.toString()}`, {
+    // Try multiple possible endpoints for orders
+    const ordersEndpoints = [
+      `${this.baseUrl}/admin/orders`,
+      `${this.baseUrl}/orders`,
+      `${this.baseUrl}/admin/orders/all`,
+      `${this.baseUrl}/orders/admin`,
+      `${this.baseUrl}/rentals`,
+      `${this.baseUrl}/admin/rentals`
+    ];
+
+    for (const endpoint of ordersEndpoints) {
+      try {
+        console.log("Fetching orders from:", endpoint);
+        
+        const response = await fetch(endpoint, {
         headers: {
-          Authorization: `Bearer ${this.token}`
+            Authorization: `Bearer ${this.token}`,
+            'Content-Type': 'application/json'
         }
       });
 
+        console.log(`Orders API response from ${endpoint}:`, response.status);
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch orders");
+          console.log(`Failed ${endpoint}: ${response.status} ${response.statusText}`);
+          continue;
       }
 
       const data = await response.json();
-      const orders = data.orders;
+        console.log(`Orders data received from ${endpoint}:`, data);
       
-      // Update pagination info
-      this.totalPages = data.pagination.pages;
-      this.currentPage = data.pagination.page;
-      this.updatePaginationUI();
+      // Handle different API response formats
+      let orders = [];
       
-      // Update order count
-      const orderCountElement = document.getElementById("orderCount");
-      if (orderCountElement) {
-        orderCountElement.textContent = data.pagination.total;
+      if (Array.isArray(data)) {
+        orders = data;
+      } else if (Array.isArray(data.orders)) {
+        orders = data.orders;
+      } else if (Array.isArray(data.data)) {
+        orders = data.data;
+        } else if (data.rentals && Array.isArray(data.rentals)) {
+          orders = data.rentals;
       }
-      
-      // Clear selected orders when loading new data
-      this.selectedOrders.clear();
-      this.updateBatchActionsButton();
-      
-      if (orders.length === 0) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="8" class="empty-table">No orders found</td>
-          </tr>
-        `;
-        return;
-      }
-      
-      tableBody.innerHTML = orders.map(order => {
-        // Format date
-        const orderDate = new Date(order.createdAt);
-        const formattedDate = orderDate.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
+        
+        console.log(`Successfully loaded ${orders.length} orders from ${endpoint}`);
+        
+        // Clear previous selections and data
+        this.selectedOrders.clear();
+        this.ordersData.clear();
+        
+        // Store orders data for view/edit operations
+        orders.forEach(order => {
+          const orderId = order.id || order._id || order.orderId;
+          this.ordersData.set(orderId, order);
         });
+        console.log(`Stored ${this.ordersData.size} orders in memory for view/edit operations`);
         
-        // Get shortened order ID
-        const shortOrderId = order._id.substring(order._id.length - 6);
+        const ordersTableBody = document.getElementById("ordersTableBody");
+        if (!ordersTableBody) return;
         
-        // Get user details
-        const userName = order.user ? `${order.user.firstName} ${order.user.lastName}` : 'Unknown User';
+        if (!orders || orders.length === 0) {
+          ordersTableBody.innerHTML = `
+            <tr class="empty-row">
+                <td colspan="8">
+                <div class="empty-state">
+                  <i class="ri-inbox-line"></i>
+                  <p>No orders found</p>
+                </div>
+              </td>
+            </tr>
+          `;
+            this.attachOrderActionListeners();
+            this.attachCheckboxListeners();
+          return;
+        }
         
-        // Get listing details
-        const listingName = order.listing ? order.listing.name : 'Unknown Item';
-        const listingImage = order.listing && order.listing.images && order.listing.images.length > 0 
-          ? order.listing.images[0]
-          : 'https://via.placeholder.com/40';
+        ordersTableBody.innerHTML = orders.map(order => {
+          // Handle different property names in API response
+          const orderId = order.id || order._id || order.orderId;
+          const user = order.user || order.renter || order.customer || {};
+          const item = order.item || order.listing || order.product || {};
+          const totalAmount = order.totalAmount || order.totalPrice || order.price || order.amount || 0;
+          const status = order.status || 'pending';
+          const createdAt = order.createdAt || order.date || order.orderDate || new Date().toISOString();
+          const startDate = order.startDate || order.rentalStartDate || order.fromDate || '';
+          const endDate = order.endDate || order.rentalEndDate || order.toDate || '';
+          
+          // Extract image URL properly with fallback
+          let imageUrl = 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop';
+          
+          if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+            // Handle both string URLs and object URLs
+            const firstImage = item.images[0];
+            if (typeof firstImage === 'string') {
+              imageUrl = firstImage;
+            } else if (firstImage && typeof firstImage === 'object') {
+              // Check for common URL properties
+              imageUrl = firstImage.url || firstImage.src || firstImage.path || firstImage.uri || imageUrl;
+            }
+          } else if (item.image) {
+            imageUrl = item.image;
+          } else if (item.thumbnail) {
+            imageUrl = item.thumbnail;
+          } else if (item.photo) {
+            imageUrl = item.photo;
+          }
+          
+          console.log("Order item image URL extracted:", imageUrl);
+          
+          return `
+            <tr data-order-id="${orderId}">
+              <td>
+                <input type="checkbox" class="order-checkbox custom-checkbox" data-order-id="${orderId}">
+              </td>
+              <td>
+                <a href="#" class="order-link" onclick="viewOrderDetails('${orderId}')">#${orderId}</a>
+              </td>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar">
+                    ${user.profileImage 
+                      ? `<img src="${user.profileImage}" alt="${user.firstName || 'User'}" />` 
+                      : `<div class="avatar-initial">${(user.firstName || user.name || 'U')[0]}</div>`}
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">${user.firstName || user.name || ''} ${user.lastName || ''}</span>
+                    <span class="user-email">${user.email || ''}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="item-info">
+                                    <div class="item-image">
+                          <img src="${imageUrl}" alt="${item.name || item.title || 'Item'}" class="item-image" onerror="this.src='https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop'" />
+                        </div>
+                      <div class="item-details">
+                        <span class="item-name">${item.name || item.title || 'Unknown Item'}</span>
+                        <span class="item-category">${item.category || 'Uncategorized'}</span>
+                      </div>
+                    </div>
+              </td>
+              <td>${new Date(createdAt).toLocaleDateString()}</td>
+              <td>
+                ${startDate ? new Date(startDate).toLocaleDateString() : 'N/A'} - 
+                ${endDate ? new Date(endDate).toLocaleDateString() : 'N/A'}
+              </td>
+              <td>$${totalAmount.toFixed(2)}</td>
+              <td>
+                <span class="status-badge ${status}-status">${this.capitalizeFirstLetter(status)}</span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button class="action-btn view-btn" data-order-id="${orderId}" title="View Details">
+                    <i class="ri-eye-line"></i>
+                  </button>
+                  <button class="action-btn edit-btn" data-order-id="${orderId}" title="Edit Order">
+                    <i class="ri-edit-line"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
         
-        return `
-          <tr>
-            <td>
-              <input type="checkbox" class="custom-checkbox order-checkbox" data-order-id="${order._id}">
-            </td>
-            <td class="order-id">#${shortOrderId}</td>
-            <td class="order-user">
-              <div class="avatar-initial">${userName.charAt(0)}</div>
-              <span class="user-name">${userName}</span>
-            </td>
-            <td class="order-item">
-              <img src="${listingImage}" alt="${listingName}" class="item-image">
-              <span class="item-name">${listingName}</span>
-            </td>
-            <td class="order-price">$${order.totalPrice.toFixed(2)}</td>
-            <td class="order-date">${formattedDate}</td>
-            <td>
-              <span class="order-status status-${order.status.toLowerCase()}">${this.capitalizeFirstLetter(order.status)}</span>
-            </td>
-            <td class="order-actions">
-              <button class="action-btn view-btn" data-order-id="${order._id}" title="View Details">
-                <i class="ri-eye-line"></i>
-              </button>
-              <button class="action-btn edit-btn" data-order-id="${order._id}" title="Edit Order">
-                <i class="ri-edit-line"></i>
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-      
-      // Attach event listeners to action buttons and checkboxes
-      this.attachOrderActionListeners();
-      this.attachCheckboxListeners();
-      
-    } catch (error) {
-      console.error("Error loading orders:", error);
-      const tableBody = document.getElementById("ordersTableBody");
-      tableBody.innerHTML = `
-        <tr>
-          <td colspan="8" class="error-table">Error loading orders: ${error.message}</td>
-        </tr>
-      `;
+          // Attach event listeners after orders are loaded
+          this.attachOrderActionListeners();
+          this.attachCheckboxListeners();
+          this.updateBatchActionsButton(); // Update button state
+          return; // Successfully loaded orders, exit the loop
+        
+      } catch (error) {
+          console.log(`Error loading orders from ${endpoint}:`, error.message);
+          continue; // Try next endpoint
+        }
     }
+    
+        // If all endpoints failed, show placeholder data
+    console.log("All order endpoints failed, showing placeholder data");
+    this.showPlaceholderOrders();
+  }
+
+  /**
+   * Show placeholder orders when API fails
+   */
+  showPlaceholderOrders() {
+    console.error("Error loading orders from all endpoints");
+    this.showToast("Unable to load orders. Using placeholder data.", "warning");
+    
+    const ordersTableBody = document.getElementById("ordersTableBody");
+    if (!ordersTableBody) return;
+
+    const placeholderOrders = [
+      {
+        id: "ORD1001",
+        user: { firstName: "John", lastName: "Doe", email: "john@example.com" },
+        item: { 
+          name: "Professional Camera Kit", 
+          category: "Electronics",
+          images: ["https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400&h=400&fit=crop"]
+        },
+        totalAmount: 45.00,
+        createdAt: new Date().toISOString(),
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        status: "pending"
+      },
+      {
+        id: "ORD1002",
+        user: { firstName: "Jane", lastName: "Smith", email: "jane@example.com" },
+        item: { 
+          name: "Mountain Bike", 
+          category: "Sports",
+          images: ["https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=400&fit=crop"]
+        },
+        totalAmount: 35.00,
+        createdAt: new Date().toISOString(),
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+        status: "approved"
+      },
+      {
+        id: "ORD1003",
+        user: { firstName: "Mike", lastName: "Johnson", email: "mike@example.com" },
+        item: { 
+          name: "Camping Tent", 
+          category: "Outdoor",
+          images: ["https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=400&fit=crop"]
+        },
+        totalAmount: 25.00,
+        createdAt: new Date().toISOString(),
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+        status: "completed"
+      }
+    ];
+    
+    // Clear previous selections and store placeholder orders data
+    this.selectedOrders.clear();
+    this.ordersData.clear();
+    placeholderOrders.forEach(order => {
+      this.ordersData.set(order.id, order);
+    });
+    console.log(`Stored ${this.ordersData.size} placeholder orders in memory`);
+    
+    ordersTableBody.innerHTML = placeholderOrders.map(order => {
+      const imageUrl = order.item.images && order.item.images.length > 0 
+        ? order.item.images[0] 
+        : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23cccccc%22/%3E%3C/svg%3E';
+      
+             return `
+       <tr data-order-id="${order.id}">
+         <td>
+           <input type="checkbox" class="order-checkbox custom-checkbox" data-order-id="${order.id}">
+         </td>
+         <td>
+           <a href="#" class="order-link" onclick="viewOrderDetails('${order.id}')">#${order.id}</a>
+         </td>
+        <td>
+          <div class="user-info">
+            <div class="user-avatar">
+              <div class="avatar-initial">${order.user.firstName[0]}</div>
+            </div>
+            <div class="user-details">
+              <span class="user-name">${order.user.firstName} ${order.user.lastName}</span>
+              <span class="user-email">${order.user.email}</span>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="item-info">
+            <div class="item-image">
+              <img src="${imageUrl}" alt="${order.item.name}" class="item-image" />
+            </div>
+            <div class="item-details">
+              <span class="item-name">${order.item.name}</span>
+              <span class="item-category">${order.item.category}</span>
+            </div>
+          </div>
+        </td>
+        <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+        <td>
+          ${new Date(order.startDate).toLocaleDateString()} - 
+          ${new Date(order.endDate).toLocaleDateString()}
+        </td>
+        <td>$${order.totalAmount.toFixed(2)}</td>
+        <td>
+          <span class="status-badge ${order.status}-status">${this.capitalizeFirstLetter(order.status)}</span>
+        </td>
+        <td>
+          <div class="actions">
+          <button class="action-btn view-btn" data-order-id="${order.id}" title="View Details">
+            <i class="ri-eye-line"></i>
+            </button>
+          <button class="action-btn edit-btn" data-order-id="${order.id}" title="Edit Order">
+            <i class="ri-edit-line"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+    }).join('');
+  
+    // Attach event listeners after placeholder orders are loaded
+    this.attachOrderActionListeners();
+    this.attachCheckboxListeners();
+    this.updateBatchActionsButton(); // Update button state
   }
 
   /**
@@ -433,7 +638,7 @@ class AdminOrdersManager {
     editButtons.forEach(button => {
       button.addEventListener('click', () => {
         const orderId = button.getAttribute('data-order-id');
-        window.location.href = `admin-edit-order.html?id=${orderId}`;
+        this.openEditOrderModal(orderId);
       });
     });
   }
@@ -443,14 +648,17 @@ class AdminOrdersManager {
    */
   attachCheckboxListeners() {
     const orderCheckboxes = document.querySelectorAll('.order-checkbox');
+    
     orderCheckboxes.forEach(checkbox => {
       checkbox.addEventListener('change', (e) => {
         const orderId = checkbox.getAttribute('data-order-id');
+        
         if (e.target.checked) {
           this.selectedOrders.add(orderId);
         } else {
           this.selectedOrders.delete(orderId);
         }
+        
         this.updateBatchActionsButton();
         this.updateSelectAllCheckbox();
       });
@@ -462,8 +670,23 @@ class AdminOrdersManager {
    */
   updateBatchActionsButton() {
     const batchActionsBtn = document.getElementById("batchActionsBtn");
+    
     if (batchActionsBtn) {
-      batchActionsBtn.disabled = this.selectedOrders.size === 0;
+      const isDisabled = this.selectedOrders.size === 0;
+      batchActionsBtn.disabled = isDisabled;
+      
+      // Force update the button style to make sure it's clickable
+      if (!isDisabled) {
+        batchActionsBtn.style.pointerEvents = 'auto';
+        batchActionsBtn.style.opacity = '1';
+        batchActionsBtn.style.cursor = 'pointer';
+        console.log('Batch actions button enabled');
+      } else {
+        batchActionsBtn.style.pointerEvents = 'auto'; // Keep pointer events for warning message
+        batchActionsBtn.style.opacity = '0.6';
+        batchActionsBtn.style.cursor = 'not-allowed';
+        console.log('Batch actions button disabled');
+      }
     }
   }
 
@@ -651,167 +874,372 @@ class AdminOrdersManager {
    * View order details in a modal
    */
   async viewOrderDetails(orderId) {
-    try {
-      // Show modal with loading state
-      const modal = document.getElementById("orderDetailsModal");
-      const modalContent = document.getElementById("orderDetailsContent");
+    console.log('Viewing order details for:', orderId);
+    
+    // Show the order details modal
+    const modal = document.getElementById('orderDetailsModal');
+    const modalContent = document.getElementById('orderDetailsContent');
+    
+    console.log('Modal element found:', modal);
+    console.log('Modal content element found:', modalContent);
+    
+    if (modal && modalContent) {
+      // Show loading state
+      modalContent.innerHTML = `
+        <div class="loading-indicator">
+          <i class="ri-loader-4-line"></i>
+          <p>Loading order details...</p>
+        </div>
+      `;
       
-      if (modal && modalContent) {
-        modal.classList.add("show");
-        modalContent.innerHTML = `<div class="loading-indicator">Loading order details...</div>`;
+      modal.classList.add('show');
+      console.log('Modal should now be visible, classes:', modal.className);
+      
+      // Get order data from stored data
+      const orderData = this.ordersData.get(orderId);
+      
+      if (orderData) {
+        console.log('Found order data in memory:', orderData);
         
-        // Set order ID for the edit button
-        const editOrderBtn = document.getElementById("editOrderBtn");
-        if (editOrderBtn) {
-          editOrderBtn.setAttribute("data-order-id", orderId);
-        }
+        // Extract order information with fallbacks
+        const order = orderData;
+        const user = order.user || order.renter || order.customer || {};
+        const item = order.item || order.listing || order.product || {};
+        const orderId_display = order.id || order._id || orderId;
+        const status = order.status || 'pending';
+        const totalAmount = order.totalAmount || order.totalPrice || order.price || order.amount || 0;
+        const createdAt = order.createdAt || order.date || order.orderDate || new Date().toISOString();
+        const startDate = order.startDate || order.rentalStartDate || order.fromDate || '';
+        const endDate = order.endDate || order.rentalEndDate || order.toDate || '';
+        const adminNote = order.adminNote || order.note || '';
         
-        // Fetch order details
-        const response = await fetch(`${this.baseUrl}/admin/orders/${orderId}`, {
-          headers: {
-            Authorization: `Bearer ${this.token}`
+        // Extract image URL
+        let imageUrl = 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop';
+        
+        if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+          const firstImage = item.images[0];
+          if (typeof firstImage === 'string') {
+            imageUrl = firstImage;
+          } else if (firstImage && typeof firstImage === 'object') {
+            imageUrl = firstImage.url || firstImage.src || firstImage.path || firstImage.uri || imageUrl;
           }
-        });
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch order details");
+        } else if (item.image) {
+          imageUrl = item.image;
+        } else if (item.thumbnail) {
+          imageUrl = item.thumbnail;
+        } else if (item.photo) {
+          imageUrl = item.photo;
         }
         
-        const order = await response.json();
-        
-        // Format dates
-        const createdDate = new Date(order.createdAt);
-        const startDate = new Date(order.startDate);
-        const endDate = new Date(order.endDate);
-        
-        const formatDate = (date) => {
-          return date.toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-          });
-        };
-        
-        // Render order details
+        // Build the order details HTML with real data
         modalContent.innerHTML = `
           <div class="order-details-grid">
             <div class="order-detail-section">
               <h4>Order Information</h4>
               <div class="detail-row">
-                <div class="detail-label">Order ID:</div>
-                <div class="detail-value">${order._id}</div>
+                <span class="detail-label">Order ID:</span>
+                <span class="detail-value">#${orderId_display}</span>
               </div>
               <div class="detail-row">
-                <div class="detail-label">Created:</div>
-                <div class="detail-value">${formatDate(createdDate)}</div>
+                <span class="detail-label">Status:</span>
+                <span class="detail-value">
+                  <span class="status-badge ${status}-status">${this.capitalizeFirstLetter(status)}</span>
+                </span>
               </div>
               <div class="detail-row">
-                <div class="detail-label">Status:</div>
-                <div class="detail-value">
-                  <span class="order-status status-${order.status.toLowerCase()}">${this.capitalizeFirstLetter(order.status)}</span>
-                </div>
+                <span class="detail-label">Order Date:</span>
+                <span class="detail-value">${new Date(createdAt).toLocaleDateString()}</span>
               </div>
               <div class="detail-row">
-                <div class="detail-label">Payment Status:</div>
-                <div class="detail-value">
-                  <span class="order-status status-${order.paymentStatus.toLowerCase()}">${this.capitalizeFirstLetter(order.paymentStatus)}</span>
-                </div>
+                <span class="detail-label">Total Amount:</span>
+                <span class="detail-value">$${totalAmount.toFixed(2)}</span>
+              </div>
+              ${adminNote ? `
+              <div class="detail-row">
+                <span class="detail-label">Admin Notes:</span>
+                <span class="detail-value">${adminNote}</span>
+              </div>
+              ` : ''}
+            </div>
+            
+            <div class="order-detail-section">
+              <h4>Customer Information</h4>
+              <div class="detail-row">
+                <span class="detail-label">Name:</span>
+                <span class="detail-value">${user.firstName || user.name || 'N/A'} ${user.lastName || ''}</span>
               </div>
               <div class="detail-row">
-                <div class="detail-label">Total Price:</div>
-                <div class="detail-value">$${order.totalPrice.toFixed(2)}</div>
-              </div>
-              <div class="detail-row">
-                <div class="detail-label">Rental Period:</div>
-                <div class="detail-value">${formatDate(startDate)} to ${formatDate(endDate)}</div>
-              </div>
-              <div class="detail-row">
-                <div class="detail-label">Rental Days:</div>
-                <div class="detail-value">${order.rentalDays} days</div>
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">${user.email || 'N/A'}</span>
               </div>
             </div>
             
             <div class="order-detail-section">
-              <h4>User Information</h4>
-              <div class="detail-row">
-                <div class="detail-label">Renter:</div>
-                <div class="detail-value">${order.user ? `${order.user.firstName} ${order.user.lastName}` : 'Unknown User'}</div>
+              <h4>Item Details</h4>
+              <div class="order-item-card">
+                <div class="item-image-container">
+                  <img src="${imageUrl}" alt="${item.name || item.title || 'Item'}" onerror="this.src='https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop'">
+                </div>
+                <div class="item-details">
+                  <h5 class="item-name">${item.name || item.title || 'Unknown Item'}</h5>
+                  <p class="item-price">$${(item.pricePerDay || item.price || totalAmount).toFixed(2)}/day</p>
+                  <p class="item-category">${item.category || 'Uncategorized'}</p>
+                  ${startDate && endDate ? `
+                  <div class="item-dates">
+                    <strong>Rental Period:</strong><br>
+                    ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}
+                  </div>
+                  ` : ''}
+                </div>
               </div>
-              <div class="detail-row">
-                <div class="detail-label">Email:</div>
-                <div class="detail-value">${order.user ? order.user.email : 'N/A'}</div>
-              </div>
-              <div class="detail-row">
-                <div class="detail-label">Owner:</div>
-                <div class="detail-value">${order.owner ? `${order.owner.firstName} ${order.owner.lastName}` : 'Unknown Owner'}</div>
-              </div>
-              <div class="detail-row">
-                <div class="detail-label">Owner Email:</div>
-                <div class="detail-value">${order.owner ? order.owner.email : 'N/A'}</div>
+            </div>
+            
+            <div class="order-detail-section">
+              <h4>Order Timeline</h4>
+              <div class="order-timeline">
+                <div class="timeline-item">
+                  <div class="timeline-date">${new Date(createdAt).toLocaleDateString()}</div>
+                  <div class="timeline-content">
+                    <h6 class="timeline-title">Order Placed</h6>
+                    <p class="timeline-description">Order was successfully placed by the customer.</p>
+                  </div>
+                </div>
+                ${order.updatedAt && order.updatedAt !== order.createdAt ? `
+                <div class="timeline-item">
+                  <div class="timeline-date">${new Date(order.updatedAt).toLocaleDateString()}</div>
+                  <div class="timeline-content">
+                    <h6 class="timeline-title">Order Updated</h6>
+                    <p class="timeline-description">Order status was updated to ${this.capitalizeFirstLetter(status)}.</p>
+                  </div>
+                </div>
+                ` : ''}
               </div>
             </div>
           </div>
-          
-          <div class="order-detail-section">
-            <h4>Item Details</h4>
-            <div class="order-item-card">
-              <div class="item-image-container">
-                <img src="${order.listing && order.listing.images && order.listing.images.length > 0 ? order.listing.images[0] : 'https://via.placeholder.com/80'}" alt="${order.listing ? order.listing.name : 'Unknown Item'}">
+        `;
+        
+      } else {
+        console.error('Order data not found in memory for ID:', orderId);
+        
+        // Show error state
+        modalContent.innerHTML = `
+          <div class="order-details-grid">
+            <div class="order-detail-section">
+              <h4>Order Information</h4>
+              <div class="detail-row">
+                <span class="detail-label">Order ID:</span>
+                <span class="detail-value">#${orderId}</span>
               </div>
-              <div class="item-details">
-                <h5 class="item-name">${order.listing ? order.listing.name : 'Unknown Item'}</h5>
-                <p class="item-price">$${order.listing ? order.listing.rentalRate : '0'}/day</p>
-                <p class="item-dates">${formatDate(startDate)} - ${formatDate(endDate)}</p>
+              <div class="detail-row">
+                <span class="detail-label">Status:</span>
+                <span class="detail-value">
+                  <span class="status-badge error-status">Order data not found</span>
+                </span>
               </div>
-            </div>
-          </div>
-          
-          <div class="order-detail-section">
-            <h4>Order Timeline</h4>
-            <div class="order-timeline">
-              <div class="timeline-item">
-                <div class="timeline-date">${formatDate(createdDate)}</div>
-                <div class="timeline-content">
-                  <div class="timeline-title">Order Created</div>
-                  <p class="timeline-description">Order was placed by ${order.user ? `${order.user.firstName} ${order.user.lastName}` : 'Unknown User'}</p>
-                </div>
+              <div class="detail-row">
+                <span class="detail-label">Error:</span>
+                <span class="detail-value" style="color: #dc3545;">Please refresh the page to reload order data.</span>
               </div>
-              
-              ${order.status !== 'pending' ? `
-              <div class="timeline-item">
-                <div class="timeline-date">${formatDate(new Date())}</div>
-                <div class="timeline-content">
-                  <div class="timeline-title">Status Updated</div>
-                  <p class="timeline-description">Order status changed to ${this.capitalizeFirstLetter(order.status)}</p>
-                </div>
-              </div>
-              ` : ''}
             </div>
           </div>
         `;
       }
-    } catch (error) {
-      console.error("Error viewing order details:", error);
+    } else {
+      console.error('Modal or modal content not found!');
+      alert(`Order Details for #${orderId}\n\nModal elements not found in DOM.`);
+    }
+  }
+
+  /**
+   * Open the edit order modal
+   */
+  async openEditOrderModal(orderId) {
+    try {
+      console.log("Opening edit modal for order:", orderId);
       
-      const modalContent = document.getElementById("orderDetailsContent");
-      if (modalContent) {
-        modalContent.innerHTML = `
-          <div class="error-message">
-            <i class="ri-error-warning-line"></i>
-            <p>Error loading order details: ${error.message}</p>
-          </div>
-        `;
+      // Show edit modal with loading state first
+      const editModal = document.getElementById('editOrderModal');
+      if (editModal) {
+        editModal.classList.add('show');
+        
+        // Show loading state in form fields
+        document.getElementById('editOrderId').value = orderId;
+        document.getElementById('editOrderStatus').value = "";
+        document.getElementById('editCustomerName').value = "Loading...";
+        document.getElementById('editCustomerEmail').value = "Loading...";
+        document.getElementById('editItemName').value = "Loading...";
+        document.getElementById('editTotalPrice').value = "0.00";
+        document.getElementById('editAdminNotes').value = "";
+      }
+      
+      // Get order data from stored data
+      const orderData = this.ordersData.get(orderId);
+      
+      if (orderData) {
+        console.log('Found order data in memory for edit:', orderData);
+        
+        // Extract order information with fallbacks
+        const order = orderData;
+        const user = order.user || order.renter || order.customer || {};
+        const item = order.item || order.listing || order.product || {};
+        const totalAmount = order.totalAmount || order.totalPrice || order.price || order.amount || 0;
+        const status = order.status || 'pending';
+        const adminNote = order.adminNote || order.note || '';
+        
+        // Populate edit form with real data
+        document.getElementById('editOrderId').value = orderId;
+        document.getElementById('editOrderStatus').value = status;
+        document.getElementById('editCustomerName').value = `${user.firstName || user.name || 'N/A'} ${user.lastName || ''}`.trim();
+        document.getElementById('editCustomerEmail').value = user.email || 'N/A';
+        document.getElementById('editItemName').value = item.name || item.title || 'Unknown Item';
+        document.getElementById('editTotalPrice').value = totalAmount.toFixed(2);
+        document.getElementById('editAdminNotes').value = adminNote;
+        
+        console.log("Edit form populated with real order data");
+      } else {
+        console.error('Order data not found in memory for ID:', orderId);
+        
+        // Populate with basic info and show warning
+        document.getElementById('editOrderId').value = orderId;
+        document.getElementById('editOrderStatus').value = "pending";
+        document.getElementById('editCustomerName').value = "Order data not found";
+        document.getElementById('editCustomerEmail').value = "Please refresh page";
+        document.getElementById('editItemName').value = "Order data not found";
+        document.getElementById('editTotalPrice').value = "0.00";
+        document.getElementById('editAdminNotes').value = "";
+        
+        this.showToast("Warning: Order data not found. Please refresh the page.", "warning");
+      }
+      
+      // Close any other open modals
+      this.closeAllModals();
+      
+      // Show edit modal
+      if (editModal) {
+        editModal.classList.add('show');
+      }
+      
+      // Store current order ID for saving
+      this.currentEditOrderId = orderId;
+      
+    } catch (error) {
+      console.error("Error opening edit modal:", error);
+      this.showToast("Error opening edit form", "error");
+    }
+  }
+
+  /**
+   * Save order changes using the API
+   */
+  async saveOrderChanges() {
+    try {
+      if (!this.currentEditOrderId) {
+        this.showToast("No order selected for editing", "error");
+        return;
+      }
+      
+      const newStatus = document.getElementById('editOrderStatus').value;
+      const adminNote = document.getElementById('editAdminNotes').value;
+      
+      if (!newStatus) {
+        this.showToast("Please select a status", "error");
+        return;
+      }
+      
+      // Show loading state
+      const saveBtn = document.getElementById('saveOrderChanges');
+      const originalBtnText = saveBtn.innerHTML;
+      saveBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Saving...';
+      saveBtn.disabled = true;
+      
+      // Call the API to update order status
+      const response = await fetch(`${this.baseUrl}/admin/orders/${this.currentEditOrderId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.token}`
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          note: adminNote || undefined
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to update order");
+      }
+      
+      const result = await response.json();
+      
+      // Close modal and reload orders
+      this.closeEditOrderModal();
+      await this.loadOrders();
+      
+      // Show success message
+      this.showToast(result.message || "Order updated successfully", "success");
+      
+    } catch (error) {
+      console.error("Error saving order changes:", error);
+      this.showToast(`Error: ${error.message}`, "error");
+    } finally {
+      // Reset button state
+      const saveBtn = document.getElementById('saveOrderChanges');
+      if (saveBtn) {
+        saveBtn.innerHTML = 'Save Changes';
+        saveBtn.disabled = false;
       }
     }
+  }
+
+  /**
+   * Close edit order modal
+   */
+  closeEditOrderModal() {
+    const editModal = document.getElementById('editOrderModal');
+    if (editModal) {
+      editModal.classList.remove('show');
+    }
+    this.currentEditOrderId = null;
+  }
+
+  /**
+   * Setup modal close functionality
+   */
+  setupModalHandlers() {
+    // Add event listeners for closing modals
+    const closeButtons = document.querySelectorAll('.close-modal');
+    closeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        this.closeAllModals();
+      });
+    });
+    
+    // Close modals when clicking outside
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          this.closeAllModals();
+        }
+      });
+    });
+    
+    // Close modals with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closeAllModals();
+      }
+    });
   }
 
   /**
    * Close all modals
    */
   closeAllModals() {
-    const modals = document.querySelectorAll(".modal");
+    const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
-      modal.classList.remove("show");
+      modal.classList.remove('show');
     });
   }
 
@@ -819,9 +1247,9 @@ class AdminOrdersManager {
    * Logout the admin user
    */
   logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    window.location.href = "login.html";
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    window.location.href = 'login.html';
   }
 
   /**
@@ -860,3 +1288,18 @@ class AdminOrdersManager {
 document.addEventListener("DOMContentLoaded", () => {
   window.adminOrders = new AdminOrdersManager();
 });
+
+// Global functions for order actions
+window.viewOrderDetails = function(orderId) {
+  if (window.adminOrders) {
+    window.adminOrders.viewOrderDetails(orderId);
+  }
+};
+
+window.editOrder = function(orderId) {
+  if (window.adminOrders) {
+    window.adminOrders.openEditOrderModal(orderId);
+  }
+};
+
+

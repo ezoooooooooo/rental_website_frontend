@@ -66,6 +66,138 @@ function setupLogoutListeners() {
   });
 }
 
+/**
+ * Show a toast notification
+ * @param {string} message - Message to display
+ * @param {string} type - Type of notification (success, error, warning, info)
+ */
+function showToast(message, type = "success") {
+  // Check if notification container exists, create if not
+  let toastContainer = document.getElementById("toast-container");
+  if (!toastContainer) {
+    toastContainer = document.createElement("div");
+    toastContainer.id = "toast-container";
+    toastContainer.className = "notification-container";
+    document.body.appendChild(toastContainer);
+  }
+  
+  // Create toast element
+  const toast = document.createElement("div");
+  toast.className = `notification ${type}`;
+  toast.setAttribute("role", "alert");
+  toast.setAttribute("aria-live", "polite");
+  
+  // Set icon based on type
+  let icon;
+  switch(type) {
+    case "success":
+      icon = '<i class="ri-check-line notification-icon"></i>';
+      break;
+    case "error":
+      icon = '<i class="ri-error-warning-line notification-icon"></i>';
+      break;
+    case "warning":
+      icon = '<i class="ri-alert-line notification-icon"></i>';
+      break;
+    case "info":
+      icon = '<i class="ri-information-line notification-icon"></i>';
+      break;
+    default:
+      icon = '<i class="ri-information-line notification-icon"></i>';
+  }
+  
+  // Create toast content with progress bar
+  toast.innerHTML = `
+    ${icon}
+    <div class="notification-content">
+      <div class="notification-message">${message}</div>
+    </div>
+    <button class="notification-close" aria-label="Close notification">&times;</button>
+    <div class="notification-progress"></div>
+  `;
+  
+  // Add to container
+  toastContainer.appendChild(toast);
+  
+  // Trigger animation
+  setTimeout(() => toast.classList.add("show"), 10);
+  
+  // Add event listener to close button
+  const closeBtn = toast.querySelector(".notification-close");
+  closeBtn.addEventListener("click", () => {
+    toast.classList.add("hide");
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.remove();
+      }
+    }, 400);
+  });
+  
+  // Auto remove after 5 seconds
+  const autoRemoveTimer = setTimeout(() => {
+    if (document.body.contains(toast)) {
+      toast.classList.add("hide");
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 400);
+    }
+  }, 5000);
+  
+  // Pause auto-remove on hover
+  toast.addEventListener("mouseenter", () => {
+    clearTimeout(autoRemoveTimer);
+    const progressBar = toast.querySelector(".notification-progress");
+    if (progressBar) {
+      progressBar.style.animationPlayState = "paused";
+    }
+  });
+  
+  // Resume auto-remove on mouse leave
+  toast.addEventListener("mouseleave", () => {
+    const progressBar = toast.querySelector(".notification-progress");
+    if (progressBar) {
+      progressBar.style.animationPlayState = "running";
+    }
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        toast.classList.add("hide");
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.remove();
+          }
+        }, 400);
+      }
+    }, 2000); // Shorter time after mouse leave
+  });
+}
+
+/**
+ * Ensure toast notification CSS is loaded
+ */
+function ensureToastCSSLoaded() {
+  // Check if the CSS is already loaded
+  const cssLoaded = Array.from(document.styleSheets).some(styleSheet => {
+    try {
+      return styleSheet.href && styleSheet.href.includes('toast-notifications.css');
+    } catch (e) {
+      return false;
+    }
+  });
+  
+  if (!cssLoaded) {
+    // Create link element
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'toast-notifications.css';
+    
+    // Append to head
+    document.head.appendChild(link);
+    console.log('Toast notifications CSS loaded dynamically');
+  }
+}
+
 // Set up logout listeners when the DOM is loaded
 document.addEventListener('DOMContentLoaded', setupLogoutListeners);
 
@@ -80,9 +212,13 @@ document.addEventListener('DOMContentLoaded', () => {
       logout();
     });
   });
+  
+  // Ensure toast CSS is loaded
+  ensureToastCSSLoaded();
 });
 
 // Make functions globally available
 window.updateCartBadge = updateCartBadge;
 window.updateCartBadgeWithAnimation = updateCartBadgeWithAnimation;
 window.logout = logout;
+window.showToast = showToast;

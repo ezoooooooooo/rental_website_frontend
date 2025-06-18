@@ -297,7 +297,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 </div>
                 <div class="quantity-controls">
                     <button class="decrease">-</button>
-                    <span class="quantity">${item.rentalDays}</span>
+                    <input type="number" class="quantity" value="${item.rentalDays}" min="1">
                     <button class="increase">+</button>
                 </div>
             `;
@@ -317,20 +317,35 @@ document.addEventListener("DOMContentLoaded", async function () {
   function setupCartItemEventListeners(cartItem, itemId) {
     const decreaseButton = cartItem.querySelector(".decrease");
     const increaseButton = cartItem.querySelector(".increase");
-    const quantityElement = cartItem.querySelector(".quantity");
+    const quantityInput = cartItem.querySelector(".quantity");
     const removeButton = cartItem.querySelector(".remove-item");
 
     decreaseButton.addEventListener("click", () => {
-      const currentVal = parseInt(quantityElement.textContent);
+      const currentVal = parseInt(quantityInput.value);
       if (currentVal > 1) {
         const newValue = currentVal - 1;
+        quantityInput.value = newValue;
         updateCartItemDays(itemId, newValue);
       }
     });
 
     increaseButton.addEventListener("click", () => {
-      const currentVal = parseInt(quantityElement.textContent);
+      const currentVal = parseInt(quantityInput.value);
       const newValue = currentVal + 1;
+      quantityInput.value = newValue;
+      updateCartItemDays(itemId, newValue);
+    });
+
+    // Add event listener for manual input changes
+    quantityInput.addEventListener("change", () => {
+      let newValue = parseInt(quantityInput.value);
+      
+      // Ensure value is at least 1
+      if (isNaN(newValue) || newValue < 1) {
+        newValue = 1;
+        quantityInput.value = newValue;
+      }
+      
       updateCartItemDays(itemId, newValue);
     });
 

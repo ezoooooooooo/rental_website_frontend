@@ -80,9 +80,17 @@ body {
     align-items: center;
 }
 
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+    gap: 10px;
+}
+
 .logo {
     height: 40px;
-    margin-right: 10px;
 }
 
 .logo-section h1 {
@@ -417,10 +425,28 @@ header h1 i {
 
 .quantity {
     font-size: 16px;
-    min-width: 30px;
+    min-width: 40px;
+    width: 40px;
     text-align: center;
     font-weight: 600;
     color: #2c3e50;
+    border: none;
+    background: transparent;
+    -moz-appearance: textfield; /* Remove spinner for Firefox */
+}
+
+/* Remove spinner for Chrome, Safari, Edge, Opera */
+.quantity::-webkit-outer-spin-button,
+.quantity::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Add focus style */
+.quantity:focus {
+    outline: none;
+    background-color: #f4f4f6;
+    border-radius: 4px;
 }
 
 .remove-item {

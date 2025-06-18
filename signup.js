@@ -20,6 +20,12 @@ function createParticles() {
  }
 }
 
+// Global variables for verification process
+let userEmail = '';
+let resendTimer = null;
+let resendCountdown = 60;
+
+// Step 1: Signup Form Submission
 document.getElementById("signupForm").addEventListener("submit", async function (event) {
  event.preventDefault();
 
@@ -32,40 +38,42 @@ document.getElementById("signupForm").addEventListener("submit", async function 
      password: document.getElementById("password").value,
  };
 
- const message = document.getElementById("message");
+ const message = document.getElementById("signupMessage");
+ const submitButton = document.getElementById("signupBtn");
+ const buttonText = document.getElementById("signupBtnText");
+ const loader = document.getElementById("signupLoader");
 
-
+ // Client-side validation
  const hasLetters = /[a-zA-Z]/.test(formData.password);
  const hasNumbers = /\d/.test(formData.password);
  const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
  const validPhone = /^\d{11}$/.test(formData.phone);
 
  if (!validEmail) {
-     message.textContent = "Please enter a valid email address";
-     message.className = "message error";
+     showMessage(message, "Please enter a valid email address", "error");
      return;
  }
 
  if (!validPhone) {
-     message.textContent = "Phone number must be exactly 11 digits";
-     message.className = "message error";
+     showMessage(message, "Phone number must be exactly 11 digits", "error");
      return;
  }
 
  if (formData.password.length < 8) {
-     message.textContent = "Password should contain at least 8 characters";
-     message.className = "message error";
+     showMessage(message, "Password should contain at least 8 characters", "error");
      return;
  }
 
  if (!hasLetters || !hasNumbers) {
-     message.textContent = "Password must include both letters and numbers";
-     message.className = "message error";
+     showMessage(message, "Password must include both letters and numbers", "error");
      return;
  }
 
+ // Show loading state
+ setButtonLoading(submitButton, buttonText, loader, true);
+
  try {
-     const response = await fetch("http://localhost:3000/api/signup", {
+     const response = await fetch("http://localhost:3000/api/request-verification", {
          method: "POST",
          headers: {
              "Content-Type": "application/json",
@@ -76,31 +84,254 @@ document.getElementById("signupForm").addEventListener("submit", async function 
      const data = await response.json();
 
      if (response.ok) {
-      localStorage.setItem('token', data.token);
-      message.textContent = "Account created successfully!";
-      message.className = "message success";
+      userEmail = formData.email;
+      showMessage(message, "Verification code sent to your email!", "success");
       
-      
+      // Switch to verification step after a short delay
       setTimeout(() => {
-          window.location.href = "./home.html";
+          switchToVerificationStep();
       }, 1500);
   } else {
       
-      if (data.errors) {
+      if (data.message) {
           
-          const errorMessage = Object.values(data.errors).join(", ");
-          message.textContent = errorMessage;
+          showMessage(message, data.message, "error");
       } else {
           
-          message.textContent = data.message || "Error creating account. Please try again.";
+          showMessage(message, "Error sending verification code. Please try again.", "error");
       }
-      message.className = "message error"; 
   }
 } catch (error) {
   
-  message.textContent = "Connection error. Please try again.";
-  message.className = "message error"; 
+  showMessage(message, "Connection error. Please try again.", "error");
+} finally {
+  setButtonLoading(submitButton, buttonText, loader, false);
 }
 });
 
+// Step 2: Verification Form Submission
+document.getElementById("verificationForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const verificationCode = document.getElementById("verificationCode").value;
+    const message = document.getElementById("verificationMessage");
+    const submitButton = document.getElementById("verifyBtn");
+    const buttonText = document.getElementById("verifyBtnText");
+    const loader = document.getElementById("verifyLoader");
+
+    if (verificationCode.length !== 6 || !/^\d{6}$/.test(verificationCode)) {
+        showMessage(message, "Please enter a valid 6-digit code", "error");
+        return;
+    }
+
+    // Show loading state
+    setButtonLoading(submitButton, buttonText, loader, true);
+
+    try {
+        const response = await fetch("http://localhost:3000/api/verify-signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email: userEmail,
+                verificationCode: verificationCode
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Account created successfully
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('userRole', data.user.role);
+            
+            showMessage(message, "Account created successfully! Redirecting...", "success");
+            
+            // Redirect based on user role
+            setTimeout(() => {
+                if (data.user.role === 'admin') {
+                    window.location.href = "./admin-dashboard.html";
+                } else {
+                    window.location.href = "./home.html";
+                }
+            }, 1500);
+        } else {
+            if (data.message && data.message.includes("too many")) {
+                // Too many attempts - restart process
+                showMessage(message, data.message, "error");
+                setTimeout(() => {
+                    resetToSignupStep();
+                }, 3000);
+            } else {
+                showMessage(message, data.message || "Invalid verification code. Please try again.", "error");
+            }
+        }
+    } catch (error) {
+        showMessage(message, "Connection error. Please try again.", "error");
+    } finally {
+        setButtonLoading(submitButton, buttonText, loader, false);
+    }
+});
+
+// Resend Code Functionality
+document.getElementById("resendBtn").addEventListener("click", async function() {
+    const resendBtn = document.getElementById("resendBtn");
+    const message = document.getElementById("verificationMessage");
+    
+    resendBtn.disabled = true;
+    const originalText = resendBtn.textContent;
+    resendBtn.textContent = "Sending...";
+
+    try {
+        const response = await fetch("http://localhost:3000/api/resend-code", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email: userEmail
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showMessage(message, "New verification code sent!", "success");
+            startResendCountdown();
+        } else {
+            showMessage(message, data.message || "Failed to resend code. Please try again.", "error");
+            resendBtn.disabled = false;
+            resendBtn.textContent = originalText;
+        }
+    } catch (error) {
+        showMessage(message, "Connection error. Please try again.", "error");
+        resendBtn.disabled = false;
+        resendBtn.textContent = originalText;
+    }
+});
+
+// Back to Signup Functionality
+document.getElementById("backToSignup").addEventListener("click", function(event) {
+    event.preventDefault();
+    resetToSignupStep();
+});
+
+// Utility Functions
+function showMessage(messageElement, text, type) {
+    messageElement.textContent = text;
+    messageElement.className = `message ${type}`;
+}
+
+function setButtonLoading(button, textElement, loader, isLoading) {
+    if (isLoading) {
+        button.disabled = true;
+        textElement.classList.add('hidden');
+        loader.classList.remove('hidden');
+    } else {
+        button.disabled = false;
+        textElement.classList.remove('hidden');
+        loader.classList.add('hidden');
+    }
+}
+
+function switchToVerificationStep() {
+    document.getElementById("signupStep").classList.add("hidden");
+    document.getElementById("verificationStep").classList.remove("hidden");
+    document.getElementById("verificationEmail").textContent = userEmail;
+    
+    // Clear verification form
+    document.getElementById("verificationCode").value = "";
+    document.getElementById("verificationMessage").textContent = "";
+    document.getElementById("verificationMessage").className = "message";
+    
+    // Start resend countdown
+    startResendCountdown();
+    
+    // Focus on verification input
+    setTimeout(() => {
+        document.getElementById("verificationCode").focus();
+    }, 100);
+}
+
+function resetToSignupStep() {
+    document.getElementById("verificationStep").classList.add("hidden");
+    document.getElementById("signupStep").classList.remove("hidden");
+    
+    // Clear messages
+    document.getElementById("signupMessage").textContent = "";
+    document.getElementById("signupMessage").className = "message";
+    document.getElementById("verificationMessage").textContent = "";
+    document.getElementById("verificationMessage").className = "message";
+    
+    // Reset resend timer
+    if (resendTimer) {
+        clearInterval(resendTimer);
+        resendTimer = null;
+    }
+    
+    // Reset email
+    userEmail = "";
+}
+
+function startResendCountdown() {
+    const resendBtn = document.getElementById("resendBtn");
+    const countdown = document.getElementById("countdown");
+    const countdownTimer = document.getElementById("countdownTimer");
+    
+    resendCountdown = 60;
+    resendBtn.disabled = true;
+    resendBtn.textContent = "Code Sent";
+    countdown.classList.remove("hidden");
+    
+    resendTimer = setInterval(() => {
+        resendCountdown--;
+        countdownTimer.textContent = resendCountdown;
+        
+        if (resendCountdown <= 0) {
+            clearInterval(resendTimer);
+            resendTimer = null;
+            resendBtn.disabled = false;
+            resendBtn.textContent = "Resend Code";
+            countdown.classList.add("hidden");
+        }
+    }, 1000);
+}
+
+// Auto-format verification code input (numbers only)
+document.getElementById("verificationCode").addEventListener("input", function(event) {
+    const input = event.target;
+    const value = input.value.replace(/\D/g, ''); // Remove non-digits
+    input.value = value;
+    
+    // Auto-submit when 6 digits are entered
+    if (value.length === 6) {
+        document.getElementById("verificationForm").dispatchEvent(new Event('submit'));
+    }
+});
+
+// Password toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const toggles = document.querySelectorAll('.password-toggle');
+  
+  toggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const targetInput = document.getElementById(targetId);
+      
+      if (targetInput.type === 'password') {
+        targetInput.type = 'text';
+        this.classList.remove('ri-eye-off-line');
+        this.classList.add('ri-eye-line');
+      } else {
+        targetInput.type = 'password';
+        this.classList.remove('ri-eye-line');
+        this.classList.add('ri-eye-off-line');
+      }
+    });
+  });
+});
+
+// Initialize particles on page load
 window.addEventListener('load', createParticles);

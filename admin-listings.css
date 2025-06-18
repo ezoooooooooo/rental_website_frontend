@@ -164,6 +164,10 @@
   background-color: rgba(46, 204, 113, 0.9);
 }
 
+.status-reserved {
+  background-color: rgba(243, 156, 18, 0.9);
+}
+
 .status-rented {
   background-color: rgba(52, 152, 219, 0.9);
 }
@@ -241,26 +245,42 @@
 
 .listing-actions {
   display: flex;
-  justify-content: space-between;
+  gap: 8px;
   margin-top: 15px;
 }
 
 .listing-action-btn {
-  background: none;
+  background-color: transparent;
   border: none;
-  font-size: 1.1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  color: #7f8c8d;
-  transition: color 0.3s;
-  padding: 5px;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.view-listing-btn {
+  color: #3498db;
+  background-color: rgba(52, 152, 219, 0.1);
 }
 
 .view-listing-btn:hover {
-  color: var(--info-color);
+  background-color: rgba(52, 152, 219, 0.2);
+  transform: translateY(-1px);
+}
+
+.edit-listing-btn {
+  color: #f39c12;
+  background-color: rgba(243, 156, 18, 0.1);
 }
 
 .edit-listing-btn:hover {
-  color: var(--warning-color);
+  background-color: rgba(243, 156, 18, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Table View */
@@ -458,7 +478,40 @@ tbody tr:hover {
 
 .listing-actions-cell {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+}
+
+.listing-actions-cell .listing-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.listing-actions-cell .view-listing-btn {
+  color: #3498db;
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.listing-actions-cell .view-listing-btn:hover {
+  background-color: rgba(52, 152, 219, 0.2);
+  transform: translateY(-1px);
+}
+
+.listing-actions-cell .edit-listing-btn {
+  color: #f39c12;
+  background-color: rgba(243, 156, 18, 0.1);
+}
+
+.listing-actions-cell .edit-listing-btn:hover {
+  background-color: rgba(243, 156, 18, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Pagination Controls */
@@ -483,6 +536,101 @@ tbody tr:hover {
 
 .pagination-controls .pagination-btn:hover:not(:disabled) {
   background-color: #e9e9ec;
+}
+
+/* Modal Styles - Specific to admin listings to avoid conflicts */
+#listingDetailsModal,
+#editListingStatusModal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease !important;
+}
+
+#listingDetailsModal.show,
+#editListingStatusModal.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#listingDetailsModal .modal-content,
+#editListingStatusModal .modal-content {
+  background-color: white !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  transform: scale(0.9) !important;
+  transition: transform 0.3s ease !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+#listingDetailsModal.show .modal-content,
+#editListingStatusModal.show .modal-content {
+  transform: scale(1) !important;
+}
+
+#editListingStatusModal .modal-content {
+  max-width: 500px !important;
+}
+
+.modal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 20px 25px !important;
+  border-bottom: 1px solid #e9ecef !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.modal-header h3 {
+  margin: 0 !important;
+  font-size: 1.3rem !important;
+  font-weight: 600 !important;
+}
+
+.close-modal {
+  background: none !important;
+  border: none !important;
+  font-size: 1.5rem !important;
+  color: white !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.close-modal:hover {
+  opacity: 0.7 !important;
+}
+
+.modal-body {
+  padding: 25px !important;
+}
+
+.modal-footer {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  padding: 20px 25px !important;
+  border-top: 1px solid #e9ecef !important;
+  background-color: #f8f9fa !important;
+  border-radius: 0 0 12px 12px !important;
 }
 
 /* Listing Details Modal */

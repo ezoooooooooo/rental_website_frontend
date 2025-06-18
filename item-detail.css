@@ -1,3 +1,18 @@
+/* Featured badge for item detail page */
+.featured-badge-detail {
+  display: inline-block;
+  background: linear-gradient(135deg, #f1c40f, #f39c12);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 10px;
+  margin-top: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
 /* Top rated badge */
 .top-rated-badge {
   position: absolute;
@@ -21,7 +36,28 @@
 }
 
 .star-rating {
-  display: inline-flex;
+  display: flex;
+  gap: 2px;
+  font-size: 20px;
+}
+
+.star-rating.interactive {
+  cursor: pointer;
+}
+
+.star-rating.interactive i {
+  cursor: pointer;
+  transition: color 0.2s ease;
+  color: #ddd;
+}
+
+.star-rating.interactive i:hover,
+.star-rating.interactive i.active {
+  color: #ffc107;
+}
+
+.star-rating.readonly i {
+  color: #ffc107;
 }
 
 .star-rating i {
@@ -86,7 +122,7 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  display: none; /* Hidden by default */
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 1000;
@@ -101,79 +137,92 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.rating-dialog-header {
+.rating-tabs {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
   border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
+  margin-bottom: 20px;
+  position: relative;
 }
 
-.rating-dialog-header h3 {
-  margin: 0;
-  font-size: 18px;
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+  transition: color 0.3s ease;
+  flex: 1;
 }
 
-.close-dialog-btn {
+.tab-btn.active {
+  color: #6c5ce7;
+  border-bottom: 2px solid #6c5ce7;
+}
+
+.tab-btn:hover {
+  color: #6c5ce7;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
   background: none;
   border: none;
   font-size: 24px;
   cursor: pointer;
+  color: #666;
+  padding: 10px;
 }
 
-.rating-stars {
-  display: flex;
-  justify-content: center;
+.close-btn:hover {
+  color: #333;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.rating-tab-content {
+  display: none;
+}
+
+.rating-tab-content h3 {
   margin-bottom: 20px;
+  color: #333;
 }
 
-.rating-stars i {
-  font-size: 30px;
-  color: #ddd;
-  margin: 0 5px;
-  cursor: pointer;
-}
-
-.rating-stars i.ri-star-fill {
-  color: #ffcc33;
-}
-
-.comment-field {
-  margin-bottom: 20px;
-}
-
-.comment-field textarea {
+.rating-tab-content textarea {
   width: 100%;
-  height: 100px;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  resize: none;
+  resize: vertical;
+  min-height: 80px;
+  margin: 15px 0;
+  font-family: inherit;
 }
 
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.dialog-actions button {
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-.cancel-btn {
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-}
-
-.submit-btn {
+.rating-tab-content button {
   background-color: #6c5ce7;
   color: white;
   border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
+
+.rating-tab-content button:hover {
+  background-color: #5a4fcf;
+}
+
 .product-rating[data-rating="5"] .star-rating i.ri-star-fill,
 .product-rating[data-rating="4.5"] .star-rating i.ri-star-fill {
   background: linear-gradient(to bottom, #ffcc33, #ff9900);
@@ -312,9 +361,31 @@
 }
 
 .item-rating-summary {
-  margin: 20px 0;
   display: flex;
   align-items: center;
+  margin: 10px 0;
+  gap: 10px;
+}
+
+.item-rating-summary .rating-average-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  min-width: 40px;
+}
+
+.item-rating-summary .star-rating {
+  margin-right: 10px;
+}
+
+.item-rating-summary .review-count {
+  color: #666;
+  font-size: 14px;
+}
+
+.item-rating-summary .star-rating i {
+  color: #ffc107;
+  font-size: 18px;
 }
 
 .item-description {
@@ -881,22 +952,7 @@
   transform: translateY(-2px);
 }
 
-.rating-toggle-btn {
-  background-color: transparent;
-  color: var(--accent-color);
-  border: 1px solid var(--accent-color);
-  padding: 8px 15px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.rating-toggle-btn:hover {
-  background-color: rgba(108, 92, 231, 0.1);
-  transform: translateY(-2px);
-}
+/* rating-toggle-btn styles moved to enhanced-rating-system.css for consistency */
 
 /* Active rating label styles */
 .star-rating label.active i {
@@ -946,167 +1002,226 @@
   font-size: 14px;
 }
 
-/* Rating Dialog Styles */
-.rating-dialog {
+/* Notification styles */
+.notification-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  max-width: 400px;
+}
+
+.notification {
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-
-.rating-dialog.fade-out {
-  opacity: 0;
-}
-
-.rating-dialog-content {
-  background-color: white;
+  background: white;
   border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  width: 100%;
-  max-width: 500px;
-  overflow: hidden;
-  animation: dialog-appear 0.3s ease;
+  border-left: 4px solid #ddd;
+  transform: translateX(450px);
+  opacity: 0;
+  transition: all 0.3s ease;
 }
 
-@keyframes dialog-appear {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.notification.show {
+  transform: translateX(0);
+  opacity: 1;
 }
 
-.rating-dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
+.notification.success {
+  border-left-color: #4caf50;
 }
 
-.rating-dialog-header h3 {
-  margin: 0;
-  font-size: 18px;
-  color: #333;
+.notification.error {
+  border-left-color: #f44336;
 }
 
-.close-dialog-btn {
+.notification-icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.notification.success .notification-icon {
+  color: #4caf50;
+}
+
+.notification.error .notification-icon {
+  color: #f44336;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.notification-message {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.notification-close {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 18px;
   cursor: pointer;
   color: #999;
-  transition: color 0.2s;
-}
-
-.close-dialog-btn:hover {
-  color: #333;
-}
-
-.rating-dialog-body {
-  padding: 20px;
-}
-
-.rating-stars p,
-.comment-field p {
-  margin: 0 0 10px;
-  font-size: 16px;
-  color: #555;
-}
-
-.star-rating-large {
-  display: flex;
-  justify-content: center;
-  margin: 15px 0 25px;
-}
-
-.star-rating-large label {
-  cursor: pointer;
-  font-size: 36px;
-  color: #ddd;
-  margin: 0 8px;
-  transition: transform 0.2s, color 0.2s;
-}
-
-.star-rating-large label:hover,
-.star-rating-large label.active {
-  transform: scale(1.1);
-}
-
-.star-rating-large label:hover i,
-.star-rating-large label.active i {
-  color: var(--star-filled, #ffcc33);
-}
-
-.star-rating-large label:hover ~ label i {
-  color: #ddd;
-}
-
-.comment-field textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
+  margin-left: 8px;
+  padding: 4px;
   border-radius: 4px;
-  resize: vertical;
-  font-family: inherit;
-  font-size: 14px;
-  min-height: 100px;
-  box-sizing: border-box;
-}
-
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
-
-.dialog-actions button {
-  padding: 10px 16px;
-  border-radius: 4px;
-  font-weight: 500;
-  font-size: 14px;
-  cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.dialog-actions .cancel-btn {
-  background-color: transparent;
-  border: 1px solid #ddd;
-  color: #555;
-  margin-right: 10px;
-}
-
-.dialog-actions .cancel-btn:hover {
+.notification-close:hover {
   background-color: #f5f5f5;
 }
 
-.dialog-actions .submit-btn {
-  background-color: var(--primary-color, #4caf50);
-  border: none;
-  color: white;
+/* Star rating improvements */
+.star-rating-large {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
 }
 
-.dialog-actions .submit-btn:hover {
-  background-color: var(--primary-color-dark, #388e3c);
+.star-rating-large i {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #ddd;
+  font-size: 36px;
 }
 
-.dialog-actions .submit-btn:disabled {
-  background-color: #aaa;
-  cursor: not-allowed;
+.star-rating-large i:hover,
+.star-rating-large i.ri-star-fill {
+  color: #ffcc33;
+  transform: scale(1.05);
 }
 
-/* Remove cursor pointer from star rating */
-#ratingSnapshot .star-rating {
-  cursor: default;
+.star-rating-large i:hover ~ i {
+  color: #ddd;
+  transform: scale(1);
+}
+
+/* Category rating stars */
+.rating-category .star-rating label {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0 2px;
+}
+
+.rating-category .star-rating label i {
+  color: #ddd;
+  font-size: 20px;
+}
+
+.rating-category .star-rating label:hover i,
+.rating-category .star-rating label.active i {
+  color: #ffcc33;
+}
+
+.rating-category .star-rating label:hover ~ label i {
+  color: #ddd;
+}
+
+/* Rating dialog improvements */
+.rating-dialog-content {
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Better form styling */
+.add-review-form {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.rating-category {
+  margin-bottom: 15px;
+}
+
+.rating-category-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Seller rating form improvements */
+#sellerReviewForm {
+  transition: all 0.3s ease;
+}
+
+#sellerReviewForm .rating-category .star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+#sellerReviewForm .rating-category .star-rating label {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0 2px;
+}
+
+#sellerReviewForm .rating-category .star-rating label i {
+  color: #ddd;
+  font-size: 20px;
+  transition: color 0.2s ease;
+}
+
+#sellerReviewForm .rating-category .star-rating label:hover i,
+#sellerReviewForm .rating-category .star-rating label.active i {
+  color: #ffcc33;
+}
+
+#sellerReviewForm .rating-category .star-rating label:hover ~ label i {
+  color: #ffcc33;
+}
+
+/* Make status labels more prominent */
+.item-status-label {
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: inline-block;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.item-status-label.reserved {
+  background-color: #ff9800; /* Orange */
+  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+}
+
+.item-status-label.rented {
+  background-color: #f44336; /* Red */
+  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+}
+
+/* Add loading animation for the star rating */
+.star-rating.loading i {
+  animation: pulse 1.5s infinite ease-in-out;
+  opacity: 0.6;
+}
+
+.star-rating.loading i:nth-child(1) { animation-delay: 0.0s; }
+.star-rating.loading i:nth-child(2) { animation-delay: 0.2s; }
+.star-rating.loading i:nth-child(3) { animation-delay: 0.4s; }
+.star-rating.loading i:nth-child(4) { animation-delay: 0.6s; }
+.star-rating.loading i:nth-child(5) { animation-delay: 0.8s; }
+
+@keyframes pulse {
+  0% { opacity: 0.3; transform: scale(0.95); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+  100% { opacity: 0.3; transform: scale(0.95); }
 }

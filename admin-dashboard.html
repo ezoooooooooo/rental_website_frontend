@@ -11,25 +11,62 @@
     <link rel="stylesheet" href="home.css" />
     <link rel="stylesheet" href="nav-utils.css" />
     <link rel="stylesheet" href="status-labels.css" />
+    <link rel="stylesheet" href="admin-nav-shared.css" />
     <link rel="stylesheet" href="admin-dashboard.css" />
     <link rel="stylesheet" href="toast-notifications.css" />
   </head>
   <body>
-    <!-- Navigation -->
-    <nav class="main-navigation">
-      <div class="nav-container">
-        <div class="logo-section">
-          <img src="./rent.png" alt="Rently Logo" class="logo" />
+    <!-- Standardized Admin Navigation -->
+    <nav class="admin-main-navigation">
+      <div class="admin-nav-container">
+        <div class="admin-logo-section">
+          <img src="./rent.png" alt="Rently Logo" class="admin-logo" />
           <h1>Rently Admin</h1>
         </div>
-        <ul class="nav-links">
-          <li><a href="admin-dashboard.html" class="active"><i class="ri-dashboard-line"></i> Dashboard</a></li>
-          <li><a href="admin-orders.html"><i class="ri-shopping-cart-2-line"></i> Orders</a></li>
-          <li><a href="admin-users.html"><i class="ri-user-line"></i> Users</a></li>
-          <li><a href="admin-listings.html"><i class="ri-store-2-line"></i> Listings</a></li>
-          <li><a href="admin-analytics.html"><i class="ri-bar-chart-line"></i> Analytics</a></li>
+        
+        <ul class="admin-nav-links">
+          <li>
+            <a href="admin-dashboard.html" class="active">
+              <i class="ri-dashboard-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="admin-orders.html">
+              <i class="ri-shopping-cart-2-line"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li>
+            <a href="admin-users.html">
+              <i class="ri-user-line"></i>
+              <span>Users</span>
+            </a>
+          </li>
+          <li>
+            <a href="admin-listings.html">
+              <i class="ri-store-2-line"></i>
+              <span>Listings</span>
+            </a>
+          </li>
+          <li>
+            <a href="admin-analytics.html">
+              <i class="ri-bar-chart-line"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
         </ul>
-        <div class="user-actions"><!-- Admin profile dropdown rendered by JS --></div>
+        
+        <div class="admin-user-actions">
+          <a href="home.html" class="back-to-site-link">
+            <i class="ri-external-link-line"></i>
+            <span>Back to Site</span>
+          </a>
+          
+          <div class="admin-profile-dropdown">
+            <!-- Profile will be rendered by JavaScript -->
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -60,12 +97,6 @@
       <div class="admin-content">
         <header class="admin-header">
           <h2 class="gradient-text">Admin Dashboard</h2>
-          <div class="admin-actions">
-            <div class="date-display" id="currentDate"></div>
-            <div class="admin-profile" id="adminProfile">
-              <!-- Admin profile will be rendered here by JS -->
-            </div>
-          </div>
         </header>
 
         <div class="dashboard-stats">
@@ -201,6 +232,7 @@
       </div>
     </main>
 
+    <script src="admin-nav-shared.js"></script>
     <script src="admin-dashboard.js"></script>
   </body>
 </html>

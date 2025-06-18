@@ -20,37 +20,6 @@ function createParticles() {
  }
 }
 
-// Forgot Password Modal Functionality
-const modal = document.getElementById('forgotPasswordModal');
-const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-const closeModal = document.querySelector('.close-modal');
-const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-const resetMessage = document.getElementById('resetMessage');
-
-// Open modal when clicking on forgot password link
-forgotPasswordLink.addEventListener('click', function(event) {
-    event.preventDefault();
-    modal.style.display = 'flex';
-});
-
-// Close modal when clicking on close button
-closeModal.addEventListener('click', function() {
-    modal.style.display = 'none';
-    resetMessage.textContent = '';
-    resetMessage.className = 'message';
-    forgotPasswordForm.reset();
-});
-
-// Close modal when clicking outside of it
-window.addEventListener('click', function(event) {
-    if (event.target === modal) {
-        modal.style.display = 'none';
-        resetMessage.textContent = '';
-        resetMessage.className = 'message';
-        forgotPasswordForm.reset();
-    }
-});
-
 document.getElementById('loginForm').addEventListener('submit', async function(event) {
  event.preventDefault();
  
@@ -110,57 +79,26 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
 });
 
-// Handle forgot password form submission
-forgotPasswordForm.addEventListener('submit', async function(event) {
-    event.preventDefault();
-    
-    const email = document.getElementById('resetEmail').value;
-    
-    // Show loading state
-    const submitButton = forgotPasswordForm.querySelector('button[type="submit"]');
-    const originalButtonText = submitButton.textContent;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Sending...';
-    
-    try {
-        const response = await fetch('http://localhost:3000/api/forgot-password', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email })
-        });
-        
-        // Reset button state
-        submitButton.disabled = false;
-        submitButton.textContent = originalButtonText;
-        
-        if (response.ok) {
-            resetMessage.textContent = 'Password reset link sent to your email!';
-            resetMessage.className = 'message success';
-            
-            // Clear the form
-            forgotPasswordForm.reset();
-            
-            // Close the modal after 3 seconds
-            setTimeout(() => {
-                modal.style.display = 'none';
-                resetMessage.textContent = '';
-                resetMessage.className = 'message';
-            }, 3000);
-        } else {
-            const errorData = await response.json();
-            resetMessage.textContent = errorData.message || 'Failed to send reset link. Please try again.';
-            resetMessage.className = 'message error';
-        }
-    } catch (error) {
-        // Reset button state
-        submitButton.disabled = false;
-        submitButton.textContent = originalButtonText;
-        
-        resetMessage.textContent = 'Connection error. Please try again.';
-        resetMessage.className = 'message error';
-    }
+// Password toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const toggles = document.querySelectorAll('.password-toggle');
+  
+  toggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const targetInput = document.getElementById(targetId);
+      
+      if (targetInput.type === 'password') {
+        targetInput.type = 'text';
+        this.classList.remove('ri-eye-off-line');
+        this.classList.add('ri-eye-line');
+      } else {
+        targetInput.type = 'password';
+        this.classList.remove('ri-eye-line');
+        this.classList.add('ri-eye-off-line');
+      }
+    });
+  });
 });
 
 window.addEventListener('load', createParticles);

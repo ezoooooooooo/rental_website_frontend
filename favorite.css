@@ -101,9 +101,17 @@ body {
     align-items: center;
 }
 
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+    gap: 10px;
+}
+
 .logo {
     height: 40px;
-    margin-right: 10px;
 }
 
 .logo-section h1 {

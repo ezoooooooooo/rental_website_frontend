@@ -472,12 +472,20 @@ class RatingSystem {
     const comment = document.getElementById('dialogComment').value;
     
     if (rating === 0) {
-      alert('Please select a star rating');
+      if (window.showToast) {
+        window.showToast('Please select a star rating', 'error');
+      } else {
+        alert('Please select a star rating');
+      }
       return;
     }
     
     if (!comment.trim()) {
-      alert('Please write a comment');
+      if (window.showToast) {
+        window.showToast('Please write a comment', 'error');
+      } else {
+        alert('Please write a comment');
+      }
       return;
     }
     

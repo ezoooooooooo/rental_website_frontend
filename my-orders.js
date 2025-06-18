@@ -355,35 +355,39 @@ class OrdersManager {
    * Cancel a pending order
    */
   async cancelOrder(orderId) {
-    if (!confirm("Are you sure you want to cancel this order?")) {
-      return;
-    }
+    this.showConfirmationModal(
+      "Cancel Order",
+      "Are you sure you want to cancel this order? This action cannot be undone.",
+      "ri-close-line",
+      "error",
+      async () => {
+        try {
+          const response = await fetch(`${this.baseUrl}/orders/${orderId}/cancel`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.token}`,
+            },
+          });
 
-    try {
-      const response = await fetch(`${this.baseUrl}/orders/${orderId}/cancel`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.token}`,
-        },
-      });
+          if (!response.ok) {
+            throw new Error("Failed to cancel order");
+          }
 
-      if (!response.ok) {
-        throw new Error("Failed to cancel order");
+          // Reload orders to reflect changes
+          await this.loadUserOrders();
+
+          // Show success message
+          this.showNotification("Order cancelled successfully", "success");
+        } catch (error) {
+          console.error("Error cancelling order:", error);
+          this.showNotification(
+            "Failed to cancel order. Please try again.",
+            "error"
+          );
+        }
       }
-
-      // Reload orders to reflect changes
-      await this.loadUserOrders();
-
-      // Show success message
-      this.showNotification("Order cancelled successfully", "success");
-    } catch (error) {
-      console.error("Error cancelling order:", error);
-      this.showNotification(
-        "Failed to cancel order. Please try again.",
-        "error"
-      );
-    }
+    );
   }
 
   /**
@@ -483,19 +487,102 @@ class OrdersManager {
   }
 
   /**
+   * Show a custom confirmation modal
+   */
+  showConfirmationModal(title, message, icon, type, onConfirm) {
+    const modalHTML = `
+      <div class="confirmation-modal-backdrop">
+        <div class="confirmation-modal">
+          <div class="confirmation-modal-header">
+            <div class="confirmation-icon ${type}">
+              <i class="${icon}"></i>
+            </div>
+            <h3>${title}</h3>
+          </div>
+          <div class="confirmation-modal-body">
+            <p>${message}</p>
+          </div>
+          <div class="confirmation-modal-footer">
+            <button class="btn btn-outline" onclick="ordersManager.closeConfirmationModal()">
+              <i class="ri-close-line"></i> Cancel
+            </button>
+            <button class="btn btn-${type}" onclick="ordersManager.confirmAction()">
+              <i class="${icon}"></i> Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Store the callback function
+    this.pendingConfirmAction = onConfirm;
+
+    // Add modal to the DOM
+    const modalContainer = document.createElement('div');
+    modalContainer.id = 'confirmationModalContainer';
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+
+    // Add click outside to close
+    const backdrop = modalContainer.querySelector('.confirmation-modal-backdrop');
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) {
+        this.closeConfirmationModal();
+      }
+    });
+
+    // Add escape key to close
+    const escapeHandler = (e) => {
+      if (e.key === 'Escape') {
+        this.closeConfirmationModal();
+        document.removeEventListener('keydown', escapeHandler);
+      }
+    };
+    document.addEventListener('keydown', escapeHandler);
+  }
+
+  /**
+   * Close the confirmation modal
+   */
+  closeConfirmationModal() {
+    const modalContainer = document.getElementById('confirmationModalContainer');
+    if (modalContainer) {
+      document.body.removeChild(modalContainer);
+    }
+    this.pendingConfirmAction = null;
+  }
+
+  /**
+   * Execute the pending confirmation action
+   */
+  async confirmAction() {
+    if (this.pendingConfirmAction) {
+      await this.pendingConfirmAction();
+    }
+    this.closeConfirmationModal();
+  }
+
+  /**
    * Show a toast notification
    */
   showToast(message, type = "success") {
+    // Use global showToast if available, otherwise fallback to local implementation
+    if (window.showToast) {
+      window.showToast(message, type);
+      return;
+    }
+    
+    // Fallback implementation (should rarely be used)
     const toast = document.createElement("div");
-    toast.className = `toast toast-${type}`;
+    toast.className = `notification ${type}`;
     toast.innerHTML = `
-      <div class="toast-content">
-        <i class="${
-          type === "success" ? "ri-check-line" : "ri-error-warning-line"
-        }"></i>
-        <span>${message}</span>
+      <div class="notification-icon">
+        <i class="${type === "success" ? "ri-check-line" : "ri-error-warning-line"}"></i>
       </div>
-      <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+      <div class="notification-content">
+        <div class="notification-message">${message}</div>
+      </div>
+      <button class="notification-close" onclick="this.parentElement.remove()">×</button>
     `;
 
     document.body.appendChild(toast);
@@ -593,15 +680,32 @@ class OrdersManager {
   }
 
   showNotification(message, type = "info") {
+    // Use global showToast if available, otherwise fallback to local implementation
+    if (window.showToast) {
+      window.showToast(message, type);
+      return;
+    }
+    
+    // Fallback implementation (should rarely be used)
     const notification = document.createElement("div");
     notification.className = `notification ${type}`;
-    notification.textContent = message;
+    notification.innerHTML = `
+      <div class="notification-icon">
+        <i class="${type === 'success' ? 'ri-check-line' : type === 'error' ? 'ri-error-warning-line' : 'ri-information-line'}"></i>
+      </div>
+      <div class="notification-content">
+        <div class="notification-message">${message}</div>
+      </div>
+      <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+    `;
 
     document.body.appendChild(notification);
 
     setTimeout(() => {
-      notification.remove();
-    }, 3000);
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 5000);
   }
 
   viewOrderDetails(orderId) {
@@ -614,29 +718,4 @@ document.addEventListener("DOMContentLoaded", () => {
   window.ordersManager = new OrdersManager();
 });
 
-// --- Toast CSS for popout messages ---
-const toastStyle = document.createElement('style');
-toastStyle.innerHTML = `
-.custom-toast {
-  position: fixed;
-  top: 32px;
-  left: 50%;
-  transform: translateX(-50%) scale(0.97);
-  background: linear-gradient(135deg, #6c5ce7, #9982b1);
-  color: #fff;
-  padding: 18px 36px;
-  border-radius: 14px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  opacity: 0;
-  z-index: 9999;
-  box-shadow: 0 4px 32px rgba(44,62,80,0.15);
-  transition: opacity 0.3s, transform 0.3s;
-  pointer-events: none;
-}
-.custom-toast.show {
-  opacity: 1;
-  transform: translateX(-50%) scale(1.02);
-}
-`;
-document.head.appendChild(toastStyle);
+// We're now using the global toast notification system from nav-utils.js

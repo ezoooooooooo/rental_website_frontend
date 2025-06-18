@@ -353,7 +353,10 @@ class RentEaseApp {
         // Fetch ratings for listings if needed
         await this.fetchRatingsForListings(listings);
 
-        this.renderListings(listings, listingsContainer);
+        // Sort listings to prioritize featured items first
+        const sortedListings = this.sortListingsByPriority(listings);
+
+        this.renderListings(sortedListings, listingsContainer);
       } else {
         console.error("Failed to fetch listings");
       }
@@ -441,6 +444,29 @@ class RentEaseApp {
 
     // Wait for all rating requests to complete
     await Promise.all(ratingPromises);
+  }
+
+  /**
+   * Sort listings by priority: Featured first, then by rating, then by date
+   * @param {Array} listings - Array of listing objects
+   * @returns {Array} Sorted listings array
+   */
+  sortListingsByPriority(listings) {
+    return listings.sort((a, b) => {
+      // First priority: Featured status (featured listings come first)
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+
+      // Second priority: Average rating (higher ratings first)
+      const aRating = a.rating?.averageScore || a.rating?.average || 0;
+      const bRating = b.rating?.averageScore || b.rating?.average || 0;
+      if (aRating !== bRating) return bRating - aRating;
+
+      // Third priority: Creation date (newer first) - fallback if ratings are equal
+      const aDate = new Date(a.createdAt || a.dateAdded || 0);
+      const bDate = new Date(b.createdAt || b.dateAdded || 0);
+      return bDate - aDate;
+    });
   }
 
   /**
@@ -596,6 +622,11 @@ class RentEaseApp {
           ? `<div class="top-rated-badge">⭐ Top Rated</div>`
           : "";
 
+        // Featured badge for promoted listings
+        const featuredBadge = listing.featured
+          ? `<div class="featured-badge">⭐ Featured</div>`
+          : "";
+
         // Calculate rating breakdown percentages
         let highRatingPercentage = 0;
         if (reviewCount > 0 && listing.rating && listing.rating.distribution) {
@@ -672,6 +703,7 @@ class RentEaseApp {
           listing.name
         }" loading="lazy" onerror="this.onerror=null; this.src='./pets.jpeg';">
               ${imageDots}
+              ${featuredBadge}
               ${topRatedBadge}
               ${statusLabel}
               ${
@@ -694,9 +726,12 @@ class RentEaseApp {
               <p class="listing-price">${formattedPrice}</p>
               ${ratingDisplay}
               <p class="listing-description">${shortDescription}</p>
-              <a href="item-detail.html?listingId=${
-                listing._id
-              }" class="btn btn-primary">View Details</a>
+              <div class="listing-actions">
+                <a href="item-detail.html?listingId=${listing._id}" class="btn btn-primary">View Details</a>
+                <button onclick="event.preventDefault(); event.stopPropagation(); rentEaseApp.addToCart('${listing._id}')" class="btn btn-cart">
+                  <i class="ri-shopping-cart-line"></i> Add to Cart
+                </button>
+              </div>
             </div>
           </div>
         `;

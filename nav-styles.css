@@ -21,9 +21,21 @@
   align-items: center;
 }
 
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s ease;
+  gap: 10px;
+}
+
+.logo-link:hover {
+  transform: scale(1.02);
+}
+
 .logo {
   height: 40px;
-  margin-right: 10px;
 }
 
 .logo-section h1 {
@@ -69,12 +81,14 @@
   cursor: pointer;
   border: none;
   transition: all 0.3s ease;
+  text-decoration: none;
 }
 
 .btn-login {
   background-color: transparent;
   color: #6c5ce7;
   border: 1px solid #6c5ce7;
+  text-decoration: none;
 }
 
 .btn-login:hover {
@@ -85,6 +99,7 @@
   background: linear-gradient(to right, #9982b1, #6c5ce7);
   color: white;
   box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+  text-decoration: none;
 }
 
 .btn-signup:hover {
@@ -116,4 +131,28 @@
     padding: 8px 12px;
     font-size: 14px;
   }
+}
+
+/* Fallback for missing user avatar */
+.avatar-img {
+  display: inline-block;
+}
+
+.avatar-img:error {
+  display: none;
+}
+
+/* Default avatar when image fails to load */
+.avatar-fallback {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  text-transform: uppercase;
 }

@@ -18,8 +18,10 @@
     <nav class="main-navigation">
       <div class="nav-container">
         <div class="logo-section">
-          <img src="./rent.png" alt="RentEase Logo" class="logo" />
-          <h1>Rently</h1>
+          <a href="home.html" class="logo-link">
+            <img src="./rent.png" alt="RentEase Logo" class="logo" />
+            <h1>Rently</h1>
+          </a>
         </div>
         <ul class="nav-links">
           <li><a href="home.html">Home</a></li>
@@ -34,12 +36,13 @@
               />
             </a>
           </li>
-          <li><a href="index.html#about">About</a></li>
+          <li><a href="#footer">About</a></li>
         </ul>
         <div class="user-actions">
           <div class="user-profile-dropdown">
             <button class="profile-button">
-              <img src="./user-avatar.png" alt="Profile" class="avatar-img" />
+              <img src="./user-avatar.png" alt="Profile" class="avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+              <div class="avatar-initial" style="display: none;">U</div>
               <span class="username">Profile</span>
               <i class="ri-arrow-down-s-line"></i>
             </button>
@@ -181,7 +184,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="main-footer">
+    <footer id="footer" class="main-footer">
       <div class="footer-container">
         <div class="footer-columns">
           <div class="footer-column">
