@@ -160,7 +160,13 @@ class RatingSystem {
 
       const data = await response.json();
       console.log("Rating data received:", data);
-      this.renderItemRatings(data);
+      
+      // Use the item detail manager to render ratings if available
+      if (window.itemDetailManager && window.itemDetailManager.renderItemRatingsManually) {
+        window.itemDetailManager.renderItemRatingsManually(data);
+      } else {
+        this.renderItemRatingsBasic(data);
+      }
     } catch (error) {
       console.error("Error loading item ratings:", error);
       this.showErrorMessage("Failed to load ratings. Please try again later.");
@@ -321,6 +327,85 @@ class RatingSystem {
     
     // Append to document head
     document.head.appendChild(style);
+  }
+
+  /**
+   * Basic rendering fallback for item ratings
+   * @param {Object} data - Rating data to render
+   */
+  renderItemRatingsBasic(data) {
+    const container = document.getElementById("itemRatingContainer");
+    if (!container) return;
+
+    let ratings = [];
+    let count = 0;
+    let averageScore = 0;
+
+    if (data) {
+      if (Array.isArray(data)) {
+        ratings = data;
+        count = data.length;
+        averageScore = count > 0 ? data.reduce((sum, r) => sum + (r.score || r.rating || 0), 0) / count : 0;
+      } else if (data.ratings || data.data) {
+        ratings = data.ratings || data.data || [];
+        count = data.count || ratings.length;
+        averageScore = data.averageScore || (count > 0 ? ratings.reduce((sum, r) => sum + (r.score || r.rating || 0), 0) / count : 0);
+      }
+    }
+
+    let html = `
+      <div class="rating-header">
+        <h3>Item Ratings & Reviews</h3>
+        <button class="rating-toggle-btn" id="addReviewBtn">
+          <i class="ri-star-line"></i> Add Review
+        </button>
+      </div>
+    `;
+
+    if (count > 0) {
+      html += `
+        <div class="rating-summary">
+          <div class="rating-average">
+            <div class="rating-average-value">${averageScore.toFixed(1)}</div>
+            <div class="rating-count">${count} ${count === 1 ? "review" : "reviews"}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    html += `<div class="review-list">`;
+
+    if (ratings.length === 0) {
+      html += `<div class="no-reviews">No reviews yet for this item.</div>`;
+    } else {
+      ratings.forEach((rating) => {
+        const reviewerName = rating.user?.firstName && rating.user?.lastName 
+          ? `${rating.user.firstName} ${rating.user.lastName}`
+          : rating.user?.username || rating.user?.name || 'Anonymous';
+          
+        const reviewDate = rating.createdAt || rating.date;
+        const reviewScore = rating.score || rating.rating || 0;
+        const reviewComment = rating.comment || rating.review || rating.text || "No comment provided.";
+
+        html += `
+          <div class="review-item">
+            <div class="review-header">
+              <div class="reviewer-info">
+                <div class="reviewer-name">${reviewerName}</div>
+                ${reviewDate ? `<div class="review-date">${new Date(reviewDate).toLocaleDateString()}</div>` : ''}
+              </div>
+              <div class="review-rating">★ ${reviewScore}</div>
+            </div>
+            <div class="review-content">
+              <p>${reviewComment}</p>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    html += `</div>`;
+    container.innerHTML = html;
   }
 
   /**
