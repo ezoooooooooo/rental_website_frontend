@@ -58,6 +58,7 @@ class UserListingsManager {
                           <a href="./item.html"><i class="ri-shopping-bag-3-line"></i> My Items</a>
                           <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
                           <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
+                          ${userData.role === 'admin' ? `<a href="admin-dashboard.html"><i class='ri-shield-user-line'></i> Admin Dashboard</a>` : ''}
                           <div class="dropdown-divider"></div>
                           <a href="#" data-action="logout"><i class="ri-logout-box-r-line"></i> Logout</a>
                       </div>

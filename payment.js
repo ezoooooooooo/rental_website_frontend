@@ -193,31 +193,28 @@ class RentEaseApp {
           // Create profile UI with actual user data
           if (userActions) {
             userActions.innerHTML = `
-                    <div class="user-profile-dropdown">
-                        <button class="profile-button">
-                            ${
-                              userData.profileImage
-                                ? `<img src="${userData.profileImage}" alt="Profile" class="avatar-img">`
-                                : userData.firstName
+                <div class="user-profile-dropdown">
+                    <button class="profile-button">
+                        ${userData.profileImage 
+                            ? `<img src="${userData.profileImage}" alt="Profile" class="avatar-img">` 
+                            : userData.firstName 
                                 ? `<div class="avatar-initial">${userData.firstName[0]}</div>`
                                 : `<i class="ri-user-line profile-icon"></i>`
-                            }
-                            <span class="username">${
-                              userData.firstName || "Profile"
-                            }</span>
-                            <i class="ri-arrow-down-s-line"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <a href="favorite.html"><i class="ri-heart-3-line"></i> My Favorites</a>
-                            <a href="./item.html"><i class="ri-shopping-bag-3-line"></i> My Items</a>
-                            <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
-                            <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" onclick="rentEaseApp.logout()"><i class="ri-logout-box-r-line"></i> Logout</a>
-                        </div>
+                        }
+                        <span class="username">${userData.firstName || 'Profile'}</span>
+                        <i class="ri-arrow-down-s-line"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="favorite.html"><i class="ri-heart-3-line"></i> My Favorites</a>
+                        <a href="./item.html"><i class="ri-shopping-bag-3-line"></i> My Items</a>
+                        <a href="my-orders.html"><i class="ri-shopping-cart-2-line"></i> My Orders</a>
+                        <a href="my-requests.html"><i class="ri-file-list-3-line"></i> My Requests</a>
+                        ${userData.role === 'admin' ? `<a href="admin-dashboard.html"><i class='ri-shield-user-line'></i> Admin Dashboard</a>` : ''}
+                        <div class="dropdown-divider"></div>
+                        <a href="#" data-action="logout"><i class="ri-logout-box-r-line"></i> Logout</a>
                     </div>
-                `;
-
+                </div>
+            `;
             this.setupDropdownListeners();
           }
         })
