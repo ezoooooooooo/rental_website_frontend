@@ -846,8 +846,15 @@ setupDropdownListeners() {
       return;
     }
 
-    // Confirm deletion
-    if (!confirm("Are you sure you want to delete this listing?")) {
+    // Show custom styled confirmation modal
+    const confirmed = await this.showConfirmModal(
+      "Delete Listing", 
+      "Are you sure you want to delete this listing? This action cannot be undone.",
+      "Delete",
+      "Cancel"
+    );
+    
+    if (!confirmed) {
       return;
     }
 
@@ -876,6 +883,90 @@ setupDropdownListeners() {
     } finally {
       loader.remove();
     }
+  }
+
+  /**
+   * Show a styled confirmation modal
+   * @param {string} title - Modal title
+   * @param {string} message - Confirmation message
+   * @param {string} confirmText - Text for confirm button
+   * @param {string} cancelText - Text for cancel button
+   * @returns {Promise<boolean>} - Promise that resolves to true if confirmed, false if cancelled
+   */
+  showConfirmModal(title, message, confirmText = "Confirm", cancelText = "Cancel") {
+    return new Promise((resolve) => {
+      const modalId = "confirmModal";
+      
+      // Remove any existing confirmation modal
+      const existingModal = document.getElementById(modalId);
+      if (existingModal) {
+        existingModal.remove();
+      }
+
+      const modalHtml = `
+        <div id="${modalId}" class="modal confirm-modal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2>${title}</h2>
+            </div>
+            <div class="modal-body">
+              <div class="confirm-icon">
+                <i class="ri-error-warning-line"></i>
+              </div>
+              <p class="confirm-message">${message}</p>
+            </div>
+            <div class="modal-actions">
+              <button class="btn btn-secondary cancel-btn">${cancelText}</button>
+              <button class="btn btn-delete confirm-btn">${confirmText}</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add modal to body
+      document.body.insertAdjacentHTML("beforeend", modalHtml);
+      
+      const modal = document.getElementById(modalId);
+      const confirmBtn = modal.querySelector(".confirm-btn");
+      const cancelBtn = modal.querySelector(".cancel-btn");
+
+      // Show modal
+      setTimeout(() => {
+        modal.classList.remove("hidden");
+      }, 10);
+
+      // Handle confirm
+      const handleConfirm = () => {
+        modal.remove();
+        resolve(true);
+      };
+
+      // Handle cancel
+      const handleCancel = () => {
+        modal.remove();
+        resolve(false);
+      };
+
+      // Add event listeners
+      confirmBtn.addEventListener("click", handleConfirm);
+      cancelBtn.addEventListener("click", handleCancel);
+      
+      // Close on outside click
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          handleCancel();
+        }
+      });
+
+      // Close on escape key
+      const handleEscape = (e) => {
+        if (e.key === "Escape") {
+          handleCancel();
+          document.removeEventListener("keydown", handleEscape);
+        }
+      };
+      document.addEventListener("keydown", handleEscape);
+    });
   }
 
   showLoadingIndicator() {

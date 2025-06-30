@@ -711,6 +711,11 @@
     visibility: hidden;
    }
    
+   .modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+   }
+   
    .modal-content {
     width: 90%;
     max-width: 600px;
@@ -775,6 +780,63 @@
    .auth-redirect-modal .modal-content {
     text-align: center;
     padding: 40px;
+   }
+   
+   /* Confirmation Modal Styles */
+   .confirm-modal .modal-content {
+    max-width: 450px;
+    text-align: center;
+    padding: 30px;
+   }
+   
+   .confirm-modal .modal-header {
+    border-bottom: none;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+   }
+   
+   .confirm-modal .modal-header h2 {
+    color: var(--danger-color, #e74c3c);
+    font-size: 22px;
+    font-weight: 600;
+   }
+   
+   .confirm-icon {
+    margin-bottom: 20px;
+   }
+   
+   .confirm-icon i {
+    font-size: 48px;
+    color: var(--danger-color, #e74c3c);
+    background: rgba(231, 76, 60, 0.1);
+    padding: 20px;
+    border-radius: 50%;
+    display: inline-block;
+   }
+   
+   .confirm-message {
+    font-size: 16px;
+    color: var(--text-color);
+    line-height: 1.5;
+    margin-bottom: 30px;
+   }
+   
+   .confirm-modal .modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 0;
+   }
+   
+   .btn-secondary {
+    background-color: var(--gray-medium, #95a5a6);
+    color: white;
+    border: none;
+   }
+   
+   .btn-secondary:hover {
+    background-color: var(--gray-dark, #7f8c8d);
+    transform: translateY(-2px);
    }
    
    /* Current Images Display in Edit Modal */
