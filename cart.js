@@ -357,24 +357,41 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   /**
-   * Updates the total price display
-   * @param {number} totalPrice - The total price to display
+   * Updates the total price display using the price breakdown from the API
+   * @param {Object} priceBreakdown - The price breakdown object from API
    */
-  function updateTotal(totalPrice) {
-    const subtotal = totalPrice;
-    const insuranceFee = subtotal * 0.1; // 10% insurance fee
-    const total = subtotal + insuranceFee;
+  function updateTotal(priceBreakdown) {
+    const subtotalElement = document.getElementById('subtotal');
+    const platformFeeElement = document.getElementById('platform-fee');
+    const insuranceFeeElement = document.getElementById('insurance-fee');
+    const totalElement = document.getElementById('total');
 
-    if (subtotalElement)
-      subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
-    
-    // Update insurance fee display
-    const insuranceElement = document.querySelector('.summary-row:nth-child(3) span:last-child');
-    if (insuranceElement) {
-      insuranceElement.textContent = `$${insuranceFee.toFixed(2)}`;
+    if (priceBreakdown) {
+      // Use the breakdown from the API
+      if (subtotalElement) 
+        subtotalElement.textContent = `$${priceBreakdown.subtotal.toFixed(2)}`;
+      if (platformFeeElement) 
+        platformFeeElement.textContent = `$${priceBreakdown.platformFee.toFixed(2)}`;
+      if (insuranceFeeElement) 
+        insuranceFeeElement.textContent = `$${priceBreakdown.insuranceFee.toFixed(2)}`;
+      if (totalElement) 
+        totalElement.textContent = `$${priceBreakdown.totalPrice.toFixed(2)}`;
+    } else {
+      // Fallback: calculate manually if breakdown not available
+      const subtotal = 0;
+      const platformFee = subtotal * 0.1;
+      const insuranceFee = subtotal * 0.1;
+      const total = subtotal + platformFee + insuranceFee;
+
+      if (subtotalElement) 
+        subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+      if (platformFeeElement) 
+        platformFeeElement.textContent = `$${platformFee.toFixed(2)}`;
+      if (insuranceFeeElement) 
+        insuranceFeeElement.textContent = `$${insuranceFee.toFixed(2)}`;
+      if (totalElement) 
+        totalElement.textContent = `$${total.toFixed(2)}`;
     }
-    
-    if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
   }
 
   // ======== API INTERACTION FUNCTIONS ========
@@ -399,13 +416,24 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
       }
 
-      // Calculate total price from cart items
-      const totalPrice = data.cart.items.reduce((sum, item) => {
-        return sum + item.listing.rentalRate * item.rentalDays;
-      }, 0);
+      // Use the price breakdown from the API if available, otherwise calculate manually
+      let priceBreakdown = data.priceBreakdown;
+      
+      if (!priceBreakdown) {
+        // Fallback: calculate manually if backend doesn't provide breakdown
+        const subtotal = data.cart.items.reduce((sum, item) => {
+          return sum + item.listing.rentalRate * item.rentalDays;
+        }, 0);
+        priceBreakdown = {
+          subtotal: subtotal,
+          platformFee: subtotal * 0.1,
+          insuranceFee: subtotal * 0.1,
+          totalPrice: subtotal + (subtotal * 0.1) + (subtotal * 0.1)
+        };
+      }
 
       renderCart(data.cart.items);
-      updateTotal(totalPrice);
+      updateTotal(priceBreakdown);
     } catch (error) {
       console.error("Error fetching cart:", error);
       cartList.innerHTML =
@@ -482,6 +510,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         fetchCart();
         // Show success message to user
         showToast("Cart item updated successfully", "success");
+        
+        // Update pricing in real-time if cart data is available
+        if (data.cart && data.cart.items) {
+          updatePricingRealTime(data.cart.items);
+        }
       } else {
         console.error("Failed to update item:", data.message);
         // Show error message to user
@@ -529,6 +562,60 @@ document.addEventListener("DOMContentLoaded", async function () {
       console.error("Error clearing cart:", error);
       // Show error message to user
       showToast("Error clearing cart. Please try again.", "error");
+    }
+  }
+
+  /**
+   * Calculate fee breakdown in real-time using the backend endpoint
+   * @param {number} subtotal - The subtotal amount
+   * @returns {Promise<Object>} Price breakdown object
+   */
+  async function calculateFeeBreakdown(subtotal) {
+    try {
+      const response = await fetch(`${baseUrl}/orders/fee-breakdown`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ subtotal }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to calculate fees: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.success ? data.breakdown : null;
+    } catch (error) {
+      console.error("Error calculating fee breakdown:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Update pricing in real-time when cart items change
+   * @param {Array} items - Cart items array
+   */
+  async function updatePricingRealTime(items) {
+    const subtotal = items.reduce((sum, item) => {
+      return sum + item.listing.rentalRate * item.rentalDays;
+    }, 0);
+
+    // Try to get real-time breakdown from the API
+    const breakdown = await calculateFeeBreakdown(subtotal);
+    
+    if (breakdown) {
+      updateTotal(breakdown);
+    } else {
+      // Fallback to manual calculation
+      const fallbackBreakdown = {
+        subtotal: subtotal,
+        platformFee: subtotal * 0.1,
+        insuranceFee: subtotal * 0.1,
+        totalPrice: subtotal + (subtotal * 0.1) + (subtotal * 0.1)
+      };
+      updateTotal(fallbackBreakdown);
     }
   }
 

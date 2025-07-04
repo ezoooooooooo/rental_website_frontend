@@ -136,28 +136,40 @@ class RentEaseApp {
   }
 
   /**
-   * Calculate and display order summary
+   * Calculate and display order summary using price breakdown from API
    */
   calculateOrderSummary(items) {
     const subtotalElement = document.querySelector('.order-subtotal .price');
+    const platformFeeElement = document.querySelector('.order-platform-fee .price');
     const insuranceElement = document.querySelector('.order-insurance .price');
     const totalElement = document.querySelector('.order-total .price');
     
-    // Calculate subtotal
-    const subtotal = items.reduce((sum, item) => {
-      return sum + (item.listing.rentalRate * item.rentalDays);
-    }, 0);
-    
-    // Calculate insurance fee (10%)
-    const insuranceFee = subtotal * 0.1;
-    
-    // Calculate total
-    const total = subtotal + insuranceFee;
-    
-    // Update display
-    subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
-    insuranceElement.textContent = `$${insuranceFee.toFixed(2)}`;
-    totalElement.textContent = `$${total.toFixed(2)}`;
+    // Try to use price breakdown from the stored cart data
+    if (this.cartData && this.cartData.priceBreakdown) {
+      const breakdown = this.cartData.priceBreakdown;
+      subtotalElement.textContent = `$${breakdown.subtotal.toFixed(2)}`;
+      platformFeeElement.textContent = `$${breakdown.platformFee.toFixed(2)}`;
+      insuranceElement.textContent = `$${breakdown.insuranceFee.toFixed(2)}`;
+      totalElement.textContent = `$${breakdown.totalPrice.toFixed(2)}`;
+    } else {
+      // Fallback: calculate manually
+      const subtotal = items.reduce((sum, item) => {
+        return sum + (item.listing.rentalRate * item.rentalDays);
+      }, 0);
+      
+      // Calculate platform fee and insurance fee (10% each)
+      const platformFee = subtotal * 0.1;
+      const insuranceFee = subtotal * 0.1;
+      
+      // Calculate total
+      const total = subtotal + platformFee + insuranceFee;
+      
+      // Update display
+      subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+      platformFeeElement.textContent = `$${platformFee.toFixed(2)}`;
+      insuranceElement.textContent = `$${insuranceFee.toFixed(2)}`;
+      totalElement.textContent = `$${total.toFixed(2)}`;
+    }
   }
 
   /**
@@ -319,6 +331,62 @@ class RentEaseApp {
    */
   showErrorMessage(message) {
     this.showMessage(message, true);
+  }
+
+  /**
+   * Calculate fee breakdown in real-time using the backend endpoint
+   * @param {number} subtotal - The subtotal amount
+   * @returns {Promise<Object>} Price breakdown object
+   */
+  async calculateFeeBreakdown(subtotal) {
+    try {
+      const response = await fetch(`${this.baseUrl}/orders/fee-breakdown`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.token}`,
+        },
+        body: JSON.stringify({ subtotal }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to calculate fees: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.success ? data.breakdown : null;
+    } catch (error) {
+      console.error("Error calculating fee breakdown:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Update order summary with real-time fee calculation
+   * @param {Array} items - Cart items array
+   */
+  async updateOrderSummaryRealTime(items) {
+    const subtotal = items.reduce((sum, item) => {
+      return sum + (item.listing.rentalRate * item.rentalDays);
+    }, 0);
+
+    // Try to get real-time breakdown from the API
+    const breakdown = await this.calculateFeeBreakdown(subtotal);
+    
+    if (breakdown) {
+      const subtotalElement = document.querySelector('.order-subtotal .price');
+      const platformFeeElement = document.querySelector('.order-platform-fee .price');
+      const insuranceElement = document.querySelector('.order-insurance .price');
+      const totalElement = document.querySelector('.order-total .price');
+      
+      subtotalElement.textContent = `$${breakdown.subtotal.toFixed(2)}`;
+      platformFeeElement.textContent = `$${breakdown.platformFee.toFixed(2)}`;
+      insuranceElement.textContent = `$${breakdown.insuranceFee.toFixed(2)}`;
+      totalElement.textContent = `$${breakdown.totalPrice.toFixed(2)}`;
+    } else {
+      // Fallback to existing calculation method
+      this.calculateOrderSummary(items);
+    }
   }
 }
 

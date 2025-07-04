@@ -180,7 +180,26 @@ class OrdersManager {
             </div>
             <div class="order-info-row">
               <i class="ri-money-dollar-circle-line"></i>
-              <span class="order-price">$${order.totalPrice ? order.totalPrice.toFixed(2) : "0.00"}</span>
+              <div class="order-price-breakdown">
+                ${order.subtotal ? `
+                  <div class="price-line">
+                    <span>Subtotal: $${order.subtotal.toFixed(2)}</span>
+                  </div>
+                  ${order.platformFee ? `
+                    <div class="price-line">
+                      <span>Platform Fee: $${order.platformFee.toFixed(2)}</span>
+                    </div>` : ''}
+                  ${order.insuranceFee ? `
+                    <div class="price-line">
+                      <span>Insurance Fee: $${order.insuranceFee.toFixed(2)}</span>
+                    </div>` : ''}
+                  <div class="price-line total-price">
+                    <span>Total: $${order.totalPrice ? order.totalPrice.toFixed(2) : "0.00"}</span>
+                  </div>
+                ` : `
+                  <span class="order-price">$${order.totalPrice ? order.totalPrice.toFixed(2) : "0.00"}</span>
+                `}
+              </div>
             </div>
             <div class="order-info-row">
               <i class="ri-user-line"></i>
@@ -205,37 +224,25 @@ class OrdersManager {
     const cancelButtons = document.querySelectorAll('.cancel-order-btn');
     const rateButtons = document.querySelectorAll('.rate-item-btn');
     
+    console.log(`Found ${cancelButtons.length} cancel buttons and ${rateButtons.length} rate buttons`);
+    
     // Add event listeners to rate buttons
     rateButtons.forEach(btn => {
       // We're now handling this with direct onclick in the HTML
       // The button now redirects to item-detail.html with scrollToRating=true
     });
-    cancelButtons.forEach(btn => {
+    
+    cancelButtons.forEach((btn, index) => {
+      const orderId = btn.getAttribute('data-order-id');
+      console.log(`Attaching cancel listener ${index + 1}: Order ID ${orderId}`);
+      
       btn.addEventListener('click', (e) => {
-        const orderId = btn.getAttribute('data-order-id');
+        e.preventDefault();
+        e.stopPropagation();
+        console.log(`Cancel button clicked for order: ${orderId}`);
         this.cancelOrder(orderId);
       });
     });
-  }
-
-  cancelOrder(orderId) {
-    const token = localStorage.getItem('token');
-    fetch(`http://localhost:3000/api/orders/${orderId}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ status: "cancelled" })
-    })
-      .then(res => res.json())
-      .then(data => {
-        this.showToast('Order cancelled successfully', 'success');
-        this.loadUserOrders();
-      })
-      .catch(err => {
-        this.showToast('Failed to cancel order', 'error');
-      });
   }
 
   /**
@@ -355,6 +362,8 @@ class OrdersManager {
    * Cancel a pending order
    */
   async cancelOrder(orderId) {
+    console.log("Cancel order called for ID:", orderId);
+    
     this.showConfirmationModal(
       "Cancel Order",
       "Are you sure you want to cancel this order? This action cannot be undone.",
@@ -362,7 +371,10 @@ class OrdersManager {
       "error",
       async () => {
         try {
-          const response = await fetch(`${this.baseUrl}/orders/${orderId}/cancel`, {
+          console.log("Sending cancel request for order:", orderId);
+          
+          // Try the cancel endpoint first
+          let response = await fetch(`${this.baseUrl}/orders/${orderId}/cancel`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -370,9 +382,26 @@ class OrdersManager {
             },
           });
 
-          if (!response.ok) {
-            throw new Error("Failed to cancel order");
+          // If cancel endpoint doesn't exist, try status endpoint
+          if (!response.ok && response.status === 404) {
+            console.log("Cancel endpoint not found, trying status endpoint");
+            response = await fetch(`${this.baseUrl}/orders/${orderId}/status`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.token}`,
+              },
+              body: JSON.stringify({ status: "cancelled" })
+            });
           }
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `HTTP ${response.status}: Failed to cancel order`);
+          }
+
+          const result = await response.json();
+          console.log("Cancel response:", result);
 
           // Reload orders to reflect changes
           await this.loadUserOrders();
@@ -382,7 +411,7 @@ class OrdersManager {
         } catch (error) {
           console.error("Error cancelling order:", error);
           this.showNotification(
-            "Failed to cancel order. Please try again.",
+            `Failed to cancel order: ${error.message}`,
             "error"
           );
         }

@@ -129,6 +129,22 @@ class OrderConfirmationManager {
           </div>
           
           <div class="order-totals">
+            ${order.subtotal ? `
+            <div class="order-subtotal">
+              <span>Subtotal:</span>
+              <span>$${order.subtotal.toFixed(2)}</span>
+            </div>
+            ${order.platformFee ? `
+            <div class="order-platform-fee">
+              <span>Platform Fee:</span>
+              <span>$${order.platformFee.toFixed(2)}</span>
+            </div>` : ''}
+            ${order.insuranceFee ? `
+            <div class="order-insurance-fee">
+              <span>Insurance Fee:</span>
+              <span>$${order.insuranceFee.toFixed(2)}</span>
+            </div>` : ''}
+            ` : ''}
             <div class="order-total">
               <span>Total:</span>
               <span>$${order.totalPrice.toFixed(2)}</span>
