@@ -88,6 +88,21 @@
                 <i class="ri-eye-off-line password-toggle" data-target="password"></i>
               </div>
 
+              <div class="file-upload-container">
+                <label for="governmentId" class="file-upload-label">
+                  <i class="ri-file-upload-line"></i>
+                  GOVERNMENT ID (REQUIRED)
+                </label>
+                <input
+                  type="file"
+                  id="governmentId"
+                  accept="image/*"
+                  required
+                  class="file-upload-input"
+                />
+                <span class="file-upload-text">Upload your government ID</span>
+              </div>
+
               <button type="submit" class="opacity" id="signupBtn">
                 <span id="signupBtnText">CREATE ACCOUNT</span>
                 <span id="signupLoader" class="loader hidden">⏳</span>

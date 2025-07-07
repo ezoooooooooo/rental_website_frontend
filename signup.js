@@ -29,7 +29,25 @@ let resendCountdown = 60;
 document.getElementById("signupForm").addEventListener("submit", async function (event) {
  event.preventDefault();
 
- const formData = {
+ // Create FormData object to handle file upload
+ const formData = new FormData();
+ formData.append('firstName', document.getElementById("firstname").value);
+ formData.append('lastName', document.getElementById("lastname").value);
+ formData.append('address', document.getElementById("address").value);
+ formData.append('email', document.getElementById("email").value);
+ formData.append('phone', document.getElementById("phone").value);
+ formData.append('password', document.getElementById("password").value);
+ 
+ // Add government ID file (validate but don't send to backend yet)
+ const governmentIdFile = document.getElementById("governmentId").files[0];
+ if (governmentIdFile) {
+     // Store file info locally for validation, but don't send to backend
+     console.log("Government ID validated:", governmentIdFile.name);
+     // File is required and validated, but not sent to backend until it's ready
+ }
+
+ // Get form values for validation
+ const formValues = {
      firstName: document.getElementById("firstname").value,
      lastName: document.getElementById("lastname").value,
      address: document.getElementById("address").value,
@@ -44,10 +62,16 @@ document.getElementById("signupForm").addEventListener("submit", async function 
  const loader = document.getElementById("signupLoader");
 
  // Client-side validation
- const hasLetters = /[a-zA-Z]/.test(formData.password);
- const hasNumbers = /\d/.test(formData.password);
- const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
- const validPhone = /^\d{11}$/.test(formData.phone);
+ const hasLetters = /[a-zA-Z]/.test(formValues.password);
+ const hasNumbers = /\d/.test(formValues.password);
+ const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email);
+ const validPhone = /^\d{11}$/.test(formValues.phone);
+
+ // Validate government ID upload (required but not sent to backend)
+ if (!governmentIdFile) {
+     showMessage(message, "Please upload your government ID", "error");
+     return;
+ }
 
  if (!validEmail) {
      showMessage(message, "Please enter a valid email address", "error");
@@ -59,7 +83,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
      return;
  }
 
- if (formData.password.length < 8) {
+ if (formValues.password.length < 8) {
      showMessage(message, "Password should contain at least 8 characters", "error");
      return;
  }
@@ -73,18 +97,19 @@ document.getElementById("signupForm").addEventListener("submit", async function 
  setButtonLoading(submitButton, buttonText, loader, true);
 
  try {
+     // For now, send as JSON until backend supports file uploads
      const response = await fetch("http://localhost:3000/api/request-verification", {
          method: "POST",
          headers: {
              "Content-Type": "application/json",
          },
-         body: JSON.stringify(formData),
+         body: JSON.stringify(formValues),
      });
 
      const data = await response.json();
 
      if (response.ok) {
-      userEmail = formData.email;
+      userEmail = formValues.email;
       showMessage(message, "Verification code sent to your email!", "success");
       
       // Switch to verification step after a short delay
